@@ -1,8 +1,9 @@
+import Link from "next/link";
 import React from "react";
 
 export default function LoginPage() {
   return (
-    <section className="w-full h-full flex justify-center px-4 py-2">
+    <section className="w-full h-full flex justify-center px-4 py-2 flex-col items-center gap-4">
       <div className=" w-96 h-96 border border-gray-400 text-center gap-3 px-2 py-4 rounded-md flex flex-col">
         <h3 className="font-semibold text-xl border-b pb-4 border-gray-400">
           Log in or Create your account
@@ -23,6 +24,11 @@ export default function LoginPage() {
           Tip: To create an account, you need to continue with one of the social
           media providers
         </p>
+      </div>
+      <div className="flex">
+        <Link className="underlined" href="/">
+          Home
+        </Link>
       </div>
     </section>
   );
