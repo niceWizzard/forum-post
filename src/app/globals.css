@@ -5,3 +5,11 @@
 html {
   @apply bg-surface text-on-surface;
 }
+
+a {
+  @apply text-primary-700 font-semibold;
+}
+
+a.underlined {
+  @apply underline-offset-2 underline;
+}
