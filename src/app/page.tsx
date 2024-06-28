@@ -1,3 +1,10 @@
 export default function Home() {
-  return <div>Hello world</div>;
+  const arr = new Array(10).fill(0);
+  return (
+    <div>
+      {arr.map(() => (
+        <div>Hell world</div>
+      ))}
+    </div>
+  );
 }
