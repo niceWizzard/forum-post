@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function LoginPage() {
   return (
     <section className="w-full h-full flex justify-center px-4 py-2 flex-col items-center gap-4">
-      <div className="bg-surface-accent w-96 h-96  text-center gap-3 px-2 py-4 rounded-md flex flex-col">
+      <div className="bg-secondary w-96 h-96  text-center gap-3 px-2 py-4 rounded-md flex flex-col">
         <h3 className="font-semibold text-xl border-b pb-4 border-gray-400">
           Log in or Create your account
         </h3>

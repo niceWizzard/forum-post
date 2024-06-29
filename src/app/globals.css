@@ -2,48 +2,83 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  --surface-color: #080808;
-  --surface-color-accent: #232329;
-  --on-surface-color: #f8f9fa;
-
-  --primary-color: #014f86;
-  --primary-color-50: "#eff8ff";
-  --primary-color-100: "#dff0ff";
-  --primary-color-200: "#b7e2ff";
-  --primary-color-300: "#77ccff";
-  --primary-color-400: "#2fb4ff";
-  --primary-color-500: "#049af3";
-  --primary-color-600: "#007ad0";
-  --primary-color-700: "#0060a8";
-  --primary-color-800: "#014f86";
-  --primary-color-900: "#074473";
-  --primary-color-950: "#052b4c";
-
-  --on-primary-color: #f8f9fa;
-
-  --danger-color: #e41a46;
-  --on-danger-color: #f8f9fa;
-
-  --danger-color-50: "#fff1f2";
-  --danger-color-100: "#ffe4e6";
-  --danger-color-200: "#ffccd2";
-  --danger-color-300: "#fea3ae";
-  --danger-color-400: "#fd6f84";
-  --danger-color-500: "#f62d4f";
-  --danger-color-600: "#e41a46";
-  --danger-color-700: "#c10f3b";
-  --danger-color-800: "#a11038";
-  --danger-color-900: "#8a1136";
-  --danger-color-950: "#4d0419";
-
-  @apply bg-surface text-on-surface;
-}
-
 a {
   @apply text-primary font-semibold;
 }
 
 a.underlined {
   @apply underline-offset-2 underline;
+}
+
+@layer base {
+  :root {
+    --background: hsl(0 0% 100%);
+    --foreground: hsl(222.2 84% 4.9%);
+
+    --card: hsl(0 0% 100%);
+    --card-foreground: hsl(222.2 84% 4.9%);
+
+    --popover: hsl(0 0% 100%);
+    --popover-foreground: hsl(222.2 84% 4.9%);
+
+    --primary: hsl(222.2 47.4% 11.2%);
+    --primary-foreground: hsl(210 40% 98%);
+
+    --secondary: hsl(210 40% 96.1%);
+    --secondary-foreground: hsl(222.2 47.4% 11.2%);
+
+    --muted: hsl(210 40% 96.1%);
+    --muted-foreground: hsl(215.4 16.3% 46.9%);
+
+    --accent: hsl(210 40% 96.1%);
+    --accent-foreground: hsl(222.2 47.4% 11.2%);
+
+    --destructive: hsl(0 84.2% 60.2%);
+    --destructive-foreground: hsl(210 40% 98%);
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: hsl(0, 0%, 3%);
+    --foreground: hsl(210, 17%, 98%);
+
+    --card: hsl(222.2 84% 4.9%);
+    --card-foreground: hsl(210 40% 98%);
+
+    --popover: hsl(222.2 84% 4.9%);
+    --popover-foreground: hsl(210, 17%, 98%);
+
+    --primary: hsl(206, 100%, 29%);
+    --primary-foreground: hsl(222.2 47.4% 11.2%);
+
+    --secondary: hsl(216, 9%, 21%);
+    --secondary-foreground: hsl(210 40% 98%);
+
+    --muted: hsl(217.2 32.6% 17.5%);
+    --muted-foreground: hsl(215 20.2% 65.1%);
+
+    --accent: hsl(217.2 32.6% 17.5%);
+    --accent-foreground: hsl(210 40% 98%);
+
+    --destructive: hsl(347, 80%, 50%);
+    --destructive-foreground: var(--foreground);
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

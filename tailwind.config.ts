@@ -1,57 +1,80 @@
 import type { Config } from "tailwindcss";
 
-const config: Config = {
+const config = {
+  darkMode: ["class"],
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
   ],
+  prefix: "",
   theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
     extend: {
       colors: {
+        border: "var(--border)",
+        input: "var(--input)",
+        ring: "var(--ring)",
+        background: "var(--background)",
+        foreground: "var(--foreground)",
         primary: {
-          "50": "var(--primary-color-50)",
-          "100": "var(--primary-color-100)",
-          "200": "var(--primary-color-200)",
-          "300": "var(--primary-color-300)",
-          "400": "var(--primary-color-400)",
-          "500": "var(--primary-color-500)",
-          "600": "var(--primary-color-600)",
-          "700": "var(--primary-color-700)",
-          "800": "var(--primary-color-800)",
-          "900": "var(--primary-color-900)",
-          "950": "var(--primary-color-950)",
-          DEFAULT: "var(--primary-color)",
+          DEFAULT: "var(--primary)",
+          foreground: "var(--primary-foreground)",
         },
-        surface: {
-          DEFAULT: "var(--surface-color)",
-          accent: "var(--surface-color-accent)",
+        secondary: {
+          DEFAULT: "var(--secondary)",
+          foreground: "var(--secondary-foreground)",
         },
-        danger: {
-          "50": "var(--danger-color-50)",
-          "100": "var(--danger-color-100)",
-          "200": "var(--danger-color-200)",
-          "300": "var(--danger-color-300)",
-          "400": "var(--danger-color-400)",
-          "500": "var(--danger-color-500)",
-          "600": "var(--danger-color-600)",
-          "700": "var(--danger-color-700)",
-          "800": "var(--danger-color-800)",
-          "900": "var(--danger-color-900)",
-          "950": "var(--danger-color-950)",
-          DEFAULT: "var(--danger-color)",
+        destructive: {
+          DEFAULT: "var(--destructive)",
+          foreground: "var(--destructive-foreground)",
         },
-
-        on: {
-          primary: "var(--on-primary-color)",
-          surface: {
-            DEFAULT: "var(--on-surface-color)",
-          },
-          danger: "var(--on-danger-color)",
+        muted: {
+          DEFAULT: "var(--muted)",
+          foreground: "var(--muted-foreground)",
         },
+        accent: {
+          DEFAULT: "var(--accent)",
+          foreground: "var(--accent-foreground)",
+        },
+        popover: {
+          DEFAULT: "var(--popover)",
+          foreground: "var(--popover-foreground)",
+        },
+        card: {
+          DEFAULT: "var(--card)",
+          foreground: "var(--card-foreground)",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
   },
-  plugins: [],
-};
+  plugins: [require("tailwindcss-animate")],
+} satisfies Config;
+
 export default config;
