@@ -3,11 +3,45 @@
 @tailwind utilities;
 
 html {
+  --surface-color: #080808;
+  --surface-color-accent: #232329;
+  --on-surface-color: #f8f9fa;
+
+  --primary-color: #014f86;
+  --primary-color-50: "#eff8ff";
+  --primary-color-100: "#dff0ff";
+  --primary-color-200: "#b7e2ff";
+  --primary-color-300: "#77ccff";
+  --primary-color-400: "#2fb4ff";
+  --primary-color-500: "#049af3";
+  --primary-color-600: "#007ad0";
+  --primary-color-700: "#0060a8";
+  --primary-color-800: "#014f86";
+  --primary-color-900: "#074473";
+  --primary-color-950: "#052b4c";
+
+  --on-primary-color: #f8f9fa;
+
+  --danger-color: #e41a46;
+  --on-danger-color: #f8f9fa;
+
+  --danger-color-50: "#fff1f2";
+  --danger-color-100: "#ffe4e6";
+  --danger-color-200: "#ffccd2";
+  --danger-color-300: "#fea3ae";
+  --danger-color-400: "#fd6f84";
+  --danger-color-500: "#f62d4f";
+  --danger-color-600: "#e41a46";
+  --danger-color-700: "#c10f3b";
+  --danger-color-800: "#a11038";
+  --danger-color-900: "#8a1136";
+  --danger-color-950: "#4d0419";
+
   @apply bg-surface text-on-surface;
 }
 
 a {
-  @apply text-primary-700 font-semibold;
+  @apply text-primary font-semibold;
 }
 
 a.underlined {
