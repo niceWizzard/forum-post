@@ -24,7 +24,7 @@ a.underlined {
     --primary: hsl(222.2 47.4% 11.2%);
     --primary-foreground: hsl(210 40% 98%);
 
-    --secondary: hsl(210 40% 96.1%);
+    --secondary: hsl(222.2 47.4% 11.2%);
     --secondary-foreground: hsl(222.2 47.4% 11.2%);
 
     --muted: hsl(210 40% 96.1%);
@@ -47,7 +47,9 @@ a.underlined {
     --background: hsl(0, 0%, 3%);
     --foreground: hsl(210, 17%, 98%);
 
-    --card: hsl(222.2 84% 4.9%);
+    --background-secondary: hsl(216, 9%, 21%);
+
+    --card: hsl(222.2 50% 4.9%);
     --card-foreground: hsl(210 40% 98%);
 
     --popover: hsl(222.2 84% 4.9%);
@@ -56,7 +58,7 @@ a.underlined {
     --primary: hsl(206, 100%, 29%);
     --primary-foreground: hsl(222.2 47.4% 11.2%);
 
-    --secondary: hsl(216, 9%, 21%);
+    --secondary: hsl(189, 34%, 41%);
     --secondary-foreground: hsl(210 40% 98%);
 
     --muted: hsl(217.2 32.6% 17.5%);
