@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { SlideFrom } from "./_components/motionComponents";
+import { MotionDiv } from "./_components/motionComponents";
 
 export const metadata: Metadata = {
   title: "Forum Post - Home",
@@ -19,7 +19,23 @@ export default function Home() {
 
 function HighlightSection() {
   return (
-    <SlideFrom translateX="-25%">
+    <MotionDiv
+      initial={{
+        opacity: 0,
+        translateX: "-25%",
+      }}
+      transition={{
+        type: "spring",
+        delay: 0.3,
+        duration: 1.5,
+        damping: 25,
+      }}
+      animate={{
+        opacity: 1,
+        scale: 1,
+        translateX: 0,
+      }}
+    >
       <div className="h-[80vh] w-full flex flex-col items-center justify-center gap-4 bg-gradient-to-tr from-gray-300/2">
         <div className="text-center w-full">
           <h2 className="text-4xl font-semibold">
@@ -43,6 +59,6 @@ function HighlightSection() {
           Continue now
         </Link>
       </div>
-    </SlideFrom>
+    </MotionDiv>
   );
 }

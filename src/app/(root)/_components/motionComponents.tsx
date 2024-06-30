@@ -1,31 +1,13 @@
 "use client";
-import { motion } from "framer-motion";
+import { HTMLMotionProps, motion, MotionProps } from "framer-motion";
+import { ReactHTML } from "react";
 
 interface Props {
   children: React.ReactNode;
-  translateX: string | number;
 }
 
-export function SlideFrom({ children, translateX }: Props) {
-  return (
-    <motion.div
-      initial={{
-        opacity: 0,
-        translateX,
-      }}
-      transition={{
-        type: "spring",
-        delay: 0.3,
-        duration: 1.5,
-        damping: 25,
-      }}
-      animate={{
-        opacity: 1,
-        scale: 1,
-        translateX: 0,
-      }}
-    >
-      {children}
-    </motion.div>
-  );
+type MotionElementProps<T extends keyof ReactHTML> = HTMLMotionProps<T> & Props;
+
+export function MotionDiv({ children, ...rest }: MotionElementProps<"div">) {
+  return <motion.div {...rest}>{children}</motion.div>;
 }
