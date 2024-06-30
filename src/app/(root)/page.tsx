@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <section className="container px-6 py-4">
+    <section className="container px-6 py-4  mb-12">
       <div className="flex flex-col justify-center items-center">
         <HighlightSection />
         <CountSection />
