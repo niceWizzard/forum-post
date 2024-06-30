@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { MotionDiv } from "./_components/motionComponents";
+import { MotionDiv, MotionH2, MotionP } from "./_components/motionComponents";
 
 export const metadata: Metadata = {
   title: "Forum Post - Home",
@@ -19,46 +19,78 @@ export default function Home() {
 
 function HighlightSection() {
   return (
-    <MotionDiv
-      initial={{
-        opacity: 0,
-        translateX: "-25%",
-      }}
-      transition={{
-        type: "spring",
-        delay: 0.3,
-        duration: 1.5,
-        damping: 25,
-      }}
-      animate={{
-        opacity: 1,
-        scale: 1,
-        translateX: 0,
-      }}
-    >
-      <div className="h-[80vh] w-full flex flex-col items-center justify-center gap-4 bg-gradient-to-tr from-gray-300/2">
-        <div className="text-center w-full">
-          <h2 className="text-4xl font-semibold">
-            Your{" "}
-            <span className="text-primary hover:scale-105 inline-block transition-transform">
-              forum
-            </span>
-            , your &nbsp;
-            <span className="text-primary hover:scale-105 inline-block transition-transform">
-              post
-            </span>
-          </h2>
-          <p className="text-gray-300  font-light mt-2 text-lg">
-            Your platform for discussion
-          </p>
-        </div>
+    <div className="h-[80vh] w-full flex flex-col items-center justify-center gap-4 bg-gradient-to-tr from-gray-300/2">
+      <div className="text-center w-full">
+        <MotionH2
+          className="text-4xl font-semibold"
+          initial={{
+            opacity: 0,
+            translateY: "-75%",
+          }}
+          transition={{
+            type: "spring",
+            duration: 1.5,
+            stiffness: 150,
+          }}
+          animate={{
+            opacity: 1,
+            translateY: 0,
+          }}
+        >
+          Your{" "}
+          <span className="text-primary hover:scale-105 inline-block transition-transform">
+            forum
+          </span>
+          , your &nbsp;
+          <span className="text-primary hover:scale-105 inline-block transition-transform">
+            post
+          </span>
+        </MotionH2>
+        <MotionP
+          className="text-gray-300  font-light mt-2 text-lg"
+          initial={{
+            opacity: 0,
+            translateY: "75%",
+          }}
+          transition={{
+            delay: 1,
+            type: "spring",
+            duration: 1.5,
+            stiffness: 150,
+          }}
+          animate={{
+            opacity: 1,
+            translateY: 0,
+          }}
+        >
+          Your platform for discussion
+        </MotionP>
+      </div>
+      <MotionDiv
+        className="mt-12"
+        initial={{
+          opacity: 0,
+          scale: 0.75,
+        }}
+        transition={{
+          delay: 1.25,
+          type: "spring",
+          duration: 1.5,
+          stiffness: 200,
+          damping: 10,
+        }}
+        animate={{
+          opacity: 1,
+          scale: 1,
+        }}
+      >
         <Link
           href="/login"
-          className="mt-12 px-12 py-3 border rounded-md border-gray-400 hover:bg-primary hover:text-primary-foreground hover:scale-105  transition-all"
+          className="px-12 py-3 border rounded-md border-gray-400 hover:bg-primary hover:text-primary-foreground transition-all"
         >
           Continue now
         </Link>
-      </div>
-    </MotionDiv>
+      </MotionDiv>
+    </div>
   );
 }
