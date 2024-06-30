@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/app/globals.css";
+import { SessionProvider } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,12 +16,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={inter.className}>
-        <div className="flex flex-col h-screen">
-          <main className="flex-grow">{children}</main>
-        </div>
-      </body>
-    </html>
+    <SessionProvider>
+      <html lang="en" className="dark">
+        <body className={inter.className}>
+          <div className="flex flex-col h-screen">
+            <main className="flex-grow">{children}</main>
+          </div>
+        </body>
+      </html>
+    </SessionProvider>
   );
 }
