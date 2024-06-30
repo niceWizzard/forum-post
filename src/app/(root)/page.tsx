@@ -12,6 +12,7 @@ export default function Home() {
     <section className="container px-6 py-4">
       <div className="flex flex-col justify-center items-center">
         <HighlightSection />
+        <CountSection />
       </div>
     </section>
   );
@@ -19,7 +20,7 @@ export default function Home() {
 
 function HighlightSection() {
   return (
-    <section className="h-[80vh] w-full flex flex-col items-center justify-center gap-4 bg-gradient-to-tr from-gray-300/2">
+    <section className="h-[90vh] w-full flex flex-col items-center justify-center gap-4 bg-gradient-to-tr from-gray-300/2">
       <div className="text-center w-full">
         <MotionH2
           className="text-4xl font-semibold"
@@ -90,6 +91,88 @@ function HighlightSection() {
         >
           Continue now
         </Link>
+      </MotionDiv>
+    </section>
+  );
+}
+
+function CountSection() {
+  return (
+    <section className="w-full">
+      <MotionDiv
+        initial={{
+          opacity: 0,
+        }}
+        transition={{
+          delay: 0.25,
+          duration: 1.5,
+        }}
+        whileInView={{
+          opacity: 1,
+        }}
+        className="overflow-hidden max-w-6xl mx-auto bg-card text-card-foreground rounded-md p-6 grid gap-4 grid-cols-[1fr,5fr]"
+      >
+        <MotionDiv
+          initial={{
+            opacity: 0,
+            scale: 0.75,
+          }}
+          transition={{
+            duration: 1.5,
+            delay: 0.25,
+            type: "spring",
+          }}
+          whileInView={{
+            opacity: 1,
+            scale: 1,
+          }}
+          className="border-2 border-gray-400 p-4 rounded-md aspect-square flex justify-center items-center flex-col"
+        >
+          <h2 className="text-5xl font-bold">12 M+</h2>
+          <span>active users</span>
+        </MotionDiv>
+        <div className="flex-grow flex flex-col overflow-hidden">
+          <MotionH2
+            initial={{
+              opacity: 0,
+              translateX: "10%",
+              skewX: "-30deg",
+            }}
+            whileInView={{
+              opacity: 1,
+              translateX: 0,
+              skewX: "0deg",
+            }}
+            transition={{
+              delay: 0.3,
+              duration: 1,
+            }}
+            className="text-2xl font-medium "
+          >
+            Discuss whatever you want
+          </MotionH2>
+          <MotionP
+            initial={{
+              opacity: 0,
+              translateX: "10%",
+            }}
+            whileInView={{
+              opacity: 1,
+              translateX: 0,
+            }}
+            transition={{
+              delay: 0.5,
+              duration: 1,
+            }}
+            className="font-light text-gray-300 mt-4"
+          >
+            Join a vibrant community where your thoughts and ideas take center
+            stage. Dive into endless discussions, share your passions, and
+            connect with like-minded individuals. Explore diverse topics, spark
+            engaging debates, and find your voice in a space that celebrates
+            free expression. Start your conversation today on Forum-Poster!
+          </MotionP>
+        </div>
       </MotionDiv>
     </section>
   );
