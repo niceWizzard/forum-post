@@ -181,7 +181,7 @@ function CountSection() {
 
 function CommunitySection() {
   return (
-    <section className="w-full min-h-[50vh]">
+    <section className="w-full min-h-[50vh] overflow-hidden">
       <div className="container">
         <MotionH2
           initial={{
