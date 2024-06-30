@@ -98,7 +98,7 @@ function HighlightSection() {
 
 function CountSection() {
   return (
-    <section className="w-full">
+    <section className="w-full min-h-[70vh]">
       <MotionDiv
         initial={{
           opacity: 0,
