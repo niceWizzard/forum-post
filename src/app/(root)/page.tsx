@@ -13,6 +13,7 @@ export default function Home() {
       <div className="flex flex-col justify-center items-center">
         <HighlightSection />
         <CountSection />
+        <CommunitySection />
       </div>
     </section>
   );
@@ -174,6 +175,58 @@ function CountSection() {
           </MotionP>
         </div>
       </MotionDiv>
+    </section>
+  );
+}
+
+function CommunitySection() {
+  return (
+    <section className="w-full min-h-[50vh]">
+      <div className="container">
+        <MotionH2
+          initial={{
+            opacity: 0,
+            translateY: "40%",
+          }}
+          whileInView={{
+            opacity: 1,
+            translateY: 0,
+          }}
+          transition={{
+            delay: 0.5,
+            duration: 1,
+          }}
+          className="text-4xl font-semibold border-b border-primary pb-4"
+        >
+          Join a thriving community
+        </MotionH2>
+        <MotionP
+          initial={{
+            opacity: 0,
+            translateY: "40%",
+          }}
+          whileInView={{
+            opacity: 1,
+            translateY: 0,
+          }}
+          transition={{
+            delay: 0.5,
+            duration: 1,
+          }}
+          className="font-light text-gray-300 mt-4 text-2xl text-justify"
+        >
+          Join a thriving community where your thoughts and ideas take center
+          stage. Dive into endless discussions, share your passions, and connect
+          with like-minded individuals. Explore diverse topics, spark engaging
+          debates, and find your voice in a space that celebrates free
+          expression.
+          <br />
+          <Link className="underlined mt-4 inline-block" href="/login">
+            Start
+          </Link>{" "}
+          your conversation today on Forum-Poster!
+        </MotionP>
+      </div>
     </section>
   );
 }
