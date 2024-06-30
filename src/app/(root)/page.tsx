@@ -19,7 +19,7 @@ export default function Home() {
 
 function HighlightSection() {
   return (
-    <div className="h-[80vh] w-full flex flex-col items-center justify-center gap-4 bg-gradient-to-tr from-gray-300/2">
+    <section className="h-[80vh] w-full flex flex-col items-center justify-center gap-4 bg-gradient-to-tr from-gray-300/2">
       <div className="text-center w-full">
         <MotionH2
           className="text-4xl font-semibold"
@@ -91,6 +91,6 @@ function HighlightSection() {
           Continue now
         </Link>
       </MotionDiv>
-    </div>
+    </section>
   );
 }
