@@ -111,7 +111,7 @@ function CountSection() {
         whileInView={{
           opacity: 1,
         }}
-        className="overflow-hidden max-w-6xl mx-auto bg-card text-card-foreground rounded-md p-6 grid gap-4 grid-cols-[1fr,5fr]"
+        className="overflow-hidden max-w-6xl mx-auto bg-card text-card-foreground rounded-md p-6 md:grid gap-4 md:grid-cols-[1fr,5fr] flex flex-col"
       >
         <MotionDiv
           initial={{
@@ -127,9 +127,9 @@ function CountSection() {
             opacity: 1,
             scale: 1,
           }}
-          className="border-2 border-gray-400 p-4 rounded-md aspect-square flex justify-center items-center flex-col"
+          className="border-2 border-gray-400 p-4 rounded-md md:aspect-square flex justify-center items-center md:flex-col gap-2"
         >
-          <h2 className="text-5xl font-bold">12 M+</h2>
+          <h2 className="text-3xl md:text-4xl font-bold break-words">12 M+</h2>
           <span>active users</span>
         </MotionDiv>
         <div className="flex-grow flex flex-col overflow-hidden">
