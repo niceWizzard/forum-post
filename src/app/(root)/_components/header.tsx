@@ -1,23 +1,27 @@
-import { auth, signOut } from "@/auth";
+"use client";
+import { auth } from "@/auth";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
+import { signOutAction } from "@/auth/action";
 
-const Header = async () => {
-  const user = await auth();
+const Header = () => {
+  const { data: user, status } = useSession();
   return (
     <header className="border-b-2  ">
       <div className="w-full mx-auto container flex justify-between px-2 py-4 items-center">
         <h1 className="text-xl font-semibold">Forum Poster</h1>
+        <span>{status}</span>
         <nav className="flex gap-3 items-center">
           {user ? (
-            <form
-              action={async () => {
-                "use server";
-                await signOut();
+            <button
+              onClick={async () => {
+                await signOutAction();
+                location.reload();
               }}
             >
-              <button>Logout</button>
-            </form>
+              Logout
+            </button>
           ) : (
             <Link href="/login" className="underlined">
               Login
