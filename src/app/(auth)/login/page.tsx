@@ -1,13 +1,8 @@
-import { validateRequest } from "@/server/auth/action";
+import { unathenticatedOnly } from "@/server/auth/validate";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 export default async function LoginPage() {
-  const { user } = await validateRequest();
-
-  if (user) {
-    redirect("/");
-  }
+  await unathenticatedOnly();
 
   return (
     <section className="w-full h-full flex justify-center px-4 py-12 flex-col items-center gap-4">

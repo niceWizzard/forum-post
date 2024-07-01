@@ -3,6 +3,7 @@ import Link from "next/link";
 import { MotionDiv, MotionH2, MotionP } from "./_components/motionComponents";
 import { validateRequest } from "@/server/auth/action";
 import { redirect } from "next/navigation";
+import { unathenticatedOnly } from "@/server/auth/validate";
 
 export const metadata: Metadata = {
   title: "Forum Post - Home",
@@ -10,10 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const { user } = await validateRequest();
-  if (user) {
-    redirect("/feed");
-  }
+  await unathenticatedOnly();
 
   return (
     <section className="container px-6 py-4  mb-12">
