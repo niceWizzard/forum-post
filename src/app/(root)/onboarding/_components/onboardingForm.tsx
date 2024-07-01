@@ -57,7 +57,7 @@ function OnBoardingForm() {
   });
 
   const {
-    data: usernameTaken,
+    data: usernameAvailable,
     fetching,
     finish,
     state,
@@ -85,7 +85,7 @@ function OnBoardingForm() {
   function UsernameStatus() {
     if (state == Status.Finished) {
       return (
-        <p>Username is {usernameTaken ? "available" : "already taken."}</p>
+        <p>Username is {usernameAvailable ? "available" : "already taken."}</p>
       );
     }
     if (state == Status.Loading) {
