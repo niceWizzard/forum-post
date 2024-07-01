@@ -1,13 +1,20 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { MotionDiv, MotionH2, MotionP } from "./_components/motionComponents";
+import { validateRequest } from "@/server/auth/action";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Forum Post - Home",
   description: "Your platform for discussion",
 };
 
-export default function Home() {
+export default async function Home() {
+  const { user } = await validateRequest();
+  if (user) {
+    redirect("/feed");
+  }
+
   return (
     <section className="container px-6 py-4  mb-12">
       <div className="flex flex-col justify-center items-center">

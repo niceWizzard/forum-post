@@ -1,6 +1,14 @@
+import { validateRequest } from "@/server/auth/action";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function LoginPage() {
+  const { user } = await validateRequest();
+
+  if (user) {
+    redirect("/");
+  }
+
   return (
     <section className="w-full h-full flex justify-center px-4 py-12 flex-col items-center gap-4">
       <div className="bg-card text-card-foreground w-96 text-justify h-full   gap-3 px-6 py-4 rounded-md flex flex-col">
