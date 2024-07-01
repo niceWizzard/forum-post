@@ -1,6 +1,6 @@
 import { validateRequest } from "@/server/auth/action";
 import { authenticatedOnly } from "@/server/auth/validate";
-import { getCreatedForums } from "@/server/db/actions/forum";
+import { getCreatedForums } from "@/server/db/queries/forum";
 import { redirect } from "next/navigation";
 import React from "react";
 
