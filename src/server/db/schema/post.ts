@@ -19,6 +19,22 @@ export const forumTable = pgTable("forum", {
   }),
 });
 
+export const forumMemberTable = pgTable(
+  "forum_member",
+  {
+    forumId: uuid("forum_id").references(() => forumTable.id, {
+      onDelete: "cascade",
+    }),
+    userId: uuid("user_id").references(() => userTable.id, {
+      onDelete: "cascade",
+    }),
+    joinedAt: timestamp("joined_at").notNull().defaultNow(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.forumId, table.userId] }),
+  })
+);
+
 export const postTable = pgTable("post", {
   id: uuid("id").primaryKey().defaultRandom(),
   posterId: uuid("poster_id").references(() => userTable.id, {
