@@ -60,7 +60,7 @@ function HighlightSection() {
             translateY: "75%",
           }}
           transition={{
-            delay: 1,
+            delay: 0.5,
             type: "spring",
             duration: 1.5,
             stiffness: 150,
@@ -80,7 +80,7 @@ function HighlightSection() {
           scale: 0.75,
         }}
         transition={{
-          delay: 1.25,
+          delay: 0.75,
           type: "spring",
           duration: 1.5,
           stiffness: 200,
