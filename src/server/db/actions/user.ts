@@ -5,7 +5,6 @@ import { db } from "../index";
 import { userTable } from "../schema";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { PostgresError } from "postgres";
 
 interface Fields {
   username: string;
@@ -40,4 +39,29 @@ export async function saveRequiredUserFields({ name, username }: Fields) {
   }
 
   redirect("/feed");
+}
+
+export async function checkUsernameAvailability(username: string) {
+  if (!username.trim()) {
+    return {
+      error: true,
+      message: "bad username",
+    };
+  }
+  const { user } = await validateRequest();
+  if (!user) {
+    return {
+      error: true,
+      message: "Please login",
+    };
+  }
+
+  const res = await db.query.userTable.findFirst({
+    where: eq(userTable.username, username),
+  });
+
+  return {
+    error: false,
+    data: res == null,
+  };
 }

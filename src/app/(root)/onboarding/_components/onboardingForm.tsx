@@ -1,9 +1,12 @@
 "use client";
 
-import { saveRequiredUserFields } from "@/server/db/actions/user";
-import { useRef } from "react";
+import {
+  checkUsernameAvailability,
+  saveRequiredUserFields,
+} from "@/server/db/actions/user";
+import { useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import {
   Form,
@@ -16,12 +19,14 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useDebouncedCallback } from "use-debounce";
+import { useFormState } from "react-dom";
 
 const formSchema = z.object({
   username: z
     .string()
-    .min(1, {
-      message: "Username is required",
+    .min(3, {
+      message: "Username should have atleast 3 characters",
     })
     .max(24, {
       message: "Username must be less than 24 characters",
@@ -51,8 +56,43 @@ function OnBoardingForm() {
     },
   });
 
+  const {
+    data: usernameTaken,
+    fetching,
+    finish,
+    state,
+    reset,
+  } = useUsernameCheckStatus();
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     saveRequiredUserFields(values);
+  }
+
+  const usernameCheck = useDebouncedCallback(async (username: string) => {
+    if (!username.trim() || username.length < 3) {
+      reset();
+      return;
+    }
+    fetching();
+    const a = await checkUsernameAvailability(username);
+    if (a.error) {
+      reset();
+    } else {
+      finish(a.data ?? false);
+    }
+  }, 300);
+
+  function UsernameStatus() {
+    if (state == Status.Finished) {
+      return (
+        <p>Username is {usernameTaken ? "available" : "already taken."}</p>
+      );
+    }
+    if (state == Status.Loading) {
+      return <p>Checking username...</p>;
+    }
+
+    return null;
   }
 
   return (
@@ -67,9 +107,16 @@ function OnBoardingForm() {
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input placeholder="MyUsername" {...field} />
+                <Input
+                  placeholder="MyUsername"
+                  {...field}
+                  onChangeCapture={async (e) =>
+                    await usernameCheck(e.currentTarget.value)
+                  }
+                />
               </FormControl>
               <FormMessage />
+              <UsernameStatus />
             </FormItem>
           )}
         />
@@ -95,3 +142,34 @@ function OnBoardingForm() {
 }
 
 export default OnBoardingForm;
+
+enum Status {
+  Unset,
+  Loading,
+  Finished,
+}
+function useUsernameCheckStatus() {
+  const [state, setState] = useState(Status.Unset);
+  const [data, setData] = useState(false);
+
+  function fetching() {
+    setState(Status.Loading);
+  }
+
+  function finish(availability: boolean) {
+    setState(Status.Finished);
+    setData(availability);
+  }
+
+  function reset() {
+    setState(Status.Unset);
+  }
+
+  return {
+    state,
+    data,
+    fetching,
+    reset,
+    finish,
+  };
+}
