@@ -9,13 +9,25 @@ interface Options {
   redirectUrl?: string;
 }
 
-export async function authenticatedOnly({ auth, redirectUrl }: Options = {}) {
+interface AuthenticatedOnlyOptions extends Options {
+  onboardCheck: boolean;
+}
+
+export async function authenticatedOnly(
+  { auth, redirectUrl, onboardCheck }: AuthenticatedOnlyOptions = {
+    onboardCheck: true,
+  }
+) {
   if (!auth) {
     auth = await validateRequest();
   }
 
   if (auth.user == null) {
     return redirect(redirectUrl ?? "/login");
+  }
+
+  if (onboardCheck && (auth.user.name == null || auth.user.username == null)) {
+    return redirect("/onboarding");
   }
 
   return auth;
