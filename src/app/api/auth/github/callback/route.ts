@@ -7,6 +7,16 @@ import { db } from "@/server/db";
 import { userTable } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 
+async function setSessionCookie(id: string) {
+  const session = await lucia.createSession(id, {});
+  const sessionCookie = lucia.createSessionCookie(session.id);
+  cookies().set(
+    sessionCookie.name,
+    sessionCookie.value,
+    sessionCookie.attributes
+  );
+}
+
 export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
@@ -32,13 +42,7 @@ export async function GET(request: Request): Promise<Response> {
     });
 
     if (existingUser) {
-      const session = await lucia.createSession(existingUser.id, {});
-      const sessionCookie = lucia.createSessionCookie(session.id);
-      cookies().set(
-        sessionCookie.name,
-        sessionCookie.value,
-        sessionCookie.attributes
-      );
+      await setSessionCookie(existingUser.id);
       return new Response(null, {
         status: 302,
         headers: {
@@ -52,26 +56,21 @@ export async function GET(request: Request): Promise<Response> {
         .insert(userTable)
         .values({
           github_id: githubUser.id,
-          username: githubUser.login,
         })
         .returning()
     )[0];
 
-    const session = await lucia.createSession(generatedUser.id, {});
-    const sessionCookie = lucia.createSessionCookie(session.id);
-    cookies().set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes
-    );
+    setSessionCookie(generatedUser.id);
     return new Response(null, {
       status: 302,
       headers: {
         Location: "/",
       },
     });
-  } catch (e) {
+  } catch (_e) {
+    const e = _e as Error;
     // the specific error message depends on the provider
+    console.error(e.message);
     if (e instanceof OAuth2RequestError) {
       // invalid code
       return new Response(null, {
