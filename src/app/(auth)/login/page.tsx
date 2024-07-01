@@ -18,11 +18,12 @@ export default async function LoginPage() {
           <button className="px-3 py-3 text-lg font-medium rounded-md w-full bg-gray-300 text-gray-900">
             Login with Google
           </button>
-          <form>
-            <button className="px-3 py-3 text-lg font-medium border rounded-md w-full">
-              Login with Github
-            </button>
-          </form>
+          <Link
+            href="/api/auth/github"
+            className="px-3 py-3 text-lg font-medium border rounded-md w-full"
+          >
+            Login with Github
+          </Link>
         </div>
       </div>
       <div className="flex">

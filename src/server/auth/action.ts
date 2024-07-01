@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { cache } from "react";
 import { lucia } from "./index";
 import type { Session, User } from "lucia";
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 
 export const validateRequest = cache(
   async (): Promise<
@@ -42,7 +42,7 @@ export const validateRequest = cache(
   }
 );
 
-async function logout(): Promise<ActionResult> {
+export async function logout(): Promise<ActionResult> {
   const { session } = await validateRequest();
   if (!session) {
     return {
@@ -58,7 +58,7 @@ async function logout(): Promise<ActionResult> {
     sessionCookie.value,
     sessionCookie.attributes
   );
-  return redirect("/login");
+  return redirect("/");
 }
 
 interface ActionResult {
