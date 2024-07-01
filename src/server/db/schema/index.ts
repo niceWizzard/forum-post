@@ -5,6 +5,7 @@ export {
   commentTable,
   postLikeTable,
   postTable,
+  forumTable,
 } from "./post";
 
 export const userTable = pgTable("user", {

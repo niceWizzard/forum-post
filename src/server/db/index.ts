@@ -1,8 +1,8 @@
 import { env } from "@/env/server.mjs";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { userTable } from "@/server/db/schema";
+import * as schema from "@/server/db/schema";
 
 const client = postgres(env.NEON_DATABASE_URL);
 
-export const db = drizzle(client, { schema: { userTable } });
+export const db = drizzle(client, { schema });
