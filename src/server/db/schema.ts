@@ -1,9 +1,10 @@
-import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
 export const userTable = pgTable("user", {
   id: uuid("id").primaryKey().defaultRandom(),
   username: text("username").unique(),
   github_id: text("github_id").unique(),
+  name: varchar("name", { length: 256 }),
 });
 
 export const sessionTable = pgTable("session", {
