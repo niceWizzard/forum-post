@@ -12,7 +12,7 @@ import { userTable } from ".";
 export const forumTable = pgTable("forum", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 64 }).notNull().unique(),
-  description: varchar("description", { length: 256 }).notNull(),
+  description: varchar("description", { length: 256 }).notNull().default(""),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   ownerId: uuid("owner_id").references(() => userTable.id, {
     onDelete: "set null",
