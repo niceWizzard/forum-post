@@ -14,11 +14,12 @@ interface Fields {
 export async function saveRequiredUserFields({ name, username }: Fields) {
   const { user } = await validateRequest();
   if (!user) {
-    return Response.json({
+    return {
       status: 403,
+      error: true,
       unathorized: true,
       message: "Please sign in",
-    });
+    };
   }
 
   try {
@@ -31,10 +32,11 @@ export async function saveRequiredUserFields({ name, username }: Fields) {
       .where(eq(userTable.id, user.id));
   } catch (e: any) {
     if (e.code && e.code == "23505") {
-      return Response.json({
+      return {
         status: 403,
+        error: true,
         message: "Username already exists.",
-      });
+      };
     }
   }
 
