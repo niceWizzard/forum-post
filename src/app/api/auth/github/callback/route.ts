@@ -51,11 +51,22 @@ export async function GET(request: Request): Promise<Response> {
       });
     }
 
+    const githubEmails: GithubEmail[] = await (
+      await fetch("https://api.github.com/user/emails", {
+        headers: {
+          Authorization: `Bearer ${tokens.accessToken}`,
+        },
+      })
+    ).json();
+
+    const githubPrimaryEmail = githubEmails.find((v) => v.primary)!;
+
     const generatedUser = (
       await db
         .insert(userTable)
         .values({
           github_id: githubUser.id,
+          email: githubPrimaryEmail.email,
         })
         .returning()
     )[0];
@@ -86,4 +97,10 @@ export async function GET(request: Request): Promise<Response> {
 interface GitHubUser {
   id: string;
   login: string;
+  email: string;
+}
+
+interface GithubEmail {
+  email: string;
+  primary: boolean;
 }
