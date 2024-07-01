@@ -65,6 +65,12 @@ function OnBoardingForm() {
   } = useUsernameCheckStatus();
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    if (
+      state == Status.Loading ||
+      (state == Status.Finished && !usernameAvailable)
+    ) {
+      return;
+    }
     saveRequiredUserFields(values);
   }
 
