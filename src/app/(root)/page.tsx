@@ -116,6 +116,9 @@ function CountSection() {
         whileInView={{
           opacity: 1,
         }}
+        viewport={{
+          once: true,
+        }}
         className="overflow-hidden max-w-6xl mx-auto bg-card text-card-foreground rounded-md p-6 md:grid gap-4 md:grid-cols-[1fr,5fr] flex flex-col"
       >
         <MotionDiv
@@ -131,6 +134,9 @@ function CountSection() {
           whileInView={{
             opacity: 1,
             scale: 1,
+          }}
+          viewport={{
+            once: true,
           }}
           className="border-2 border-gray-400 p-4 rounded-md md:aspect-square flex justify-center items-center md:flex-col gap-2"
         >
@@ -153,6 +159,9 @@ function CountSection() {
               delay: 0.3,
               duration: 1,
             }}
+            viewport={{
+              once: true,
+            }}
             className="text-2xl font-medium "
           >
             Discuss whatever you want
@@ -169,6 +178,9 @@ function CountSection() {
             transition={{
               delay: 0.5,
               duration: 1,
+            }}
+            viewport={{
+              once: true,
             }}
             className="font-light text-gray-300 mt-4"
           >
@@ -201,6 +213,9 @@ function CommunitySection() {
             delay: 0.5,
             duration: 1,
           }}
+          viewport={{
+            once: true,
+          }}
           className="text-4xl font-semibold border-b border-primary pb-4"
         >
           Join a thriving community
@@ -217,6 +232,9 @@ function CommunitySection() {
           transition={{
             delay: 0.5,
             duration: 1,
+          }}
+          viewport={{
+            once: true,
           }}
           className="font-light text-gray-300 mt-4 text-2xl text-justify"
         >
