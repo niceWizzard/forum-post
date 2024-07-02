@@ -13,11 +13,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { logout } from "@/server/auth/action";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
+import { useState } from "react";
 
 const SideSheet = ({ setIsOpen }: { setIsOpen: (a: boolean) => void }) => {
   const user = useUserStore((v) => v.user);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   if (!user) {
     return null;
@@ -39,6 +42,17 @@ const SideSheet = ({ setIsOpen }: { setIsOpen: (a: boolean) => void }) => {
             </Link>
           </div>
         </div>
+        <Button
+          variant="destructive"
+          onClick={async () => {
+            if (isLoggingOut) return;
+            setIsLoggingOut(true);
+            await logout();
+            setIsOpen(false);
+          }}
+        >
+          {isLoggingOut ? "Logging out" : "Log out"}
+        </Button>
       </div>
     </SheetContent>
   );
