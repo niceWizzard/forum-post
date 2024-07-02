@@ -53,6 +53,7 @@ function LogoutButton({ onLogout }: { onLogout: () => void }) {
   return (
     <Button
       variant="destructive"
+      disabled={isLoggingOut}
       onClick={async () => {
         if (isLoggingOut) return;
         setIsLoggingOut(true);
