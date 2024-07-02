@@ -26,7 +26,7 @@ export default function SideSheetContent() {
   return (
     <SheetContent>
       <div className="flex flex-col gap-4 py-4  h-full">
-        <div className="profile-side-sheet">
+        <div className="profile-side-sheet border-b border-gray-400 pb-4">
           <div className="w-12 h-12 bg-white rounded-full item-a"></div>
           <h2 className="text-xl font-bold item-b">{user.name}</h2>
           <div className="text-md font-medium text-gray-400 item-c flex gap-2">
