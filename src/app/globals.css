@@ -10,6 +10,26 @@ a.underlined {
   @apply underline-offset-2 underline;
 }
 
+.profile-side-sheet {
+  @apply gap-x-2 justify-start;
+  display: grid;
+  grid-template:
+    "a b" auto
+    "a c" auto;
+}
+
+.item-a {
+  grid-area: a;
+}
+
+.item-b {
+  grid-area: b;
+}
+
+.item-c {
+  grid-area: c;
+}
+
 @layer base {
   :root {
     --background: hsl(0, 0%, 95%);

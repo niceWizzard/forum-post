@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,35 +13,28 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useUserStore } from "@/store/userStore";
+import Link from "next/link";
 
-export default async function SideSheetContent() {
+export default function SideSheetContent() {
+  const user = useUserStore((v) => v.user);
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <SheetContent>
-      <SheetHeader>
-        <SheetTitle>Profile</SheetTitle>
-        <SheetDescription>
-          Make changes to your profile here. Click save when you're done.
-        </SheetDescription>
-      </SheetHeader>
-      <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="name" className="text-right">
-            Name
-          </Label>
-          <Input id="name" value="Pedro Duarte" className="col-span-3" />
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="username" className="text-right">
-            Username
-          </Label>
-          <Input id="username" value="@peduarte" className="col-span-3" />
+      <div className="flex flex-col gap-4 py-4  h-full">
+        <div className="profile-side-sheet">
+          <div className="w-12 h-12 bg-white rounded-full item-a"></div>
+          <h2 className="text-xl font-bold item-b">{user.name}</h2>
+          <div className="text-md font-medium text-gray-400 item-c flex gap-2">
+            <span>@{user.username}</span>
+            <Link href={`/profile/${user.id}`}>View Profile</Link>
+          </div>
         </div>
       </div>
-      <SheetFooter>
-        <SheetClose asChild>
-          <Button type="submit">Save changes</Button>
-        </SheetClose>
-      </SheetFooter>
     </SheetContent>
   );
 }
