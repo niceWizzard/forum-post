@@ -1,0 +1,41 @@
+"use client";
+
+import React, { useState } from "react";
+import SideSheet from "./sideSheet";
+import { User } from "lucia";
+import { logout } from "@/server/auth/action";
+import Link from "next/link";
+import { Sheet, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import SideSheetContent from "./sideSheet";
+
+function ProfileButton() {
+  return (
+    <SheetTrigger asChild>
+      <Button>Profile</Button>
+    </SheetTrigger>
+  );
+}
+
+const HeaderNav = ({ user }: { user: User | null }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const profileButton = <ProfileButton />;
+
+  return (
+    <Sheet>
+      <nav className="flex gap-3 items-center">
+        {user ? (
+          profileButton
+        ) : (
+          <Link href="/login" className="underlined">
+            Login
+          </Link>
+        )}
+      </nav>
+      <SideSheetContent />
+    </Sheet>
+  );
+};
+
+export default HeaderNav;

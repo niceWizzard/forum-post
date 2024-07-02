@@ -1,5 +1,5 @@
-import { logout, validateRequest } from "@/server/auth/action";
-import Link from "next/link";
+import { validateRequest } from "@/server/auth/action";
+import HeaderNav from "./headerNav";
 
 const Header = async () => {
   const { user } = await validateRequest();
@@ -7,17 +7,7 @@ const Header = async () => {
     <header className="border-b-2  ">
       <div className="w-full mx-auto container flex justify-between px-2 py-4 items-center">
         <h1 className="text-xl font-semibold">Forum Poster</h1>
-        <nav className="flex gap-3 items-center">
-          {user ? (
-            <form action={logout}>
-              <button type="submit">Logout</button>
-            </form>
-          ) : (
-            <Link href="/login" className="underlined">
-              Login
-            </Link>
-          )}
-        </nav>
+        <HeaderNav user={user} />
       </div>
     </header>
   );
