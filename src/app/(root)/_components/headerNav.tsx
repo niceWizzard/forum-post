@@ -5,7 +5,12 @@ import SideSheet from "./sideSheet";
 import { User } from "lucia";
 import { logout } from "@/server/auth/action";
 import Link from "next/link";
-import { Sheet, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
 function ProfileButton() {
@@ -23,6 +28,10 @@ const HeaderNav = ({ user }: { user: User | null }) => {
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <SheetTitle className="sr-only">Side navigation</SheetTitle>
+      <SheetDescription className="sr-only">
+        Profile navigation
+      </SheetDescription>
       <nav className="flex gap-3 items-center">
         {user ? (
           profileButton
