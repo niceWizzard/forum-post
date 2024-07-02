@@ -20,7 +20,10 @@ import Link from "next/link";
 import { useState } from "react";
 
 const SideSheet = ({ setIsOpen }: { setIsOpen: (a: boolean) => void }) => {
-  const user = useUserStore((v) => v.user);
+  const { user, clearUser } = useUserStore(({ user, clearUser }) => ({
+    user,
+    clearUser,
+  }));
 
   if (!user) {
     return null;
@@ -36,13 +39,21 @@ const SideSheet = ({ setIsOpen }: { setIsOpen: (a: boolean) => void }) => {
             <span>@{user.username}</span>
             <Link
               href={`/profile/${user.id}`}
-              onClickCapture={() => setIsOpen(false)}
+              onClickCapture={() => {
+                setIsOpen(false);
+              }}
             >
               View Profile
             </Link>
           </div>
         </div>
-        <LogoutButton onLogout={() => setIsOpen(false)} />
+        <LogoutButton
+          onLogout={() => {
+            console.log("CLEARING USER");
+            clearUser();
+            setIsOpen(false);
+          }}
+        />
       </div>
     </SheetContent>
   );
@@ -57,8 +68,8 @@ function LogoutButton({ onLogout }: { onLogout: () => void }) {
       onClick={async () => {
         if (isLoggingOut) return;
         setIsLoggingOut(true);
-        await logout();
         onLogout();
+        await logout();
       }}
     >
       {isLoggingOut ? (
