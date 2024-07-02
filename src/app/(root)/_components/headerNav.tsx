@@ -7,7 +7,6 @@ import { logout } from "@/server/auth/action";
 import Link from "next/link";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import SideSheetContent from "./sideSheet";
 
 function ProfileButton() {
   return (
@@ -23,7 +22,7 @@ const HeaderNav = ({ user }: { user: User | null }) => {
   const profileButton = <ProfileButton />;
 
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <nav className="flex gap-3 items-center">
         {user ? (
           profileButton
@@ -33,7 +32,7 @@ const HeaderNav = ({ user }: { user: User | null }) => {
           </Link>
         )}
       </nav>
-      <SideSheetContent />
+      <SideSheet setIsOpen={setIsOpen} />
     </Sheet>
   );
 };

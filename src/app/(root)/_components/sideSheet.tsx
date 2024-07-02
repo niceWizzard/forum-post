@@ -16,7 +16,7 @@ import {
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
 
-export default function SideSheetContent() {
+const SideSheet = ({ setIsOpen }: { setIsOpen: (a: boolean) => void }) => {
   const user = useUserStore((v) => v.user);
 
   if (!user) {
@@ -31,10 +31,16 @@ export default function SideSheetContent() {
           <h2 className="text-xl font-bold item-b">{user.name}</h2>
           <div className="text-md font-medium text-gray-400 item-c flex gap-2">
             <span>@{user.username}</span>
-            <Link href={`/profile/${user.id}`}>View Profile</Link>
+            <Link
+              href={`/profile/${user.id}`}
+              onClickCapture={() => setIsOpen(false)}
+            >
+              View Profile
+            </Link>
           </div>
         </div>
       </div>
     </SheetContent>
   );
-}
+};
+export default SideSheet;
