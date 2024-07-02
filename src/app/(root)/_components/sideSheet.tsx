@@ -15,12 +15,12 @@ import {
 } from "@/components/ui/sheet";
 import { logout } from "@/server/auth/action";
 import { useUserStore } from "@/store/userStore";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
 const SideSheet = ({ setIsOpen }: { setIsOpen: (a: boolean) => void }) => {
   const user = useUserStore((v) => v.user);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   if (!user) {
     return null;
@@ -42,19 +42,34 @@ const SideSheet = ({ setIsOpen }: { setIsOpen: (a: boolean) => void }) => {
             </Link>
           </div>
         </div>
-        <Button
-          variant="destructive"
-          onClick={async () => {
-            if (isLoggingOut) return;
-            setIsLoggingOut(true);
-            await logout();
-            setIsOpen(false);
-          }}
-        >
-          {isLoggingOut ? "Logging out" : "Log out"}
-        </Button>
+        <LogoutButton onLogout={() => setIsOpen(false)} />
       </div>
     </SheetContent>
   );
 };
+
+function LogoutButton({ onLogout }: { onLogout: () => void }) {
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  return (
+    <Button
+      variant="destructive"
+      onClick={async () => {
+        if (isLoggingOut) return;
+        setIsLoggingOut(true);
+        await logout();
+        onLogout();
+      }}
+    >
+      {isLoggingOut ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Logging out
+        </>
+      ) : (
+        "Log out"
+      )}
+    </Button>
+  );
+}
+
 export default SideSheet;
