@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-a {
-  @apply text-primary font-semibold;
-}
-
 a.underlined {
   @apply underline-offset-2 underline;
 }
