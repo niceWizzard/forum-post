@@ -21,6 +21,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useDebouncedCallback } from "use-debounce";
 import { useFormState } from "react-dom";
+import { useUserStore } from "@/store/userStore";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   username: z
@@ -64,14 +67,24 @@ function OnBoardingForm() {
     reset,
   } = useUsernameCheckStatus();
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const setUser = useUserStore((v) => v.setUser);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const router = useRouter();
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     if (
       state == Status.Loading ||
       (state == Status.Finished && !usernameAvailable)
     ) {
       return;
     }
-    saveRequiredUserFields(values);
+    setHasSubmitted(true);
+    const res = await saveRequiredUserFields(values);
+    if (!res.error) {
+      console.log("SETTING USER");
+      setUser(res.user ?? null);
+    }
+    router.push("/feed");
   }
 
   const usernameCheck = useDebouncedCallback(async (username: string) => {
@@ -141,7 +154,16 @@ function OnBoardingForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit" disabled={hasSubmitted}>
+          {hasSubmitted ? (
+            <>
+              <Loader2 />
+              Submitting...
+            </>
+          ) : (
+            <span>Submit</span>
+          )}
+        </Button>
       </form>
     </Form>
   );

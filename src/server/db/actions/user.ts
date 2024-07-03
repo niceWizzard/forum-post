@@ -17,7 +17,6 @@ export async function saveRequiredUserFields({ name, username }: Fields) {
     return {
       status: 403,
       error: true,
-      unathorized: true,
       message: "Please sign in",
     };
   }
@@ -40,7 +39,11 @@ export async function saveRequiredUserFields({ name, username }: Fields) {
     }
   }
 
-  redirect("/feed");
+  return {
+    error: false,
+    status: 200,
+    user: (await getAuth()).user,
+  };
 }
 
 export async function checkUsernameAvailability(username: string) {
