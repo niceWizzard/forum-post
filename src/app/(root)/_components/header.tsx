@@ -22,7 +22,9 @@ const Header = () => {
           <nav className="flex gap-3 items-center">
             {!isLoading &&
               (user ? (
-                <Button onClick={() => setIsOpen(true)}>Profile</Button>
+                <Button onClick={() => setIsOpen(true)} variant="outline">
+                  Profile
+                </Button>
               ) : (
                 <Link href="/login" className="underlined">
                   Login
