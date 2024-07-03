@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  checkUsernameAvailability,
-  saveRequiredUserFields,
-} from "@/server/db/actions/user";
+import { saveRequiredUserFields } from "@/server/db/actions/user";
 import { useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
@@ -24,6 +21,7 @@ import { useFormState } from "react-dom";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { ApiResponse } from "@/server/apiResponse";
 
 const formSchema = z.object({
   username: z
@@ -93,7 +91,12 @@ function OnBoardingForm() {
       return;
     }
     fetching();
-    const a = await checkUsernameAvailability(username);
+    const url = new URL(
+      "api/name-availability?type=username",
+      "http://localhost:3000"
+    );
+    url.searchParams.append("name", username);
+    const a: ApiResponse<boolean> = await (await fetch(url)).json();
     if (a.error) {
       reset();
     } else {

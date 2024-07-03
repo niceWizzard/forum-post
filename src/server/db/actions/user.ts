@@ -45,28 +45,3 @@ export async function saveRequiredUserFields({ name, username }: Fields) {
     user: (await getAuth()).user,
   };
 }
-
-export async function checkUsernameAvailability(username: string) {
-  if (!username.trim()) {
-    return {
-      error: true,
-      message: "bad username",
-    };
-  }
-  const { user } = await getAuth();
-  if (!user) {
-    return {
-      error: true,
-      message: "Please login",
-    };
-  }
-
-  const res = await db.query.userTable.findFirst({
-    where: eq(userTable.username, username),
-  });
-
-  return {
-    error: false,
-    data: res == null,
-  };
-}

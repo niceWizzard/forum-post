@@ -11,10 +11,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import {
-  checkForumNameAvailability,
-  createForum,
-} from "@/server/db/actions/forum";
+import { ApiResponse } from "@/server/apiResponse";
+import { createForum } from "@/server/db/actions/forum";
 import { useUserStore } from "@/store/userStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import clsx from "clsx";
@@ -84,7 +82,10 @@ function ForumCreateForm({ userId }: { userId: string }) {
       return;
     }
     fetching();
-    const a = await checkForumNameAvailability(forumName);
+    const url = new URL("api/name-availability", "http://localhost:3000");
+    url.searchParams.append("type", "forum");
+    url.searchParams.append("name", forumName);
+    const a: ApiResponse<boolean> = await (await fetch(url)).json();
     if (a.error) {
       reset();
     } else {
