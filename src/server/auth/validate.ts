@@ -1,6 +1,6 @@
 import "server-only";
 import { redirect } from "next/navigation";
-import { validateRequest } from "./action";
+import { validateRequest } from ".";
 
 type Auth = Awaited<ReturnType<typeof validateRequest>>;
 
