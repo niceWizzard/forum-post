@@ -88,9 +88,14 @@ export async function GET(request: Request): Promise<Response> {
         status: 400,
       });
     }
-    return new Response(null, {
-      status: 500,
-    });
+    return Response.json(
+      {
+        message: e.message,
+      },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
