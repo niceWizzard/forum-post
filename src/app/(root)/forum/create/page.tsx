@@ -1,4 +1,3 @@
-import React from "react";
 import ForumCreateForm from "./_components/ForumCreateForm";
 import { authenticatedOnly } from "@/server/auth/validate";
 
