@@ -81,8 +81,8 @@ function LogoutButton({ onLogout }: { onLogout: () => void }) {
       onClick={async () => {
         if (isLoggingOut) return;
         setIsLoggingOut(true);
-        onLogout();
         await logout();
+        onLogout();
       }}
     >
       {isLoggingOut ? (
