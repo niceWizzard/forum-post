@@ -1,4 +1,3 @@
-import { validateRequest } from "@/server/auth/action";
 import "client-only";
 import { User } from "lucia";
 import { create } from "zustand";
