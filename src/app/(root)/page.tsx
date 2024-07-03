@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { MotionDiv, MotionH2, MotionP } from "./_components/motionComponents";
-import { validateRequest } from "@/server/auth/action";
 import { redirect } from "next/navigation";
 import { unathenticatedOnly } from "@/server/auth/validate";
 

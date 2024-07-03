@@ -4,7 +4,7 @@ import "@/app/globals.css";
 import Header from "./_components/header";
 import Footer from "./_components/footer";
 import StoreProvider from "./_components/storeProvider";
-import { validateRequest } from "@/server/auth";
+import { getAuth } from "@/server/auth";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,7 +18,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user } = await validateRequest();
+  const { user } = await getAuth();
 
   return (
     <html lang="en" className="dark">

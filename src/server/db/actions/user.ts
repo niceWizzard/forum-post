@@ -1,10 +1,10 @@
 "use server";
-import { validateRequest } from "@/server/auth/action";
 import "server-only";
 import { db } from "../index";
 import { userTable } from "../schema";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { getAuth } from "@/server/auth";
 
 interface Fields {
   username: string;
@@ -12,7 +12,7 @@ interface Fields {
 }
 
 export async function saveRequiredUserFields({ name, username }: Fields) {
-  const { user } = await validateRequest();
+  const { user } = await getAuth();
   if (!user) {
     return {
       status: 403,
@@ -50,7 +50,7 @@ export async function checkUsernameAvailability(username: string) {
       message: "bad username",
     };
   }
-  const { user } = await validateRequest();
+  const { user } = await getAuth();
   if (!user) {
     return {
       error: true,

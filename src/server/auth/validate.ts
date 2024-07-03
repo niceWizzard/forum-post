@@ -1,8 +1,8 @@
 import "server-only";
 import { redirect } from "next/navigation";
-import { validateRequest } from ".";
+import { getAuth } from ".";
 
-type Auth = Awaited<ReturnType<typeof validateRequest>>;
+type Auth = Awaited<ReturnType<typeof getAuth>>;
 
 interface Options {
   auth?: Auth;
@@ -19,7 +19,7 @@ export async function authenticatedOnly(
   }
 ) {
   if (!auth) {
-    auth = await validateRequest();
+    auth = await getAuth();
   }
 
   if (auth.user == null) {
@@ -38,7 +38,7 @@ export async function unathenticatedOnly({
   redirectUrl,
 }: Options = {}): Promise<undefined> {
   if (!auth) {
-    auth = await validateRequest();
+    auth = await getAuth();
   }
 
   if (auth.user != null) {
