@@ -11,10 +11,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { checkForumNameAvailability } from "@/server/db/actions/forum";
+import {
+  checkForumNameAvailability,
+  createForum,
+} from "@/server/db/actions/forum";
+import { useUserStore } from "@/store/userStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import clsx from "clsx";
 import { Loader2, LoaderCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDebouncedCallback } from "use-debounce";
@@ -32,7 +37,7 @@ const formSchema = z.object({
 
 type ForumSchema = z.infer<typeof formSchema>;
 
-function ForumCreateForm() {
+function ForumCreateForm({ userId }: { userId: string }) {
   const form = useForm<ForumSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -40,6 +45,8 @@ function ForumCreateForm() {
       description: "",
     },
   });
+
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const {
     reset,
@@ -49,7 +56,27 @@ function ForumCreateForm() {
     data: forumNameAvailable,
   } = useForumNameCheckStatus();
 
-  function onSubmit(values: ForumSchema) {}
+  const router = useRouter();
+
+  async function onSubmit(values: ForumSchema) {
+    if (
+      state == Status.Loading ||
+      state == Status.Unset ||
+      !forumNameAvailable ||
+      hasSubmitted
+    ) {
+      return;
+    }
+    setHasSubmitted(true);
+    const res = await createForum({
+      forumDesc: values.description,
+      forumName: values.name,
+      userId,
+    });
+    if (!res.error) {
+      router.push("/feed");
+    }
+  }
 
   const forumNameCheck = useDebouncedCallback(async (forumName: string) => {
     if (!forumName.trim() || forumName.length < 3) {
@@ -130,8 +157,15 @@ function ForumCreateForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="md:self-end">
-          Create forum
+        <Button type="submit" className="md:self-end" disabled={hasSubmitted}>
+          {hasSubmitted ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Creating...
+            </>
+          ) : (
+            "Create forum"
+          )}
         </Button>
       </form>
     </Form>
