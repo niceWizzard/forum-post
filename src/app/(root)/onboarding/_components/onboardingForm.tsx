@@ -86,7 +86,7 @@ function OnBoardingForm() {
   }
 
   const usernameCheck = useDebouncedCallback(async (username: string) => {
-    if (!username.trim() || username.length < 3) {
+    if (!username.trim() || username.length < 3 || !form.formState.isValid) {
       reset();
       return;
     }

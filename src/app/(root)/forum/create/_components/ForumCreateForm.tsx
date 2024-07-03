@@ -77,7 +77,7 @@ function ForumCreateForm({ userId }: { userId: string }) {
   }
 
   const forumNameCheck = useDebouncedCallback(async (forumName: string) => {
-    if (!forumName.trim() || forumName.length < 3) {
+    if (!forumName.trim() || forumName.length < 3 || !form.formState.isValid) {
       reset();
       return;
     }
@@ -100,7 +100,7 @@ function ForumCreateForm({ userId }: { userId: string }) {
           className={cn(
             clsx({
               "text-green-400": forumNameAvailable,
-              "text-destructive-foreground": !forumNameAvailable,
+              "text-destructive": !forumNameAvailable,
             })
           )}
         >
