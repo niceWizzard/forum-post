@@ -1,5 +1,4 @@
 import { authenticatedOnly } from "@/server/auth/validate";
-import React from "react";
 import OnBoardingForm from "./_components/onboardingForm";
 import { redirect } from "next/navigation";
 

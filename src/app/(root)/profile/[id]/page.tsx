@@ -1,5 +1,4 @@
 import { getUserProfile } from "@/server/db/queries/user";
-import React from "react";
 
 interface Props {
   params: { id: string };
