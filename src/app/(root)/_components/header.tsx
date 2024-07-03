@@ -6,7 +6,10 @@ import { Button } from "@/components/ui/button";
 import SideSheet from "./sideSheet";
 
 const Header = () => {
-  const user = useUserStore((v) => v.user);
+  const { user, isLoading } = useUserStore(({ user, isLoading }) => ({
+    user,
+    isLoading,
+  }));
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -17,13 +20,14 @@ const Header = () => {
             <h1 className="text-xl font-semibold">Forum Poster</h1>
           </Link>
           <nav className="flex gap-3 items-center">
-            {user ? (
-              <Button onClick={() => setIsOpen(true)}>Profile</Button>
-            ) : (
-              <Link href="/login" className="underlined">
-                Login
-              </Link>
-            )}
+            {!isLoading &&
+              (user ? (
+                <Button onClick={() => setIsOpen(true)}>Profile</Button>
+              ) : (
+                <Link href="/login" className="underlined">
+                  Login
+                </Link>
+              ))}
           </nav>
         </div>
       </header>

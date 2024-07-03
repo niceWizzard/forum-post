@@ -7,9 +7,10 @@ import { useEffect } from "react";
 export default function StoreProvider(
   { initialState }: { initialState: User | null } = { initialState: null }
 ) {
-  const setUser = useUserStore((v) => v.setUser);
+  const { setUser, setLoaded } = useUserStore();
   useEffect(() => {
     setUser(initialState);
+    setLoaded();
   }, []);
   return null;
 }
