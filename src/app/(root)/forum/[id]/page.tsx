@@ -1,6 +1,7 @@
 import { getForumById, getForumPosts } from "@/server/db/queries/forum";
 import { forumTable, postTable } from "@/server/db/schema";
 import { InferSelectModel } from "drizzle-orm";
+import Link from "next/link";
 
 interface Props {
   params: { id: string };
@@ -17,7 +18,7 @@ const ForumWithIdPage = async ({ params: { id } }: Props) => {
   return (
     <section className="flex flex-col min-h-[80vh]">
       <ForumHeader forum={forum} />
-      <ForumContent posts={posts} />
+      <ForumContent posts={posts} forumId={forum.id} />
     </section>
   );
 };
@@ -27,15 +28,28 @@ export default ForumWithIdPage;
 type Forum = InferSelectModel<typeof forumTable>;
 type Post = InferSelectModel<typeof postTable>;
 
-function ForumContent({ posts }: { posts: Post[] }) {
+function ForumContent({ posts, forumId }: { posts: Post[]; forumId: string }) {
   return (
-    <div className="px-4 py-6  flex-grow">
+    <div className="px-4 py-6 flex flex-col  flex-grow">
+      <Link
+        href={`/post/create/${forumId}`}
+        className="border border-secondary rounded-md px-3 py-2 self-end"
+      >
+        Post something
+      </Link>
       <div className="container h-full">
         <div className="flex flex-col h-full">
           {posts.map((post) => (
             <p key={post.id}>{post.title}</p>
           ))}
-          {!posts.length && <span className="text-center">No posts yet..</span>}
+          {!posts.length && (
+            <span className="text-center">
+              No posts yet..{" "}
+              <Link href={`/post/create/${forumId}`} className="text-primary">
+                Create now
+              </Link>
+            </span>
+          )}
         </div>
       </div>
     </div>
