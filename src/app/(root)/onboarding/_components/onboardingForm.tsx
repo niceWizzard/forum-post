@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { ApiResponse } from "@/server/apiResponse";
 import { env } from "@/env/client.mjs";
+import { useEffectUpdate } from "@/lib/utils";
 
 const formSchema = z.object({
   username: z
@@ -70,6 +71,8 @@ function OnBoardingForm() {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const router = useRouter();
 
+  const usernameChange = form.watch("username");
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (
       state == Status.Loading ||
@@ -87,7 +90,7 @@ function OnBoardingForm() {
   }
 
   const usernameCheck = useDebouncedCallback(async (username: string) => {
-    if (!username.trim() || username.length < 3 || !form.formState.isValid) {
+    if (!(await form.trigger("username"))) {
       reset();
       return;
     }
@@ -104,6 +107,10 @@ function OnBoardingForm() {
       finish(a.data ?? false);
     }
   }, 300);
+
+  useEffectUpdate(() => {
+    usernameCheck(usernameChange);
+  }, [usernameChange]);
 
   function UsernameStatus() {
     if (state == Status.Finished) {
@@ -130,13 +137,7 @@ function OnBoardingForm() {
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="MyUsername"
-                  {...field}
-                  onChangeCapture={async (e) =>
-                    await usernameCheck(e.currentTarget.value)
-                  }
-                />
+                <Input placeholder="MyUsername" {...field} />
               </FormControl>
               <FormMessage />
               <UsernameStatus />
