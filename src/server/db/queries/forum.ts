@@ -17,3 +17,11 @@ export async function getCreatedForums(userId: string) {
 
   return createdForums;
 }
+
+export async function getForumById(forumId: string) {
+  const forum = await db.query.forumTable.findFirst({
+    where: eq(forumTable.id, forumId),
+  });
+
+  return forum;
+}
