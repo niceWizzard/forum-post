@@ -24,6 +24,7 @@ import { Loader2 } from "lucide-react";
 import { ApiResponse } from "@/server/apiResponse";
 import { env } from "@/env/client.mjs";
 import { useEffectUpdate } from "@/lib/utils";
+import { LoadingButton } from "@/components/ui/loadingButton";
 
 const formSchema = z.object({
   username: z
@@ -159,16 +160,13 @@ function OnBoardingForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={hasSubmitted}>
-          {hasSubmitted ? (
-            <>
-              <Loader2 />
-              Submitting...
-            </>
-          ) : (
-            <span>Submit</span>
-          )}
-        </Button>
+        <LoadingButton
+          type="submit"
+          isLoading={hasSubmitted}
+          loadingText="Submiting..."
+        >
+          Submit
+        </LoadingButton>
       </form>
     </Form>
   );

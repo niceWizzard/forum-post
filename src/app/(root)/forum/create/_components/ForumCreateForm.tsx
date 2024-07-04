@@ -23,6 +23,7 @@ import { useForm } from "react-hook-form";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
 import { useEffect, useState } from "react";
+import { LoadingButton } from "@/components/ui/loadingButton";
 
 const formSchema = z.object({
   name: z
@@ -159,16 +160,14 @@ function ForumCreateForm({ userId }: { userId: string }) {
             </FormItem>
           )}
         />
-        <Button type="submit" className="md:self-end" disabled={hasSubmitted}>
-          {hasSubmitted ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating...
-            </>
-          ) : (
-            "Create forum"
-          )}
-        </Button>
+        <LoadingButton
+          type="submit"
+          className="md:self-end"
+          isLoading={hasSubmitted}
+          loadingText="Creating..."
+        >
+          Create
+        </LoadingButton>
       </form>
     </Form>
   );
