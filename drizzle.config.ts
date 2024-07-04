@@ -1,9 +1,12 @@
 import { env } from "@/env/server.mjs";
 
 import { defineConfig } from "drizzle-kit";
+
+const schemaPath = "./src/server/db/schema";
+const schemas = ["index.ts", "comment.ts", "forum.ts", "post.ts"];
 export default defineConfig({
   dialect: "postgresql",
-  schema: "./src/server/db/schema/index.ts",
+  schema: schemas.map((v) => `${schemaPath}/${v}`),
   out: "./drizzle",
   dbCredentials: {
     url: env.NEON_DATABASE_URL,
