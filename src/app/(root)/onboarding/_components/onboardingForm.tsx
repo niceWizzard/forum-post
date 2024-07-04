@@ -22,6 +22,7 @@ import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { ApiResponse } from "@/server/apiResponse";
+import { env } from "@/env/client.mjs";
 
 const formSchema = z.object({
   username: z
@@ -93,7 +94,7 @@ function OnBoardingForm() {
     fetching();
     const url = new URL(
       "api/name-availability?type=username",
-      "http://localhost:3000"
+      env.PUBLIC_BASE_URL
     );
     url.searchParams.append("name", username);
     const a: ApiResponse<boolean> = await (await fetch(url)).json();

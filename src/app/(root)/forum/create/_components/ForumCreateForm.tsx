@@ -10,6 +10,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { env } from "@/env/client.mjs";
 import { cn } from "@/lib/utils";
 import { ApiResponse } from "@/server/apiResponse";
 import { createForum } from "@/server/db/actions/forum";
@@ -82,7 +83,7 @@ function ForumCreateForm({ userId }: { userId: string }) {
       return;
     }
     fetching();
-    const url = new URL("api/name-availability", "http://localhost:3000");
+    const url = new URL("api/name-availability", env.PUBLIC_BASE_URL);
     url.searchParams.append("type", "forum");
     url.searchParams.append("name", forumName);
     const a: ApiResponse<boolean> = await (await fetch(url)).json();
