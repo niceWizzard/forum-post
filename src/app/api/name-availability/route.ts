@@ -1,5 +1,6 @@
 import { db } from "@/server/db";
-import { forumTable, userTable } from "@/server/db/schema";
+import { userTable } from "@/server/db/schema";
+import { forumTable } from "@/server/db/schema/forum";
 import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 
