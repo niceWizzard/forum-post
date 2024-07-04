@@ -34,3 +34,22 @@ export const forumMemberTable = pgTable(
     pk: primaryKey({ columns: [table.forumId, table.userId] }),
   })
 );
+
+export const forumAdminTable = pgTable(
+  "forum_admin",
+  {
+    adminId: uuid("id")
+      .notNull()
+      .references(() => userTable.id, {
+        onDelete: "cascade",
+      }),
+    forumId: uuid("id")
+      .notNull()
+      .references(() => forumTable.id, {
+        onDelete: "cascade",
+      }),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.adminId, table.forumId] }),
+  })
+);
