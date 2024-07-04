@@ -1,7 +1,8 @@
 import "server-only";
 import { db } from "..";
-import { forumMemberTable, forumTable, postTable } from "../schema";
 import { eq } from "drizzle-orm";
+import { forumMemberTable, forumTable } from "../schema/forum";
+import { postTable } from "../schema/post";
 
 export async function getJoinedForums(userId: string) {
   const joinedForums = await db.query.forumMemberTable.findMany({

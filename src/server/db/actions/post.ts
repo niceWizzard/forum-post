@@ -3,8 +3,8 @@ import "server-only";
 import { z } from "zod";
 import { postCreateFormSchema } from "./schema";
 import { db } from "../index";
-import { postTable } from "../schema";
 import { getAuth } from "@/server/auth";
+import { postTable } from "../schema/post";
 
 export const createForumPost = async ({
   forumId,

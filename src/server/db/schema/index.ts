@@ -1,11 +1,5 @@
 import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
-export { postLikeTable, postTable } from "./post";
-
-export { commentLikeTable, commentTable } from "./comment";
-
-export { forumMemberTable, forumTable } from "./forum";
-
 export const userTable = pgTable("user", {
   id: uuid("id").primaryKey().defaultRandom(),
   username: text("username").unique(),
