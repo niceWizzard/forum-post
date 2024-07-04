@@ -1,6 +1,6 @@
 import "server-only";
 import { db } from "..";
-import { forumMemberTable, forumTable } from "../schema";
+import { forumMemberTable, forumTable, postTable } from "../schema";
 import { eq } from "drizzle-orm";
 
 export async function getJoinedForums(userId: string) {
@@ -24,4 +24,12 @@ export async function getForumById(forumId: string) {
   });
 
   return forum;
+}
+
+export async function getForumPosts(forumId: string) {
+  const posts = await db.query.postTable.findMany({
+    where: eq(postTable.forumId, forumId),
+  });
+
+  return posts;
 }

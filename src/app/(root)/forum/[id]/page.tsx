@@ -1,6 +1,5 @@
-import { getForumById } from "@/server/db/queries/forum";
-import { forumTable } from "@/server/db/schema";
-import * as schema from "@/server/db/schema";
+import { getForumById, getForumPosts } from "@/server/db/queries/forum";
+import { forumTable, postTable } from "@/server/db/schema";
 import { InferSelectModel } from "drizzle-orm";
 
 interface Props {
@@ -13,19 +12,37 @@ const ForumWithIdPage = async ({ params: { id } }: Props) => {
     return "Invalid forum";
   }
 
+  const posts = await getForumPosts(id);
+
   return (
-    <section>
+    <section className="flex flex-col min-h-[80vh]">
       <ForumHeader forum={forum} />
+      <ForumContent posts={posts} />
     </section>
   );
 };
 
 export default ForumWithIdPage;
-function ForumHeader({
-  forum,
-}: {
-  forum: InferSelectModel<typeof forumTable>;
-}) {
+
+type Forum = InferSelectModel<typeof forumTable>;
+type Post = InferSelectModel<typeof postTable>;
+
+function ForumContent({ posts }: { posts: Post[] }) {
+  return (
+    <div className="px-4 py-6  flex-grow">
+      <div className="container h-full">
+        <div className="flex flex-col h-full">
+          {posts.map((post) => (
+            <p key={post.id}>{post.title}</p>
+          ))}
+          {!posts.length && <span className="text-center">No posts yet..</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ForumHeader({ forum }: { forum: Forum }) {
   return (
     <div className="bg-card pt-12 pb-6 px-4 overflow-hidden break-words whitespace-normal">
       <div className="container gap-6 flex flex-col ">
