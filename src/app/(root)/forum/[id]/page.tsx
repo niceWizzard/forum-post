@@ -37,10 +37,18 @@ function ForumContent({ posts, forumId }: { posts: Post[]; forumId: string }) {
       >
         Post something
       </Link>
-      <div className="container h-full">
-        <div className="flex flex-col h-full">
+      <div className="container h-full mt-6">
+        <div className="flex flex-col h-full gap-4">
           {posts.map((post) => (
-            <p key={post.id}>{post.title}</p>
+            <div
+              key={post.id}
+              className="px-4 py-2 overflow-hidden border border-gray-500 rounded-lg"
+            >
+              <h3 className="font-semibold text-lg ">{post.title}</h3>
+              <p className="text-ellipsis text-gray-400 font-light text-sm">
+                {post.body}
+              </p>
+            </div>
           ))}
           {!posts.length && (
             <span className="text-center">
