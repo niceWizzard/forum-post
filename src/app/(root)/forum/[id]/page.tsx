@@ -1,6 +1,7 @@
 import { getForumById, getForumPosts } from "@/server/db/queries/forum";
-import { Forum, Post } from "@/server/db/schema/types";
+import { type Forum, type Post } from "@/server/db/schema/types";
 import Link from "next/link";
+import PostPreview from "./_components/PostPreview";
 
 interface Props {
   params: { id: string };
@@ -36,14 +37,7 @@ function ForumContent({ posts, forumId }: { posts: Post[]; forumId: string }) {
       <div className="container h-full mt-6">
         <div className="flex flex-col h-full gap-4">
           {posts.map((post) => (
-            <Link href={`/post/${post.id}`} key={post.id}>
-              <div className="px-4 py-2 overflow-hidden border border-gray-500 rounded-lg">
-                <h3 className="font-semibold text-lg ">{post.title}</h3>
-                <p className="text-ellipsis text-foreground-light font-light text-sm">
-                  {post.body}
-                </p>
-              </div>
-            </Link>
+            <PostPreview post={post} key={post.id} />
           ))}
           {!posts.length && (
             <span className="text-center">
