@@ -1,6 +1,5 @@
 import { getForumById, getForumPosts } from "@/server/db/queries/forum";
-import { forumTable, postTable } from "@/server/db/schema";
-import { InferSelectModel } from "drizzle-orm";
+import { Forum, Post } from "@/server/db/schema/types";
 import Link from "next/link";
 
 interface Props {
@@ -24,9 +23,6 @@ const ForumWithIdPage = async ({ params: { id } }: Props) => {
 };
 
 export default ForumWithIdPage;
-
-type Forum = InferSelectModel<typeof forumTable>;
-type Post = InferSelectModel<typeof postTable>;
 
 function ForumContent({ posts, forumId }: { posts: Post[]; forumId: string }) {
   return (
