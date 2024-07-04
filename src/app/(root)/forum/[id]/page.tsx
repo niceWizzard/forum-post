@@ -27,15 +27,15 @@ export default ForumWithIdPage;
 
 function ForumContent({ posts, forumId }: { posts: Post[]; forumId: string }) {
   return (
-    <div className="px-4 py-6 flex flex-col  flex-grow">
+    <div className="px-2 py-6 flex flex-col  flex-grow">
       <Link
         href={`/post/create/${forumId}`}
         className="border border-secondary rounded-md px-3 py-2 self-end"
       >
         Post something
       </Link>
-      <div className="container h-full mt-6">
-        <div className="flex flex-col h-full gap-4">
+      <div className="h-full mt-6">
+        <div className="flex flex-col h-full divide-y divide-foreground-lighter ">
           {posts.map((post) => (
             <PostPreview post={post} key={post.id} />
           ))}
@@ -55,7 +55,7 @@ function ForumContent({ posts, forumId }: { posts: Post[]; forumId: string }) {
 
 function ForumHeader({ forum }: { forum: Forum }) {
   return (
-    <div className="bg-card pt-12 pb-6 px-4 overflow-hidden break-words whitespace-normal">
+    <div className="bg-card pt-12 pb-6 px-2 overflow-hidden break-words whitespace-normal">
       <div className="container gap-6 flex flex-col ">
         <div className="row-span-2 flex gap-4 items-center">
           <h3 className="text-xl font-semibold flex-grow">{forum.name}</h3>
