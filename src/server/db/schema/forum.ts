@@ -38,12 +38,12 @@ export const forumMemberTable = pgTable(
 export const forumAdminTable = pgTable(
   "forum_admin",
   {
-    adminId: uuid("id")
+    adminId: uuid("admin_id")
       .notNull()
       .references(() => userTable.id, {
         onDelete: "cascade",
       }),
-    forumId: uuid("id")
+    forumId: uuid("forum_id")
       .notNull()
       .references(() => forumTable.id, {
         onDelete: "cascade",
