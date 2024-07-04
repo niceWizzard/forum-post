@@ -23,7 +23,11 @@ const config = {
         input: "var(--input)",
         ring: "var(--ring)",
         background: "var(--background)",
-        foreground: "var(--foreground)",
+        foreground: {
+          DEFAULT: "var(--foreground)",
+          light: "var(--foreground-light)",
+          lighter: "var(--foreground-lighter)",
+        },
         primary: {
           DEFAULT: "var(--primary)",
           foreground: "var(--primary-foreground)",

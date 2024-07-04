@@ -30,6 +30,8 @@ a.underlined {
   :root {
     --background: hsl(0, 0%, 95%);
     --foreground: hsl(222.2 84% 4.9%);
+    --foreground-light: hsl(223, 53%, 7%);
+    --foreground-lighter: hsl(223, 53%, 15%);
 
     --card: hsl(0 0% 100%);
     --card-foreground: hsl(222.2 84% 4.9%);
@@ -60,6 +62,8 @@ a.underlined {
   }
 
   .dark {
+    --foreground-light: hsl(0, 0%, 90%);
+    --foreground-lighter: hsl(0, 0%, 70%);
     --background: hsl(0, 0%, 1%);
     --foreground: hsl(210, 17%, 98%);
 
