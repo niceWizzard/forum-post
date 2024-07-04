@@ -72,8 +72,8 @@ function ForumCreateForm({ userId }: { userId: string }) {
       forumName: values.name,
       userId,
     });
-    if (!res.error) {
-      router.push("/feed");
+    if (!res.error && res.data) {
+      router.push(`/forum/${res.data.forumId}`);
     }
   }
 

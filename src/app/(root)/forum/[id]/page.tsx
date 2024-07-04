@@ -12,7 +12,7 @@ const ForumWithIdPage = async ({ params: { id } }: Props) => {
   return (
     <div>
       <h3>{forum.name}</h3>
-      <span>Created at {new Date(forum.createdAt).toLocaleTimeString()}</span>
+      <span>Created at {new Date(forum.createdAt).toLocaleString()}</span>
     </div>
   );
 };

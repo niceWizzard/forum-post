@@ -13,7 +13,7 @@ export async function createForum({
   userId: string;
   forumName: string;
   forumDesc: string;
-}): Promise<{ error: boolean; message: string }> {
+}): Promise<{ error: boolean; message: string, data?: {forumId : string} }> {
   const { user } = await getAuth();
   if (!user) {
     return {
@@ -29,14 +29,17 @@ export async function createForum({
     };
   }
 
-  await db.insert(forumTable).values({
+  const res = await db.insert(forumTable).values({
     name: forumName,
     description: forumDesc,
     ownerId: userId,
-  });
+  }).returning();
 
   return {
     error: false,
     message: "Created succesfully",
+    data : {
+      forumId:  res[0].id
+    }
   };
 }
