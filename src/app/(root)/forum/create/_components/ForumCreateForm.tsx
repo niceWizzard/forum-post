@@ -24,16 +24,9 @@ import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { LoadingButton } from "@/components/ui/loadingButton";
+import { forumCreateSchema } from "@/server/db/actions/schema";
 
-const formSchema = z.object({
-  name: z
-    .string()
-    .min(3, { message: "Forum name must be atleast 3 characters long." })
-    .max(64, { message: "Forum name must not exceed 64 characters." }),
-  description: z.string().max(512, {
-    message: "Forum description must not exceed 512 characters",
-  }),
-});
+const formSchema = forumCreateSchema;
 
 type ForumSchema = z.infer<typeof formSchema>;
 

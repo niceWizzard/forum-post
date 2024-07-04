@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -14,21 +13,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { postCreateFormSchema } from "@/server/db/actions/schema";
+import { createForumPost } from "@/server/db/actions/post";
+import { useRouter } from "next/navigation";
+import { LoadingButton } from "@/components/ui/loadingButton";
+import { useState } from "react";
 
 interface Props {
   forumId: string;
 }
-
-const postCreateFormSchema = z.object({
-  title: z
-    .string()
-    .min(3, { message: "Post title must be atleast 3 characters long." })
-    .max(64, { message: "Post title must not exceed 64 characters" }),
-  content: z
-    .string()
-    .min(1, { message: "Post content is required." })
-    .max(512, { message: "Post content must not exceed 512 characters" }),
-});
 
 type FormSchema = z.infer<typeof postCreateFormSchema>;
 
@@ -41,8 +34,20 @@ export default function PostCreateForm({ forumId }: Props) {
     },
   });
 
+  const router = useRouter();
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+
   async function onSubmit(values: FormSchema) {
-    console.log("onSubmit");
+    const { title, content } = values;
+    setHasSubmitted(true);
+    const res = await createForumPost({
+      title,
+      content,
+      forumId,
+    });
+    if (!res.error && res.data) {
+      router.push(`/post/${res.data.postId}`);
+    }
   }
 
   return (
@@ -76,7 +81,13 @@ export default function PostCreateForm({ forumId }: Props) {
             </FormItem>
           )}
         />
-        <Button type="submit">Create Post</Button>
+        <LoadingButton
+          type="submit"
+          isLoading={hasSubmitted}
+          loadingText="Creating..."
+        >
+          Create Post
+        </LoadingButton>
       </form>
     </Form>
   );
