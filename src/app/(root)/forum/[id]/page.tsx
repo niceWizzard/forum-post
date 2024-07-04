@@ -43,7 +43,7 @@ function ForumContent({ posts, forumId }: { posts: Post[]; forumId: string }) {
             <Link href={`/post/${post.id}`} key={post.id}>
               <div className="px-4 py-2 overflow-hidden border border-gray-500 rounded-lg">
                 <h3 className="font-semibold text-lg ">{post.title}</h3>
-                <p className="text-ellipsis text-gray-400 font-light text-sm">
+                <p className="text-ellipsis text-foreground-light font-light text-sm">
                   {post.body}
                 </p>
               </div>
@@ -72,7 +72,7 @@ function ForumHeader({ forum }: { forum: Forum }) {
           <span className="">500k members</span>
           <button className="row-span-1">Join now</button>
         </div>
-        <p className="text-sm font-light text-gray-300 row-span-1 col-span-1 text-ellipsis ">
+        <p className="text-sm font-light text-foreground-lighter row-span-1 col-span-1 text-ellipsis ">
           {forum.description || "nothing to see here... :)"}
         </p>
       </div>

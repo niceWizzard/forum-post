@@ -53,7 +53,7 @@ const SideSheet = ({
           <div className="profile-side-sheet border-b border-gray-400 pb-4">
             <div className="w-12 h-12 bg-white rounded-full item-a"></div>
             <h2 className="text-md md:text-xl font-bold item-b">{user.name}</h2>
-            <div className="text-sm md:text-md font-medium text-gray-400 item-c flex gap-2">
+            <div className="text-sm md:text-md font-medium text-foreground-lighter item-c flex gap-2">
               <span>@{user.username}</span>
               <Link href={`/profile/${user.id}`}>View Profile</Link>
             </div>

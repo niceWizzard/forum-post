@@ -53,7 +53,7 @@ function HighlightSection() {
           </span>
         </MotionH2>
         <MotionP
-          className="text-gray-300  font-light mt-2 text-lg"
+          className="text-foreground-lighter  font-light mt-2 text-lg"
           initial={{
             opacity: 0,
             translateY: "75%",
@@ -181,7 +181,7 @@ function CountSection() {
             viewport={{
               once: true,
             }}
-            className="font-light text-gray-300 mt-4"
+            className="font-light text-foreground-lighter mt-4"
           >
             Join a vibrant community where your thoughts and ideas take center
             stage. Dive into endless discussions, share your passions, and
@@ -235,7 +235,7 @@ function CommunitySection() {
           viewport={{
             once: true,
           }}
-          className="font-light text-gray-300 mt-4 text-2xl text-justify"
+          className="font-light text-foreground-light mt-4 text-2xl text-justify"
         >
           Join a thriving community where your thoughts and ideas take center
           stage. Dive into endless discussions, share your passions, and connect
