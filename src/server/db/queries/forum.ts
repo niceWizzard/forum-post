@@ -5,7 +5,7 @@ import { forumMemberTable, forumTable } from "../schema/forum";
 import { postTable } from "../schema/post";
 import { cache } from "react";
 import { userTable } from "../schema";
-import { exposeUserType } from "../schema/types";
+import { exposeUserType, PostComplete } from "../schema/types";
 
 export const getJoinedForums = cache(async (userId: string) => {
   const joinedForums = await db.query.forumMemberTable.findMany({
@@ -30,18 +30,26 @@ export const getForumById = cache(async (forumId: string) => {
   return forum;
 });
 
-export const getForumPosts = cache(async (forumId: string) => {
-  const posts = await db
-    .select()
-    .from(postTable)
-    .where(eq(postTable.forumId, forumId))
-    .leftJoin(userTable, eq(postTable.posterId, userTable.id));
+export const getForumPosts = cache(
+  async (forumId: string): Promise<PostComplete[]> => {
+    const posts = await db
+      .select()
+      .from(postTable)
+      .where(eq(postTable.forumId, forumId))
+      .leftJoin(userTable, eq(postTable.posterId, userTable.id))
+      .leftJoin(forumTable, eq(postTable.forumId, forumTable.id));
 
-  return posts.map((v) => {
-    const poster = v.user ? exposeUserType(v.user) : null;
-    return {
-      poster,
-      ...v.post,
-    };
-  });
-});
+    return posts.map((v) => {
+      const poster = v.user ? exposeUserType(v.user) : null;
+      const { name, id } = v.forum!;
+      return {
+        poster,
+        forum: {
+          name,
+          id,
+        },
+        ...v.post,
+      };
+    });
+  }
+);

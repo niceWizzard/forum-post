@@ -15,7 +15,7 @@ export const postTable = pgTable("post", {
   posterId: uuid("poster_id").references(() => userTable.id, {
     onDelete: "set null",
   }),
-  forumId: uuid("forum_id").references(() => forumTable.id, {
+  forumId: uuid("forum_id").notNull().references(() => forumTable.id, {
     onDelete: "cascade",
   }),
   title: varchar("title", { length: 64 }).notNull(),

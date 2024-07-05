@@ -1,5 +1,6 @@
 import { getForumById, getForumPosts } from "@/server/db/queries/forum";
 import {
+  PostComplete,
   PostWithPoster,
   type Forum,
   type Post,
@@ -33,7 +34,7 @@ function ForumContent({
   posts,
   forumId,
 }: {
-  posts: PostWithPoster[];
+  posts: PostComplete[];
   forumId: string;
 }) {
   return (
