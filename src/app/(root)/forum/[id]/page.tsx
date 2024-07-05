@@ -1,10 +1,5 @@
 import { getForumById, getForumPosts } from "@/server/db/queries/forum";
-import {
-  PostComplete,
-  PostWithPoster,
-  type Forum,
-  type Post,
-} from "@/server/db/schema/types";
+import { type Forum, type Post } from "@/server/db/schema/types";
 import Link from "next/link";
 import PostPreview from "./_components/PostPreview";
 
@@ -30,13 +25,7 @@ const ForumWithIdPage = async ({ params: { id } }: Props) => {
 
 export default ForumWithIdPage;
 
-function ForumContent({
-  posts,
-  forumId,
-}: {
-  posts: PostComplete[];
-  forumId: string;
-}) {
+function ForumContent({ posts, forumId }: { posts: Post[]; forumId: string }) {
   return (
     <div className="px-2 py-6 flex flex-col  flex-grow">
       <Link

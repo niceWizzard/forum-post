@@ -1,11 +1,7 @@
-import {
-  type PostComplete,
-  PostWithPoster,
-  type Post,
-} from "@/server/db/schema/types";
+import { type Post } from "@/server/db/schema/types";
 import Link from "next/link";
 
-function PostPreview({ post }: { post: PostComplete }) {
+function PostPreview({ post }: { post: Post }) {
   return (
     <div className="py-4 overflow-hidden  px-2 ">
       <div className="hover:bg-card px-4 py-2 transition-all duration-200">
