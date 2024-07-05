@@ -5,7 +5,12 @@ import { redirect } from "next/navigation";
 export default async function FeedPage() {
   const { user } = await authenticatedOnly();
 
-  const createdForums = await getCreatedForums(user.id);
+  const res = await getCreatedForums(user.id);
+  if (res.error) {
+    return res.message;
+  }
+
+  const createdForums = res.data;
 
   return (
     <div>

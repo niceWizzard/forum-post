@@ -7,7 +7,13 @@ interface Props {
 }
 
 async function ProfilePage({ params: { id } }: Props) {
-  const profile = await getUserProfile(id);
+  const profileRes = await getUserProfile(id);
+
+  if (profileRes.error) {
+    return profileRes.message;
+  }
+
+  const profile = profileRes.data;
 
   return (
     <section className="py-12">

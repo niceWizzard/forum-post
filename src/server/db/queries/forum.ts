@@ -5,13 +5,16 @@ import { forumMemberTable, forumTable } from "../schema/forum";
 import { postTable } from "../schema/post";
 import { cache } from "react";
 import { userTable } from "../schema";
-import { exposeUserType, Post } from "../schema/types";
+import { exposeUserType, Forum, Post } from "../schema/types";
+import { ApiRes, ApiResponse } from "@/server/apiResponse";
 
 export const getJoinedForums = cache(async (userId: string) => {
   const joinedForums = await db.query.forumMemberTable.findMany({
     where: eq(forumMemberTable.userId, userId),
   });
-  return joinedForums;
+  return ApiRes.success({
+    data: joinedForums,
+  });
 });
 
 export const getCreatedForums = cache(async (userId: string) => {
@@ -19,35 +22,61 @@ export const getCreatedForums = cache(async (userId: string) => {
     where: eq(forumTable.ownerId, userId),
   });
 
-  return createdForums;
-});
-
-export const getForumById = cache(async (forumId: string) => {
-  const forum = await db.query.forumTable.findFirst({
-    where: eq(forumTable.id, forumId),
-  });
-
-  return forum;
-});
-
-export const getForumPosts = cache(async (forumId: string): Promise<Post[]> => {
-  const posts = await db
-    .select()
-    .from(postTable)
-    .where(eq(postTable.forumId, forumId))
-    .leftJoin(userTable, eq(postTable.posterId, userTable.id))
-    .leftJoin(forumTable, eq(postTable.forumId, forumTable.id));
-
-  return posts.map((v) => {
-    const poster = v.user ? exposeUserType(v.user) : null;
-    const { name, id } = v.forum!;
-    return {
-      poster,
-      forum: {
-        name,
-        id,
-      },
-      ...v.post,
-    };
+  return ApiRes.success({
+    data: createdForums,
   });
 });
+
+export const getForumById = cache(
+  async (forumId: string): Promise<ApiResponse<Forum>> => {
+    const forum = await db.query.forumTable.findFirst({
+      where: eq(forumTable.id, forumId),
+    });
+
+    if (!forum) {
+      return ApiRes.error({
+        message: "Forum not found",
+        code: 1,
+      });
+    }
+
+    return ApiRes.success({
+      data: forum,
+    });
+  }
+);
+
+export const getForumPosts = cache(
+  async (forumId: string): Promise<ApiResponse<Post[]>> => {
+    const posts = await db
+      .select()
+      .from(postTable)
+      .where(eq(postTable.forumId, forumId))
+      .leftJoin(userTable, eq(postTable.posterId, userTable.id))
+      .leftJoin(forumTable, eq(postTable.forumId, forumTable.id));
+
+    if (posts.length == 0) {
+      return ApiRes.error({
+        message: "Forum not found",
+        code: 1,
+      });
+    }
+
+    const a = posts.map((v) => {
+      const poster = v.user ? exposeUserType(v.user) : null;
+      const { name, id } = v.forum!;
+      return {
+        poster,
+        forum: {
+          name,
+          id,
+        },
+        ...v.post,
+      };
+    });
+
+    return ApiRes.success({
+      data: a,
+    });
+  }
+);

@@ -8,17 +8,23 @@ interface Props {
 }
 
 const ForumWithIdPage = async ({ params: { id } }: Props) => {
-  const forum = await getForumById(id);
-  if (!forum) {
-    return "Invalid forum";
+  const res = await getForumById(id);
+  if (res.error) {
+    return res.message;
   }
 
-  const posts = await getForumPosts(id);
+  const forum = res.data;
+
+  const postsRes = await getForumPosts(id);
+
+  if (postsRes.error) {
+    return postsRes.message;
+  }
 
   return (
     <section className="flex flex-col min-h-[80vh]">
       <ForumHeader forum={forum} />
-      <ForumContent posts={posts} forumId={forum.id} />
+      <ForumContent posts={postsRes.data} forumId={forum.id} />
     </section>
   );
 };
