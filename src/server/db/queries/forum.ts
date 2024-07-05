@@ -7,6 +7,7 @@ import { cache } from "react";
 import { userTable } from "../schema";
 import { exposeUserType, Forum, Post } from "../schema/types";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
+import { ApiError } from "@/server/apiErrors";
 
 export const getJoinedForums = cache(async (userId: string) => {
   const joinedForums = await db.query.forumMemberTable.findMany({
@@ -36,7 +37,7 @@ export const getForumById = cache(
     if (!forum) {
       return ApiRes.error({
         message: "Forum not found",
-        code: 1,
+        code: ApiError.ForumNotFound,
       });
     }
 
@@ -58,7 +59,7 @@ export const getForumPosts = cache(
     if (posts.length == 0) {
       return ApiRes.error({
         message: "Forum not found",
-        code: 1,
+        code: ApiError.ForumNotFound,
       });
     }
 

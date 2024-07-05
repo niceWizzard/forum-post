@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { getAuth } from "@/server/auth";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { User } from "lucia";
+import { ApiError } from "@/server/apiErrors";
 
 interface Fields {
   username: string;
@@ -21,7 +22,7 @@ export async function saveRequiredUserFields({
   if (!user) {
     return ApiRes.error({
       message: "Please sign in",
-      code: 1,
+      code: ApiError.AuthRequired,
     });
   }
 
@@ -37,7 +38,7 @@ export async function saveRequiredUserFields({
     if (e.code && e.code == "23505") {
       return ApiRes.error({
         message: "Username already exists.",
-        code: 1,
+        code: ApiError.UsernameAlreadyExists,
       });
     }
   }

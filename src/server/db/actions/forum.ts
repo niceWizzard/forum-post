@@ -5,6 +5,7 @@ import { db } from "../index";
 import { eq } from "drizzle-orm";
 import { forumTable } from "../schema/forum";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
+import { ApiError } from "@/server/apiErrors";
 
 export async function createForum({
   forumDesc,
@@ -19,14 +20,14 @@ export async function createForum({
   if (!user) {
     return ApiRes.error({
       message: "Please login",
-      code: 1,
+      code: ApiError.AuthRequired,
     });
   }
 
   if (user.id !== userId) {
     return ApiRes.error({
       message: "Unauthorized",
-      code: 1,
+      code: ApiError.Unathorized,
     });
   }
 

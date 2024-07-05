@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { userTable } from "../schema";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { exposeUserType, Forum, User } from "../schema/types";
+import { ApiError } from "@/server/apiErrors";
 
 export const getUser = cache(
   async (userId: string): Promise<ApiResponse<User>> => {
@@ -16,7 +17,7 @@ export const getUser = cache(
     if (!dbRes) {
       return ApiRes.error({
         message: "User not found",
-        code: 1,
+        code: ApiError.UserNotFound,
       });
     }
 
@@ -32,10 +33,7 @@ export const getUserProfile = cache(
   ): Promise<ApiResponse<{ user: User; createdForums: Forum[] }>> => {
     const createdForumsRes = await getCreatedForums(userId);
     if (createdForumsRes.error) {
-      return ApiRes.error({
-        message: createdForumsRes.message,
-        code: 1,
-      });
+      return createdForumsRes;
     }
     const createdForums = createdForumsRes.data;
     const userRes = await getUser(userId);

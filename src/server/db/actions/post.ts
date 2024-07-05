@@ -6,6 +6,7 @@ import { db } from "../index";
 import { getAuth } from "@/server/auth";
 import { postTable } from "../schema/post";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
+import { ApiError } from "@/server/apiErrors";
 
 export const createForumPost = async ({
   forumId,
@@ -19,7 +20,7 @@ export const createForumPost = async ({
   if (!user) {
     return ApiRes.error({
       message: "Please login",
-      code: 1,
+      code: ApiError.AuthRequired,
     });
   }
 
