@@ -4,6 +4,7 @@ import { getAuth } from "@/server/auth";
 import { db } from "../index";
 import { eq } from "drizzle-orm";
 import { forumTable } from "../schema/forum";
+import { ApiRes, ApiResponse } from "@/server/apiResponse";
 
 export async function createForum({
   forumDesc,
@@ -13,20 +14,20 @@ export async function createForum({
   userId: string;
   forumName: string;
   forumDesc: string;
-}): Promise<{ error: boolean; message: string; data?: { forumId: string } }> {
+}): Promise<ApiResponse<{ forumId: string }>> {
   const { user } = await getAuth();
   if (!user) {
-    return {
-      error: true,
+    return ApiRes.error({
       message: "Please login",
-    };
+      code: 1,
+    });
   }
 
   if (user.id !== userId) {
-    return {
-      error: true,
-      message: "Unathorized",
-    };
+    return ApiRes.error({
+      message: "Unauthorized",
+      code: 1,
+    });
   }
 
   const res = await db
@@ -38,11 +39,9 @@ export async function createForum({
     })
     .returning();
 
-  return {
-    error: false,
-    message: "Created succesfully",
+  return ApiRes.success({
     data: {
       forumId: res[0].id,
     },
-  };
+  });
 }
