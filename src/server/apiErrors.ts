@@ -13,4 +13,7 @@ export enum ApiError {
   UnknownError,
   UsernameAlreadyExists,
   ForumNameAlreadyExists,
+
+  MissingParameter,
+  InvalidParameter,
 }

@@ -1,3 +1,5 @@
+import { ApiError } from "@/server/apiErrors";
+import { ApiRes } from "@/server/apiResponse";
 import { db } from "@/server/db";
 import { userTable } from "@/server/db/schema";
 import { forumTable } from "@/server/db/schema/forum";
@@ -10,10 +12,10 @@ export const GET = async (req: NextRequest) => {
   const name = searchParams.get("name");
   if (name == null || name.length < 3) {
     return Response.json(
-      {
-        error: true,
+      ApiRes.error({
         message: "Name is missing or invalid.",
-      },
+        code: ApiError.MissingParameter,
+      }),
       {
         status: 300,
       }
@@ -27,10 +29,10 @@ export const GET = async (req: NextRequest) => {
   }
 
   return Response.json(
-    {
-      error: true,
+    ApiRes.error({
       message: "Invalid type",
-    },
+      code: ApiError.InvalidParameter,
+    }),
     {
       status: 300,
     }
@@ -42,11 +44,11 @@ async function handleForumCheck(name: string) {
     where: eq(forumTable.name, name),
   });
 
-  return Response.json({
-    error: false,
-    data: res == null,
-    message: "Success",
-  });
+  return Response.json(
+    ApiRes.success({
+      data: res == null,
+    })
+  );
 }
 
 async function handleUsernameCheck(name: string) {
@@ -54,9 +56,9 @@ async function handleUsernameCheck(name: string) {
     where: eq(userTable.username, name),
   });
 
-  return Response.json({
-    error: false,
-    data: res == null,
-    message: "Success",
-  });
+  return Response.json(
+    ApiRes.success({
+      data: res == null,
+    })
+  );
 }
