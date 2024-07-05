@@ -4,6 +4,8 @@ import { eq } from "drizzle-orm";
 import { forumMemberTable, forumTable } from "../schema/forum";
 import { postTable } from "../schema/post";
 import { cache } from "react";
+import { userTable } from "../schema";
+import { exposeUserType } from "../schema/types";
 
 export const getJoinedForums = cache(async (userId: string) => {
   const joinedForums = await db.query.forumMemberTable.findMany({
@@ -29,9 +31,17 @@ export const getForumById = cache(async (forumId: string) => {
 });
 
 export const getForumPosts = cache(async (forumId: string) => {
-  const posts = await db.query.postTable.findMany({
-    where: eq(postTable.forumId, forumId),
-  });
+  const posts = await db
+    .select()
+    .from(postTable)
+    .where(eq(postTable.forumId, forumId))
+    .leftJoin(userTable, eq(postTable.posterId, userTable.id));
 
-  return posts;
+  return posts.map((v) => {
+    const poster = v.user ? exposeUserType(v.user) : null;
+    return {
+      poster,
+      ...v.post,
+    };
+  });
 });
