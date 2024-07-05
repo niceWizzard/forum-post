@@ -5,7 +5,7 @@ interface Props {
 }
 
 export default async function PostPage({ params: { id } }: Props) {
-  const res = await getPostById(id, true);
+  const res = await getPostById(id);
   if (!res) {
     return "Invalid post";
   }
