@@ -1,12 +1,19 @@
+import { getPostById } from "@/server/db/queries/post";
+
 interface Props {
   params: { id: string };
 }
 
-export default function PostPage({ params: { id } }: Props) {
+export default async function PostPage({ params: { id } }: Props) {
+  const res = await getPostById(id, true);
+  if (!res) {
+    return "Invalid post";
+  }
+
   return (
     <section>
       <div className="container">
-        <h2>{id}</h2>
+        <pre>{JSON.stringify(res, null, 4)}</pre>
       </div>
     </section>
   );
