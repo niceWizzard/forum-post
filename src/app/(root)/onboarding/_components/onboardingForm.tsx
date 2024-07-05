@@ -85,7 +85,7 @@ function OnBoardingForm() {
     const res = await saveRequiredUserFields(values);
     if (!res.error) {
       console.log("SETTING USER");
-      setUser(res.user ?? null);
+      setUser(res.data ?? null);
     }
     router.push("/feed");
   }

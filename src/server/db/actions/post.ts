@@ -5,19 +5,22 @@ import { postCreateFormSchema } from "./schema";
 import { db } from "../index";
 import { getAuth } from "@/server/auth";
 import { postTable } from "../schema/post";
+import { ApiRes, ApiResponse } from "@/server/apiResponse";
 
 export const createForumPost = async ({
   forumId,
   content,
   title,
-}: { forumId: string } & z.infer<typeof postCreateFormSchema>) => {
+}: { forumId: string } & z.infer<typeof postCreateFormSchema>): Promise<
+  ApiResponse<{ postId: string }>
+> => {
   const { user } = await getAuth();
 
   if (!user) {
-    return {
-      error: true,
+    return ApiRes.error({
       message: "Please login",
-    };
+      code: 1,
+    });
   }
 
   const res = await db
@@ -30,11 +33,9 @@ export const createForumPost = async ({
     })
     .returning();
 
-  return {
-    error: false,
-    message: "Success",
+  return ApiRes.success({
     data: {
       postId: res[0].id,
     },
-  };
+  });
 };

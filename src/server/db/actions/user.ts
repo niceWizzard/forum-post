@@ -5,20 +5,24 @@ import { userTable } from "../schema";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { getAuth } from "@/server/auth";
+import { ApiRes, ApiResponse } from "@/server/apiResponse";
+import { User } from "lucia";
 
 interface Fields {
   username: string;
   name: string;
 }
 
-export async function saveRequiredUserFields({ name, username }: Fields) {
+export async function saveRequiredUserFields({
+  name,
+  username,
+}: Fields): Promise<ApiResponse<User>> {
   const { user } = await getAuth();
   if (!user) {
-    return {
-      status: 403,
-      error: true,
+    return ApiRes.error({
       message: "Please sign in",
-    };
+      code: 1,
+    });
   }
 
   try {
@@ -31,17 +35,14 @@ export async function saveRequiredUserFields({ name, username }: Fields) {
       .where(eq(userTable.id, user.id));
   } catch (e: any) {
     if (e.code && e.code == "23505") {
-      return {
-        status: 403,
-        error: true,
+      return ApiRes.error({
         message: "Username already exists.",
-      };
+        code: 1,
+      });
     }
   }
 
-  return {
-    error: false,
-    status: 200,
-    user: (await getAuth()).user,
-  };
+  return ApiRes.success({
+    data: (await getAuth()).user!,
+  });
 }
