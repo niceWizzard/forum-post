@@ -11,4 +11,6 @@ export enum ApiError {
   UserNotFound,
 
   UnknownError,
+  UsernameAlreadyExists,
+  ForumNameAlreadyExists,
 }
