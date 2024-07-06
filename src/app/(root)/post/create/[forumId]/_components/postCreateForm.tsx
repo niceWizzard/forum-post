@@ -18,6 +18,7 @@ import { createForumPost } from "@/server/db/actions/post";
 import { useRouter } from "next/navigation";
 import { LoadingButton } from "@/components/ui/loadingButton";
 import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Props {
   forumId: string;
@@ -54,7 +55,7 @@ export default function PostCreateForm({ forumId }: Props) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="bg-card px-6 py-4 flex flex-col gap-4"
+        className="bg-card px-6 py-4 flex flex-col gap-4 min-h-[70vh]"
       >
         <FormField
           name="title"
@@ -72,10 +73,14 @@ export default function PostCreateForm({ forumId }: Props) {
         <FormField
           name="content"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="flex flex-col flex-grow">
               <FormLabel>Content</FormLabel>
               <FormControl>
-                <Input placeholder="This is...." {...field} />
+                <Textarea
+                  placeholder="This is...."
+                  {...field}
+                  className="flex-grow"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -25,6 +25,7 @@ import { z } from "zod";
 import { useEffect, useState } from "react";
 import { LoadingButton } from "@/components/ui/loadingButton";
 import { forumCreateSchema } from "@/server/db/actions/schema";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = forumCreateSchema;
 
@@ -125,7 +126,7 @@ function ForumCreateForm({ userId }: { userId: string }) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-4"
+        className="flex flex-col gap-4 min-h-[70vh]"
       >
         <FormField
           name="name"
@@ -144,10 +145,14 @@ function ForumCreateForm({ userId }: { userId: string }) {
         <FormField
           name="description"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="flex-grow flex flex-col">
               <FormLabel>Forum Description</FormLabel>
               <FormControl>
-                <Input placeholder="This is the forum for...." {...field} />
+                <Textarea
+                  placeholder="Descibe what the forum is for..."
+                  className="resize-none flex-grow"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
