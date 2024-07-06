@@ -5,7 +5,7 @@ interface Props {
 }
 export default function PostCreatePage({ params: { forumId } }: Props) {
   return (
-    <section className="min-h-[70vh]">
+    <section className="min-h-[70vh] py-12">
       <div className="container">
         <h3>Create a post</h3>
         <PostCreateForm forumId={forumId} />
