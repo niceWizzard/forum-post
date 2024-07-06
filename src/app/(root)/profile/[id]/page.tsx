@@ -22,7 +22,7 @@ async function ProfilePage({ params: { id } }: Props) {
         <div className="flex flex-col gap-4">
           {profile.createdForums.map((forum) => (
             <Link key={forum.id} href={`/forum/${forum.id}`}>
-              <div className="bg-card px-4 py-2 grid-cols-[1fr,auto] grid grid-rows-1">
+              <div className="bg-card px-4 py-2 grid-cols-[1fr,auto] grid grid-rows-1 border border-foreground-lighter rounded-sm ">
                 <h3 className="text-lg font-semibold row-span-1 col-span-2">
                   {forum.name}
                 </h3>
