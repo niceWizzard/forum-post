@@ -17,12 +17,12 @@ async function ProfilePage({ params: { id } }: Props) {
 
   return (
     <section className="py-12">
-      <div className="container">
+      <div className="container px-2 sm:px-4">
         <h2>Profile Page {profile.user?.name ?? "Not found"}</h2>
         <div className="flex flex-col gap-4">
           {profile.createdForums.map((forum) => (
             <Link key={forum.id} href={`/forum/${forum.id}`}>
-              <div className="bg-card px-4 py-2 grid-cols-[1fr,auto] grid grid-rows-1 border border-foreground-lighter rounded-sm ">
+              <div className="bg-card px-2  md:px-4 py-2 grid-cols-[1fr,auto] grid grid-rows-1 border border-foreground-lighter rounded-sm ">
                 <h3 className="text-lg font-semibold row-span-1 col-span-2">
                   {forum.name}
                 </h3>
