@@ -8,6 +8,11 @@ The todo list of the website
 
 ---
 
+### UX
+
+- [ ] Loading pages
+- [ ] Error pages
+
 ### Auth
 
 - [x] Login with github
