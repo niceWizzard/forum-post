@@ -43,7 +43,9 @@ function PostPreview({ post }: { post: Post }) {
           <p className="text-ellipsis text-foreground-light font-light text-sm mt-4">
             {post.body}
           </p>
-          <span>{post.likeCount} likes</span>
+          <span>
+            {post.likeCount} likes {new String(post.isLiked)}
+          </span>
         </div>
       </Link>
     </div>
