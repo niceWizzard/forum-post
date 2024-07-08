@@ -8,6 +8,7 @@ import { postLikeTable, postTable } from "../schema/post";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
 import { and, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 export const unlikePost = async (postId: string) => {
   const { user } = await getAuth();
@@ -24,6 +25,9 @@ export const unlikePost = async (postId: string) => {
       and(eq(postLikeTable.postId, postId), eq(postLikeTable.userId, user.id))
     )
     .returning();
+
+  revalidatePath("/forum");
+  revalidatePath(`/post/${postId}`);
 
   return ApiRes.success({
     message: "Post liked successfully",
@@ -47,6 +51,9 @@ export const likePost = async (postId: string) => {
       userId: user.id,
     })
     .onConflictDoNothing();
+
+  revalidatePath("/forum");
+  revalidatePath(`/post/${postId}`);
 
   return ApiRes.success({
     message: "Post liked successfully",
