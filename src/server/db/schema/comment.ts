@@ -2,6 +2,7 @@ import {
   foreignKey,
   pgTable,
   primaryKey,
+  serial,
   text,
   timestamp,
   uuid,
@@ -32,18 +33,13 @@ export const commentTable = pgTable(
   })
 );
 
-export const commentLikeTable = pgTable(
-  "comment_like",
-  {
-    userId: uuid("user_id").references(() => userTable.id, {
-      onDelete: "cascade",
-    }),
-    commentId: uuid("comment_id").references(() => commentTable.id, {
-      onDelete: "cascade",
-    }),
-    likedAt: timestamp("liked_at").notNull().defaultNow(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.userId, table.commentId] }),
-  })
-);
+export const commentLikeTable = pgTable("comment_like", {
+  id: serial("id").primaryKey(),
+  userId: uuid("user_id").references(() => userTable.id, {
+    onDelete: "cascade",
+  }),
+  commentId: uuid("comment_id").references(() => commentTable.id, {
+    onDelete: "cascade",
+  }),
+  likedAt: timestamp("liked_at").notNull().defaultNow(),
+});

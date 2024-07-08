@@ -2,6 +2,7 @@ import {
   foreignKey,
   pgTable,
   primaryKey,
+  serial,
   text,
   timestamp,
   uuid,
@@ -19,37 +20,27 @@ export const forumTable = pgTable("forum", {
   }),
 });
 
-export const forumMemberTable = pgTable(
-  "forum_member",
-  {
-    forumId: uuid("forum_id").references(() => forumTable.id, {
-      onDelete: "cascade",
-    }),
-    userId: uuid("user_id").references(() => userTable.id, {
-      onDelete: "cascade",
-    }),
-    joinedAt: timestamp("joined_at").notNull().defaultNow(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.forumId, table.userId] }),
-  })
-);
+export const forumMemberTable = pgTable("forum_member", {
+  id: serial("id").primaryKey(),
+  forumId: uuid("forum_id").references(() => forumTable.id, {
+    onDelete: "cascade",
+  }),
+  userId: uuid("user_id").references(() => userTable.id, {
+    onDelete: "cascade",
+  }),
+  joinedAt: timestamp("joined_at").notNull().defaultNow(),
+});
 
-export const forumAdminTable = pgTable(
-  "forum_admin",
-  {
-    adminId: uuid("admin_id")
-      .notNull()
-      .references(() => userTable.id, {
-        onDelete: "cascade",
-      }),
-    forumId: uuid("forum_id")
-      .notNull()
-      .references(() => forumTable.id, {
-        onDelete: "cascade",
-      }),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.adminId, table.forumId] }),
-  })
-);
+export const forumAdminTable = pgTable("forum_admin", {
+  id: serial("id").primaryKey(),
+  adminId: uuid("admin_id")
+    .notNull()
+    .references(() => userTable.id, {
+      onDelete: "cascade",
+    }),
+  forumId: uuid("forum_id")
+    .notNull()
+    .references(() => forumTable.id, {
+      onDelete: "cascade",
+    }),
+});
