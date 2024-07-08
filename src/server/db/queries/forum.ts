@@ -63,7 +63,7 @@ export const getForumPosts = cache(
 
     const { user } = await getAuth();
 
-    const b = user
+    const isLikeQuery = user
       ? posts.map((v) => {
           const query = db.query.postLikeTable.findFirst({
             where: and(
@@ -75,21 +75,28 @@ export const getForumPosts = cache(
         })
       : [];
 
-    if (!isTuple(b)) {
+    const likeCountQuery = posts.map((v) => {
+      return db.query.postLikeTable.findMany({
+        where: eq(postLikeTable.postId, v.post.id),
+      });
+    });
+    if (!isTuple(isLikeQuery) || !isTuple(likeCountQuery)) {
       return ApiRes.error({
         message: "Failed to get user likes",
         code: ApiError.UnknownError,
       });
     }
-    const batched = await db.batch([...b]);
+
+    const batchedIsLiked = await db.batch([...isLikeQuery]);
+    const batchedLikeCount = await db.batch([...likeCountQuery]);
 
     const a = posts.map((v, index): Post => {
       const poster = v.user ? exposeUserType(v.user) : null;
       const { name, id } = v.forum!;
       let isLiked: boolean | null = null;
-      let likeCount = 0;
+      let likeCount = batchedLikeCount[index].length;
       if (user) {
-        isLiked = !!batched[index];
+        isLiked = !!batchedIsLiked[index];
       }
       return {
         poster,
