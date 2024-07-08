@@ -57,15 +57,19 @@ export const getForumPosts = cache(
       .leftJoin(userTable, eq(postTable.posterId, userTable.id))
       .leftJoin(forumTable, eq(postTable.forumId, forumTable.id));
 
-    const a = posts.map((v) => {
+    const a = posts.map((v): Post => {
       const poster = v.user ? exposeUserType(v.user) : null;
       const { name, id } = v.forum!;
+      let isLiked: boolean | null = null;
+      let likeCount = 0;
       return {
         poster,
         forum: {
           name,
           id,
         },
+        likeCount,
+        isLiked,
         ...v.post,
       };
     });

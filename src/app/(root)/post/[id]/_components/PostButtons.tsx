@@ -25,7 +25,8 @@ function PostButtons({ post }: { post: Post }) {
           router.refresh();
         }}
       >
-        {post.isLiked != null ? (post.isLiked ? "Liked" : "Like") : "Like"}
+        {post.isLiked != null ? (post.isLiked ? "Liked" : "Like") : "Like"}{" "}
+        {post.likeCount} likes
       </button>
       <button>Comment</button>
       <button>Share</button>

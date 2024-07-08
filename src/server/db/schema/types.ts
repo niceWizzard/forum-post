@@ -11,6 +11,7 @@ export type Post = InferSelectModel<typeof postTable> & {
   forum: MinimizedForum;
   poster: User | null;
   isLiked: boolean | null;
+  likeCount: number;
 };
 export type PrivateUser = InferSelectModel<typeof userTable>;
 export type User = StrictOmit<PrivateUser, "github_id">;
