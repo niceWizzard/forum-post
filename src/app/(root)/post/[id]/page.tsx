@@ -1,5 +1,6 @@
 import { getPostById } from "@/server/db/queries/post";
 import Link from "next/link";
+import PostButtons from "./_components/PostButtons";
 
 interface Props {
   params: { id: string };
@@ -32,11 +33,7 @@ export default async function PostPage({ params: { id } }: Props) {
         </div>
         <div className="py-2 flex flex-col gap-4">
           <p className="text-md px-4 ">{res.body}</p>
-          <div className="flex gap-3 border-t border-t-foreground-light py-4">
-            <button>Like</button>
-            <button>Comment</button>
-            <button>Share</button>
-          </div>
+          <PostButtons post={res} />
         </div>
       </div>
     </section>

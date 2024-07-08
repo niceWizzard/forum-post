@@ -10,6 +10,7 @@ export type MinimizedForum = Pick<Forum, "id" | "name">;
 export type Post = InferSelectModel<typeof postTable> & {
   forum: MinimizedForum;
   poster: User | null;
+  isLiked: boolean | null;
 };
 export type PrivateUser = InferSelectModel<typeof userTable>;
 export type User = StrictOmit<PrivateUser, "github_id">;
