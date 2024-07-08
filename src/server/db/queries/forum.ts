@@ -1,8 +1,8 @@
 import "server-only";
 import { db } from "..";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { forumMemberTable, forumTable } from "../schema/forum";
-import { postTable } from "../schema/post";
+import { postLikeTable, postTable } from "../schema/post";
 import { cache } from "react";
 import { userTable } from "../schema";
 import { exposeUserType, Forum, Post } from "../schema/types";
@@ -48,6 +48,10 @@ export const getForumById = cache(
   }
 );
 
+function isTuple<T extends any>(array: T[]): array is [T, ...T[]] {
+  return Array.isArray(array);
+}
+
 export const getForumPosts = cache(
   async (forumId: string): Promise<ApiResponse<Post[]>> => {
     const posts = await db
@@ -57,11 +61,36 @@ export const getForumPosts = cache(
       .leftJoin(userTable, eq(postTable.posterId, userTable.id))
       .leftJoin(forumTable, eq(postTable.forumId, forumTable.id));
 
-    const a = posts.map((v): Post => {
+    const { user } = await getAuth();
+
+    const b = user
+      ? posts.map((v) => {
+          const query = db.query.postLikeTable.findFirst({
+            where: and(
+              eq(postLikeTable.userId, user.id),
+              eq(postLikeTable.postId, v.post.id)
+            ),
+          });
+          return query;
+        })
+      : [];
+
+    if (!isTuple(b)) {
+      return ApiRes.error({
+        message: "Failed to get user likes",
+        code: ApiError.UnknownError,
+      });
+    }
+    const batched = await db.batch([...b]);
+
+    const a = posts.map((v, index): Post => {
       const poster = v.user ? exposeUserType(v.user) : null;
       const { name, id } = v.forum!;
       let isLiked: boolean | null = null;
       let likeCount = 0;
+      if (user) {
+        isLiked = !!batched[index];
+      }
       return {
         poster,
         forum: {
