@@ -8,6 +8,7 @@ import { userTable } from "../schema";
 import { exposeUserType, Forum, Post } from "../schema/types";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
+import { getAuth } from "@/server/auth";
 
 export const getJoinedForums = cache(async (userId: string) => {
   const joinedForums = await db.query.forumMemberTable.findMany({
@@ -55,13 +56,6 @@ export const getForumPosts = cache(
       .where(eq(postTable.forumId, forumId))
       .leftJoin(userTable, eq(postTable.posterId, userTable.id))
       .leftJoin(forumTable, eq(postTable.forumId, forumTable.id));
-
-    if (posts.length == 0) {
-      return ApiRes.error({
-        message: "Forum not found",
-        code: ApiError.ForumNotFound,
-      });
-    }
 
     const a = posts.map((v) => {
       const poster = v.user ? exposeUserType(v.user) : null;
