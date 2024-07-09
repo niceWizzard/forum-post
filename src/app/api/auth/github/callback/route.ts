@@ -64,6 +64,10 @@ export async function GET(request: Request): Promise<NextApiResponse> {
     where: eq(userTable.github_id, githubUser.id),
   });
 
+  const existingUserWithEmail = await db.query.userTable.findFirst({
+    where: eq(userTable.email, githubUser.email),
+  });
+
   try {
     switch (type) {
       case "register":
@@ -109,8 +113,18 @@ export async function GET(request: Request): Promise<NextApiResponse> {
         });
       case "login":
         if (!existingUser) {
+          if (existingUserWithEmail) {
+            return NextApiRes.error({
+              message: "User with the github account does not exist",
+              code: ApiError.ProviderNotConnected,
+              status: 302,
+              headers: {
+                Location: `/login?error=${ApiError.ProviderNotConnected}`,
+              },
+            });
+          }
           return NextApiRes.error({
-            message: "User with the github account does not exist",
+            message: "User account does not exists.",
             code: ApiError.UserDoesNotExist,
             status: 302,
             headers: {

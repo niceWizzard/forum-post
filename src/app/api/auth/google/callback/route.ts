@@ -66,6 +66,10 @@ export async function GET(request: Request): Promise<NextApiResponse> {
     );
     const googleUser: GoogleUser = await googleUserResponse.json();
 
+    const existingUserWithEmail = await db.query.userTable.findFirst({
+      where: eq(userTable.email, googleUser.email),
+    });
+
     const existingUser = await db.query.userTable.findFirst({
       where: eq(userTable.github_id, googleUser.sub),
     });
@@ -104,12 +108,22 @@ export async function GET(request: Request): Promise<NextApiResponse> {
         });
       case "login":
         if (!existingUser) {
+          if (existingUserWithEmail)
+            return NextApiRes.error({
+              message: "User with the github account does not exist",
+              code: ApiError.ProviderNotConnected,
+              status: 302,
+              headers: {
+                Location: `/login?error=${ApiError.ProviderNotConnected}`,
+              },
+            });
+
           return NextApiRes.error({
-            message: "User with the github account does not exist",
+            message: "User account does not exist",
             code: ApiError.UserDoesNotExist,
             status: 302,
             headers: {
-              Location: `/register?error=${ApiError.UserDoesNotExist}`,
+              Location: `/login?error=${ApiError.UserDoesNotExist}`,
             },
           });
         }
@@ -134,7 +148,7 @@ export async function GET(request: Request): Promise<NextApiResponse> {
         code: ApiError.InvalidToken,
         status: 302,
         headers: {
-          Location: `/register?error=${ApiError.InvalidToken}`,
+          Location: `/${type}?error=${ApiError.InvalidToken}`,
         },
       });
     } else if (e instanceof NeonDbError && e.code == "23505") {
@@ -143,7 +157,7 @@ export async function GET(request: Request): Promise<NextApiResponse> {
         code: ApiError.UserAlreadyExists,
         status: 302,
         headers: {
-          Location: `/register?error=${ApiError.UserAlreadyExists}`,
+          Location: `/${type}?error=${ApiError.UserAlreadyExists}`,
         },
       });
     }
@@ -152,7 +166,7 @@ export async function GET(request: Request): Promise<NextApiResponse> {
       code: ApiError.UnknownError,
       status: 302,
       headers: {
-        Location: `/register?error=${ApiError.UnknownError}`,
+        Location: `/${type}?error=${ApiError.UnknownError}`,
       },
     });
   }

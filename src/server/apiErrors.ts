@@ -21,6 +21,7 @@ export enum ApiError {
 
   UserAlreadyExists = 16,
   UserDoesNotExist = 17,
+  ProviderNotConnected = 18,
 }
 
 export function getErrorMessage(err: ApiError | string): string {
@@ -63,6 +64,8 @@ export function getErrorMessage(err: ApiError | string): string {
       return "Invalid parameter.";
     case ApiError.InvalidToken:
       return "Invalid token.";
+    case ApiError.ProviderNotConnected:
+      return "No account connected to that provider.";
     default:
       return "Uknown error type.";
   }
