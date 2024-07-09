@@ -9,6 +9,7 @@ import { exposeUserType, Forum, Post } from "../schema/types";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
 import { getAuth } from "@/server/auth";
+import { isTuple } from "@/lib/utils.server";
 
 export const getJoinedForums = cache(async (userId: string) => {
   const joinedForums = await db.query.forumMemberTable.findMany({
@@ -47,10 +48,6 @@ export const getForumById = cache(
     });
   }
 );
-
-function isTuple<T extends any>(array: T[]): array is [T, ...T[]] {
-  return Array.isArray(array);
-}
 
 export const getForumPosts = cache(
   async (forumId: string): Promise<ApiResponse<Post[]>> => {
