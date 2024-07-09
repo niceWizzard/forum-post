@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+
 export type ApiResponse<T = any> =
   | {
       error: false;
@@ -9,6 +11,8 @@ export type ApiResponse<T = any> =
       message: string;
       code: number;
     };
+
+export type NextApiResponse<T = any> = NextResponse<ApiResponse<T>>;
 
 export abstract class ApiRes {
   private constructor() {}
@@ -25,5 +29,33 @@ export abstract class ApiRes {
       error: true,
       ...params,
     };
+  }
+}
+
+export abstract class NextApiRes {
+  private constructor() {}
+
+  static success<T>(params: {
+    data: T;
+    message?: string;
+    status?: number;
+    headers?: HeadersInit;
+  }): NextApiResponse<T> {
+    return NextResponse.json(ApiRes.success(params), {
+      status: params.status,
+      headers: params.headers,
+    });
+  }
+
+  static error(params: {
+    message: string;
+    code: number;
+    status?: number;
+    headers?: HeadersInit;
+  }): NextApiResponse<any> {
+    return NextResponse.json(ApiRes.error(params), {
+      status: params.status,
+      headers: params.headers,
+    });
   }
 }
