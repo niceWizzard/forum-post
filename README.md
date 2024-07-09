@@ -36,7 +36,7 @@ The todo list of the website
 
 - [ ] Share button on post
 - [ ] Implement delete post
-- [ ] Like posts
+- [x] Like posts
 - [ ] Comment on posts
 - [ ] Implement post privacy settings
 
