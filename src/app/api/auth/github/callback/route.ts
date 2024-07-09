@@ -71,6 +71,7 @@ export async function GET(request: Request): Promise<NextApiResponse> {
           return NextApiRes.error({
             message: "User with the github account already exists",
             code: ApiError.UserAlreadyExists,
+            status: 302,
             headers: {
               Location: `/login?error=${ApiError.UserAlreadyExists}`,
             },
