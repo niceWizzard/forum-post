@@ -10,5 +10,5 @@ export const github = new GitHub(
 export const google = new Google(
   env.GOOGLE_CLIENT_ID,
   env.GOOGLE_CLIENT_SECRET,
-  `${publicEnv.PUBLIC_BASE_URL}/api/auth/google/callback`
+  `${publicEnv.PUBLIC_BASE_URL}api/auth/google/callback`
 );
