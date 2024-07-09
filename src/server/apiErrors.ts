@@ -23,7 +23,11 @@ export enum ApiError {
   UserDoesNotExist = 17,
 }
 
-export function getErrorMessage(err: ApiError): string {
+export function getErrorMessage(err: ApiError | string): string {
+  if (typeof err === "string") {
+    err = Number(err);
+  }
+
   switch (err) {
     case ApiError.UserAlreadyExists:
       return "An account with the email already exists.";
@@ -59,8 +63,7 @@ export function getErrorMessage(err: ApiError): string {
       return "Invalid parameter.";
     case ApiError.InvalidToken:
       return "Invalid token.";
-
     default:
-      return ApiError[err];
+      return "Uknown error type.";
   }
 }
