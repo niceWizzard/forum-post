@@ -10,6 +10,7 @@ import { NextResponse } from "next/server";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
 import { AuthFlowType, isAuthType } from "@/lib/utils.server";
+import { CookieName } from "@/server/cookieName";
 
 async function setSessionCookie(id: string) {
   const session = await lucia.createSession(id, {});
@@ -27,7 +28,7 @@ export async function GET(
   const url = new URL(request.url);
 
   const type: AuthFlowType | string | null =
-    cookies().get("oauth_flow_type")?.value ?? null;
+    cookies().get(CookieName.OAUTH_FLOW_TYPE)?.value ?? null;
 
   if (!isAuthType(type)) {
     return NextResponse.json(
@@ -43,7 +44,8 @@ export async function GET(
 
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
-  const storedState = cookies().get("github_oauth_state")?.value ?? null;
+  const storedState =
+    cookies().get(CookieName.GITHUB_OAUTH_STATE)?.value ?? null;
   if (!code || !state || !storedState || state !== storedState) {
     return NextResponse.json(
       ApiRes.error({
@@ -65,9 +67,9 @@ export async function GET(
     where: eq(userTable.github_id, githubUser.id),
   });
 
-  switch (type) {
-    case "register":
-      try {
+  try {
+    switch (type) {
+      case "register":
         if (existingUser) {
           return NextResponse.json(
             ApiRes.error({
@@ -110,51 +112,51 @@ export async function GET(
             },
           }
         );
-      } catch (_e) {
-        const e = _e as Error;
-        console.error(e.message);
-        if (e instanceof OAuth2RequestError) {
-          // invalid code
+      case "login":
+        if (!existingUser) {
           return NextResponse.json(
             ApiRes.error({
-              message: e.message,
+              message: "User with the github account does not exist",
               code: ApiError.UnknownError,
-            })
+            }),
+            {
+              status: 400,
+            }
           );
         }
+
+        await setSessionCookie(existingUser.id);
         return NextResponse.json(
-          ApiRes.error({
-            message: e.message,
-            code: ApiError.UnknownError,
-          })
-        );
-      }
-    case "login":
-      if (!existingUser) {
-        return NextResponse.json(
-          ApiRes.error({
-            message: "User with the github account does not exist",
-            code: ApiError.UnknownError,
+          ApiRes.success({
+            data: true,
+            message: "User loginned.",
           }),
           {
-            status: 400,
+            status: 302,
+            headers: {
+              Location: "/",
+            },
           }
         );
-      }
-
-      await setSessionCookie(existingUser.id);
+    }
+  } catch (_e) {
+    const e = _e as Error;
+    console.error(e.message);
+    if (e instanceof OAuth2RequestError) {
+      // invalid code
       return NextResponse.json(
-        ApiRes.success({
-          data: true,
-          message: "User loginned.",
-        }),
-        {
-          status: 302,
-          headers: {
-            Location: "/",
-          },
-        }
+        ApiRes.error({
+          message: e.message,
+          code: ApiError.UnknownError,
+        })
       );
+    }
+    return NextResponse.json(
+      ApiRes.error({
+        message: e.message,
+        code: ApiError.UnknownError,
+      })
+    );
   }
 }
 
