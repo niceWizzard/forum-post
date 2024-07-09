@@ -60,7 +60,6 @@ const SideSheet = ({
           </div>
           <LogoutButton
             onLogout={() => {
-              console.log("CLEARING USER");
               clearUser();
               setIsOpen(false);
             }}

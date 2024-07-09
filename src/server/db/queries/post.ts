@@ -48,8 +48,6 @@ export const getPostById = cache(async (id: string) => {
     isLiked = likeRes ? true : false;
   }
 
-  console.log("LIKE COUNT: ", likeCount);
-
   return {
     poster,
     forum,
