@@ -74,7 +74,7 @@ export async function GET(
           return NextResponse.json(
             ApiRes.error({
               message: "User with the github account already exists",
-              code: ApiError.UnknownError,
+              code: ApiError.UserAlreadyExists,
             })
           );
         }
@@ -117,7 +117,7 @@ export async function GET(
           return NextResponse.json(
             ApiRes.error({
               message: "User with the github account does not exist",
-              code: ApiError.UnknownError,
+              code: ApiError.UserDoesNotExist,
             }),
             {
               status: 400,
@@ -147,7 +147,7 @@ export async function GET(
       return NextResponse.json(
         ApiRes.error({
           message: e.message,
-          code: ApiError.UnknownError,
+          code: ApiError.InvalidToken,
         })
       );
     }

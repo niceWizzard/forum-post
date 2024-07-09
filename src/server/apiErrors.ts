@@ -16,4 +16,9 @@ export enum ApiError {
 
   MissingParameter,
   InvalidParameter,
+
+  InvalidToken,
+
+  UserAlreadyExists,
+  UserDoesNotExist,
 }
