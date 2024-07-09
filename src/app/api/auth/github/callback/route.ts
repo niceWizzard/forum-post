@@ -71,6 +71,9 @@ export async function GET(request: Request): Promise<NextApiResponse> {
           return NextApiRes.error({
             message: "User with the github account already exists",
             code: ApiError.UserAlreadyExists,
+            headers: {
+              Location: `/login?error=${ApiError.UserAlreadyExists}`,
+            },
           });
         }
 
@@ -108,7 +111,10 @@ export async function GET(request: Request): Promise<NextApiResponse> {
           return NextApiRes.error({
             message: "User with the github account does not exist",
             code: ApiError.UserDoesNotExist,
-            status: 400,
+            status: 302,
+            headers: {
+              Location: `/login?error=${ApiError.UserDoesNotExist}`,
+            },
           });
         }
 
@@ -130,11 +136,19 @@ export async function GET(request: Request): Promise<NextApiResponse> {
       return NextApiRes.error({
         message: e.message,
         code: ApiError.InvalidToken,
+        status: 302,
+        headers: {
+          Location: `/login?error=${ApiError.InvalidToken}`,
+        },
       });
     }
     return NextApiRes.error({
       message: e.message,
       code: ApiError.UnknownError,
+      status: 302,
+      headers: {
+        Location: `/login?error=${ApiError.UnknownError}`,
+      },
     });
   }
 }
