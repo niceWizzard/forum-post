@@ -24,9 +24,12 @@ export default async function LoginPage({
           You can choose to login with the following:
         </p>
         <div className="flex flex-col gap-4 flex-grow justify-center">
-          <button className="px-3 py-3 text-lg font-medium rounded-md w-full bg-gray-300 text-gray-900">
+          <Link
+            href="/api/auth/google?type=register"
+            className="px-3 py-3 text-lg font-medium rounded-md w-full bg-gray-300 text-gray-900"
+          >
             Register with Google
-          </button>
+          </Link>
           <Link
             href="/api/auth/github?type=register"
             className="px-3 py-3 text-lg font-medium border rounded-md w-full"

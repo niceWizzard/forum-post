@@ -25,7 +25,9 @@ export async function GET(request: NextRequest): Promise<Response> {
 
   const state = generateState();
   const verifier = generateCodeVerifier();
-  const url = await google.createAuthorizationURL(state, verifier);
+  const url = await google.createAuthorizationURL(state, verifier, {
+    scopes: ["profile", "email"],
+  });
 
   const options = {
     path: "/",
@@ -35,7 +37,7 @@ export async function GET(request: NextRequest): Promise<Response> {
     sameSite: "lax",
   } as const;
   cookies().set(CookieName.GOOGLE_OAUTH_STATE, state, options);
-  cookies().set(CookieName.GOOGLE_CODE_VERIFIER, state, options);
+  cookies().set(CookieName.GOOGLE_CODE_VERIFIER, verifier, options);
 
   cookies().set(CookieName.OAUTH_FLOW_TYPE, type, options);
 
