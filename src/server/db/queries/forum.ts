@@ -9,6 +9,7 @@ import { exposeUserType, Forum, Post } from "../schema/types";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
 import { getAuth } from "@/server/auth";
+import { isTuple } from "@/lib/utils.server";
 
 export const getJoinedForums = cache(async (userId: string) => {
   const joinedForums = await db.query.forumMemberTable.findMany({
@@ -48,10 +49,6 @@ export const getForumById = cache(
   }
 );
 
-function isTuple<T extends any>(array: T[]): array is [T, ...T[]] {
-  return Array.isArray(array);
-}
-
 export const getForumPosts = cache(
   async (forumId: string): Promise<ApiResponse<Post[]>> => {
     const posts = await db
@@ -63,40 +60,28 @@ export const getForumPosts = cache(
 
     const { user } = await getAuth();
 
-    const isLikeQuery = user
-      ? posts.map((v) => {
-          const query = db.query.postLikeTable.findFirst({
-            where: and(
-              eq(postLikeTable.userId, user.id),
-              eq(postLikeTable.postId, v.post.id)
-            ),
-          });
-          return query;
-        })
-      : [];
-
     const likeCountQuery = posts.map((v) => {
       return db.query.postLikeTable.findMany({
         where: eq(postLikeTable.postId, v.post.id),
       });
     });
-    if (!isTuple(isLikeQuery) || !isTuple(likeCountQuery)) {
+    if (!isTuple(likeCountQuery)) {
       return ApiRes.error({
         message: "Failed to get user likes",
         code: ApiError.UnknownError,
       });
     }
 
-    const batchedIsLiked = await db.batch([...isLikeQuery]);
-    const batchedLikeCount = await db.batch([...likeCountQuery]);
+    const batchedQuery = await db.batch([...likeCountQuery]);
 
     const a = posts.map((v, index): Post => {
       const poster = v.user ? exposeUserType(v.user) : null;
       const { name, id } = v.forum!;
       let isLiked: boolean | null = null;
-      let likeCount = batchedLikeCount[index].length;
+      const postLikeData = batchedQuery[index];
+      const likeCount = postLikeData.length;
       if (user) {
-        isLiked = !!batchedIsLiked[index];
+        isLiked = !!postLikeData.find((p) => p.userId == user.id);
       }
       return {
         poster,

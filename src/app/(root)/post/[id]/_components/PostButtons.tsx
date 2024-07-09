@@ -1,7 +1,9 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { likePost, unlikePost } from "@/server/db/actions/post";
 import { Post } from "@/server/db/schema/types";
 import { useUserStore } from "@/store/userStore";
+import { Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 function PostButtons({ post }: { post: Post }) {
@@ -9,7 +11,9 @@ function PostButtons({ post }: { post: Post }) {
   const user = useUserStore((v) => v.user);
   return (
     <div className="flex gap-3 border-t border-t-foreground-light py-4">
-      <button
+      <Button
+        className="flex gap-2"
+        variant="ghost"
         onClick={async () => {
           if (!user) {
             router.push("/login");
@@ -25,9 +29,8 @@ function PostButtons({ post }: { post: Post }) {
           router.refresh();
         }}
       >
-        {post.isLiked != null ? (post.isLiked ? "Liked" : "Like") : "Like"}{" "}
-        {post.likeCount} likes
-      </button>
+        <Heart fill={post.isLiked ? "currentColor" : ""} /> {post.likeCount}
+      </Button>
       <button>Comment</button>
       <button>Share</button>
     </div>

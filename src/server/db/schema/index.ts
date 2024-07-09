@@ -6,6 +6,7 @@ export const userTable = pgTable("user", {
   email: varchar("email", { length: 256 }).unique().notNull(),
   github_id: text("github_id").unique(),
   name: varchar("name", { length: 256 }),
+  google_id: text("google_id").unique(),
 });
 
 export const sessionTable = pgTable("session", {

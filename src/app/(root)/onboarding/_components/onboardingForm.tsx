@@ -84,7 +84,6 @@ function OnBoardingForm() {
     setHasSubmitted(true);
     const res = await saveRequiredUserFields(values);
     if (!res.error) {
-      console.log("SETTING USER");
       setUser(res.data ?? null);
     }
     router.push("/feed");

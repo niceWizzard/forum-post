@@ -87,6 +87,8 @@ export const createForumPost = async ({
     })
     .returning();
 
+  revalidatePath(`/forum/${forumId}`);
+
   return ApiRes.success({
     data: {
       postId: res[0].id,
