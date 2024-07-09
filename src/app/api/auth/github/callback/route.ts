@@ -7,7 +7,12 @@ import { db } from "@/server/db";
 import { userTable } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { ApiRes, ApiResponse } from "@/server/apiResponse";
+import {
+  ApiRes,
+  ApiResponse,
+  NextApiRes,
+  NextApiResponse,
+} from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
 import { AuthFlowType, isAuthType } from "@/lib/utils.server";
 import { CookieName } from "@/server/cookieName";
@@ -22,24 +27,18 @@ async function setSessionCookie(id: string) {
   );
 }
 
-export async function GET(
-  request: Request
-): Promise<NextResponse<ApiResponse<any>>> {
+export async function GET(request: Request): Promise<NextApiResponse> {
   const url = new URL(request.url);
 
   const type: AuthFlowType | string | null =
     cookies().get(CookieName.OAUTH_FLOW_TYPE)?.value ?? null;
 
   if (!isAuthType(type)) {
-    return NextResponse.json(
-      ApiRes.error({
-        message: "Missing / invalid parameter 'type'",
-        code: ApiError.InvalidParameter,
-      }),
-      {
-        status: 400,
-      }
-    );
+    return NextApiRes.error({
+      message: "Missing / invalid parameter 'type'",
+      code: ApiError.InvalidParameter,
+      status: 400,
+    });
   }
 
   const code = url.searchParams.get("code");
@@ -47,12 +46,10 @@ export async function GET(
   const storedState =
     cookies().get(CookieName.GITHUB_OAUTH_STATE)?.value ?? null;
   if (!code || !state || !storedState || state !== storedState) {
-    return NextResponse.json(
-      ApiRes.error({
-        message: "Invalid/missing parameters",
-        code: ApiError.InvalidParameter,
-      })
-    );
+    return NextApiRes.error({
+      message: "Invalid/missing parameters",
+      code: ApiError.InvalidParameter,
+    });
   }
 
   const tokens = await github.validateAuthorizationCode(code);
@@ -71,12 +68,10 @@ export async function GET(
     switch (type) {
       case "register":
         if (existingUser) {
-          return NextResponse.json(
-            ApiRes.error({
-              message: "User with the github account already exists",
-              code: ApiError.UserAlreadyExists,
-            })
-          );
+          return NextApiRes.error({
+            message: "User with the github account already exists",
+            code: ApiError.UserAlreadyExists,
+          });
         }
 
         const githubEmails: GithubEmail[] = await (
@@ -100,63 +95,47 @@ export async function GET(
         )[0];
 
         await setSessionCookie(generatedUser.id);
-        return NextResponse.json(
-          ApiRes.success({
-            data: true,
-            message: "User account created.",
-          }),
-          {
-            status: 302,
-            headers: {
-              Location: "/",
-            },
-          }
-        );
+        return NextApiRes.success({
+          data: true,
+          message: "User account created.",
+          status: 302,
+          headers: {
+            Location: "/",
+          },
+        });
       case "login":
         if (!existingUser) {
-          return NextResponse.json(
-            ApiRes.error({
-              message: "User with the github account does not exist",
-              code: ApiError.UserDoesNotExist,
-            }),
-            {
-              status: 400,
-            }
-          );
+          return NextApiRes.error({
+            message: "User with the github account does not exist",
+            code: ApiError.UserDoesNotExist,
+            status: 400,
+          });
         }
 
         await setSessionCookie(existingUser.id);
-        return NextResponse.json(
-          ApiRes.success({
-            data: true,
-            message: "User loginned.",
-          }),
-          {
-            status: 302,
-            headers: {
-              Location: "/",
-            },
-          }
-        );
+        return NextApiRes.success({
+          data: true,
+          message: "User loginned.",
+          status: 302,
+          headers: {
+            Location: "/",
+          },
+        });
     }
   } catch (_e) {
     const e = _e as Error;
     console.error(e.message);
     if (e instanceof OAuth2RequestError) {
       // invalid code
-      return NextResponse.json(
-        ApiRes.error({
-          message: e.message,
-          code: ApiError.InvalidToken,
-        })
-      );
-    }
-    return NextResponse.json(
-      ApiRes.error({
+      return NextApiRes.error({
         message: e.message,
-        code: ApiError.UnknownError,
-      })
-    );
+        code: ApiError.InvalidToken,
+      });
+    }
+    return NextApiRes.error({
+      message: e.message,
+      code: ApiError.UnknownError,
+    });
   }
 }
 
