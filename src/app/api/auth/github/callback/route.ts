@@ -73,7 +73,7 @@ export async function GET(request: Request): Promise<NextApiResponse> {
             code: ApiError.UserAlreadyExists,
             status: 302,
             headers: {
-              Location: `/login?error=${ApiError.UserAlreadyExists}`,
+              Location: `/register?error=${ApiError.UserAlreadyExists}`,
             },
           });
         }
@@ -139,7 +139,7 @@ export async function GET(request: Request): Promise<NextApiResponse> {
         code: ApiError.InvalidToken,
         status: 302,
         headers: {
-          Location: `/login?error=${ApiError.InvalidToken}`,
+          Location: `/${type}?error=${ApiError.InvalidToken}`,
         },
       });
     }
@@ -148,7 +148,7 @@ export async function GET(request: Request): Promise<NextApiResponse> {
       code: ApiError.UnknownError,
       status: 302,
       headers: {
-        Location: `/login?error=${ApiError.UnknownError}`,
+        Location: `/${type}?error=${ApiError.UnknownError}`,
       },
     });
   }
