@@ -6,6 +6,9 @@ import { github } from "@/server/auth/providers";
 import { db } from "@/server/db";
 import { userTable } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
+import { ApiRes, ApiResponse } from "@/server/apiResponse";
+import { ApiError } from "@/server/apiErrors";
 
 async function setSessionCookie(id: string) {
   const session = await lucia.createSession(id, {});
@@ -17,15 +20,20 @@ async function setSessionCookie(id: string) {
   );
 }
 
-export async function GET(request: Request): Promise<Response> {
+export async function GET(
+  request: Request
+): Promise<NextResponse<ApiResponse<any>>> {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
   const storedState = cookies().get("github_oauth_state")?.value ?? null;
   if (!code || !state || !storedState || state !== storedState) {
-    return new Response(null, {
-      status: 400,
-    });
+    return NextResponse.json(
+      ApiRes.error({
+        message: "Invalid/missing parameters",
+        code: ApiError.InvalidParameter,
+      })
+    );
   }
 
   try {
@@ -43,12 +51,18 @@ export async function GET(request: Request): Promise<Response> {
 
     if (existingUser) {
       await setSessionCookie(existingUser.id);
-      return new Response(null, {
-        status: 302,
-        headers: {
-          Location: "/",
-        },
-      });
+      return NextResponse.json(
+        ApiRes.success({
+          data: true,
+          message: "User already exists",
+        }),
+        {
+          status: 302,
+          headers: {
+            Location: "/",
+          },
+        }
+      );
     }
 
     const githubEmails: GithubEmail[] = await (
@@ -72,29 +86,36 @@ export async function GET(request: Request): Promise<Response> {
     )[0];
 
     setSessionCookie(generatedUser.id);
-    return new Response(null, {
-      status: 302,
-      headers: {
-        Location: "/",
-      },
-    });
+    return NextResponse.json(
+      ApiRes.success({
+        data: true,
+        message: "User account created.",
+      }),
+      {
+        status: 302,
+        headers: {
+          Location: "/",
+        },
+      }
+    );
   } catch (_e) {
     const e = _e as Error;
     // the specific error message depends on the provider
     console.error(e.message);
     if (e instanceof OAuth2RequestError) {
       // invalid code
-      return new Response(null, {
-        status: 400,
-      });
+      return NextResponse.json(
+        ApiRes.error({
+          message: e.message,
+          code: ApiError.UnknownError,
+        })
+      );
     }
-    return Response.json(
-      {
+    return NextResponse.json(
+      ApiRes.error({
         message: e.message,
-      },
-      {
-        status: 500,
-      }
+        code: ApiError.UnknownError,
+      })
     );
   }
 }
