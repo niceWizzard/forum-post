@@ -22,7 +22,7 @@ export default async function LoginPage() {
             Login with Google
           </button>
           <Link
-            href="/api/auth/github"
+            href="/api/auth/github?type=login"
             className="px-3 py-3 text-lg font-medium border rounded-md w-full"
           >
             Login with Github

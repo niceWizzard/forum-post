@@ -27,15 +27,16 @@ export async function GET(request: NextRequest): Promise<Response> {
     scopes: ["user:email"],
   });
 
-  url.searchParams.append("type", type);
-
-  cookies().set("github_oauth_state", state, {
+  const options = {
     path: "/",
     secure: process.env.NODE_ENV === "production",
     httpOnly: true,
     maxAge: 60 * 10,
     sameSite: "lax",
-  });
+  } as const;
+  cookies().set("github_oauth_state", state, options);
+
+  cookies().set("oauth_flow_type", type, options);
 
   return Response.redirect(url);
 }
