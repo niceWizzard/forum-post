@@ -6,6 +6,8 @@ interface Props {
   params: { id: string };
 }
 
+export const revalidate = 60;
+
 async function ProfilePage({ params: { id } }: Props) {
   const profileRes = await getUserProfile(id);
 
