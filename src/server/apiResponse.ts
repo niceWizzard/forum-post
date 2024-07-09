@@ -41,10 +41,16 @@ export abstract class NextApiRes {
     status?: number;
     headers?: HeadersInit;
   }): NextApiResponse<T> {
-    return NextResponse.json(ApiRes.success(params), {
-      status: params.status,
-      headers: params.headers,
-    });
+    return NextResponse.json(
+      ApiRes.success({
+        message: params.message,
+        data: params.data,
+      }),
+      {
+        status: params.status,
+        headers: params.headers,
+      }
+    );
   }
 
   static error(params: {
@@ -53,9 +59,15 @@ export abstract class NextApiRes {
     status?: number;
     headers?: HeadersInit;
   }): NextApiResponse<any> {
-    return NextResponse.json(ApiRes.error(params), {
-      status: params.status,
-      headers: params.headers,
-    });
+    return NextResponse.json(
+      ApiRes.error({
+        message: params.message,
+        code: params.code,
+      }),
+      {
+        status: params.status,
+        headers: params.headers,
+      }
+    );
   }
 }
