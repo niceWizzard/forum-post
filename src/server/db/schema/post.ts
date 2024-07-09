@@ -2,7 +2,6 @@ import {
   foreignKey,
   pgTable,
   primaryKey,
-  serial,
   text,
   timestamp,
   uuid,
@@ -26,13 +25,18 @@ export const postTable = pgTable("post", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const postLikeTable = pgTable("post_like", {
-  id: serial("id").primaryKey(),
-  userId: uuid("user_id").references(() => userTable.id, {
-    onDelete: "cascade",
-  }),
-  postId: uuid("post_id").references(() => postTable.id, {
-    onDelete: "cascade",
-  }),
-  likedAt: timestamp("liked_at").notNull().defaultNow(),
-});
+export const postLikeTable = pgTable(
+  "post_like",
+  {
+    userId: uuid("user_id").references(() => userTable.id, {
+      onDelete: "cascade",
+    }),
+    postId: uuid("post_id").references(() => postTable.id, {
+      onDelete: "cascade",
+    }),
+    likedAt: timestamp("liked_at").notNull().defaultNow(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.userId, table.postId] }),
+  })
+);
