@@ -22,3 +22,45 @@ export enum ApiError {
   UserAlreadyExists = 16,
   UserDoesNotExist = 17,
 }
+
+export function getErrorMessage(err: ApiError): string {
+  switch (err) {
+    case ApiError.UserAlreadyExists:
+      return "An account with the email already exists.";
+    case ApiError.UserDoesNotExist:
+      return "User not found.";
+    case ApiError.UnknownError:
+      return "An unexpected error occurred.";
+    case ApiError.AuthRequired:
+      return "Authentication required.";
+    case ApiError.Unathorized:
+      return "Unauthorized access.";
+    case ApiError.CreateError:
+      return "Failed to create.";
+    case ApiError.PostError:
+      return "Failed to post.";
+    case ApiError.UpdateError:
+      return "Failed to update.";
+    case ApiError.DeleteError:
+      return "Failed to delete.";
+    case ApiError.ForumNotFound:
+      return "Forum not found.";
+    case ApiError.PostNotFound:
+      return "Post not found.";
+    case ApiError.UserNotFound:
+      return "User not found.";
+    case ApiError.UsernameAlreadyExists:
+      return "Username already exists.";
+    case ApiError.ForumNameAlreadyExists:
+      return "Forum name already exists.";
+    case ApiError.MissingParameter:
+      return "Missing parameter.";
+    case ApiError.InvalidParameter:
+      return "Invalid parameter.";
+    case ApiError.InvalidToken:
+      return "Invalid token.";
+
+    default:
+      return ApiError[err];
+  }
+}
