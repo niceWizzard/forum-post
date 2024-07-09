@@ -1,5 +1,8 @@
 "use client";
+import { Button } from "@/components/ui/button";
+import { likePost, unlikePost } from "@/server/db/actions/post";
 import { type Post } from "@/server/db/schema/types";
+import { Heart } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -43,9 +46,24 @@ function PostPreview({ post }: { post: Post }) {
           <p className="text-ellipsis text-foreground-light font-light text-sm mt-4">
             {post.body}
           </p>
-          <span>
-            {post.likeCount} likes {new String(post.isLiked)}
-          </span>
+          <div className="mt-2 flex gap-3 items-center">
+            <Button
+              variant="ghost"
+              className="px-2 flex gap-2"
+              onClick={async (e) => {
+                e.preventDefault();
+                const action = post.isLiked ? unlikePost : likePost;
+                const res = await action(post.id);
+                if (res.error) {
+                  console.error(res.message);
+                }
+                router.refresh();
+              }}
+            >
+              <Heart fill={post.isLiked ? "currentColor" : ""} />{" "}
+              {post.likeCount}
+            </Button>
+          </div>
         </div>
       </Link>
     </div>
