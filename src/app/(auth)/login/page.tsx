@@ -15,7 +15,11 @@ export default async function LoginPage({
         <h2 className="text-xl font-semibold pb-4 border-b text-center">
           Login to your account
         </h2>
-        {error && <span>{getErrorMessage(error)}</span>}
+        {error && (
+          <span className=" text-sm text-center text-destructive bg-background border border-destructive rounded-md p-2">
+            {getErrorMessage(error)}
+          </span>
+        )}{" "}
         <p className="text-sm font-light">
           To continue with services offered in our website, you need to login
           with your account first.
