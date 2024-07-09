@@ -5,7 +5,7 @@ import Link from "next/link";
 export default async function LoginPage({
   searchParams: { error },
 }: {
-  searchParams: { error: number };
+  searchParams: { error: string };
 }) {
   await unathenticatedOnly();
 
@@ -15,7 +15,7 @@ export default async function LoginPage({
         <h2 className="text-xl font-semibold pb-4 border-b text-center">
           Create your account
         </h2>
-        <span>{getErrorMessage(error)}</span>
+        {error && <span>{getErrorMessage(error)}</span>}
         <p className="text-sm font-light">
           To continue with services offered in our website, you need to login
           with your account first.
