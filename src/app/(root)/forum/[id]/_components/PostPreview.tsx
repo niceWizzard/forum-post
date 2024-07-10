@@ -44,7 +44,7 @@ function PostPreview({ post }: { post: Post }) {
               @{post.poster ? post.poster.username ?? "no username" : "deleted"}
             </span>
           </div>
-          <p className="text-ellipsis text-foreground-light font-light text-sm mt-4">
+          <p className="text-foreground-light font-light text-sm mt-4 max-h-64 line-clamp-6">
             {post.body}
           </p>
           <div className="mt-2 flex gap-3 items-center">
