@@ -40,9 +40,13 @@ The todo list of the website
 - [x] Delete posts
 - [ ] Comment on posts
 - [ ] Implement post privacy settings
+- [ ] Count comments
 
 ### Comment Tables
 
+- [x] Create comments
 - [ ] Delete comments
 - [ ] Like comments
+- [ ] Count likes
+- [ ] Count replies
 - [ ] Reply to comment
