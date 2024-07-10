@@ -3,6 +3,7 @@ import Link from "next/link";
 import PostButtons from "./_components/PostButtons";
 import PostMenu from "./_components/PostMenu";
 import CommentSection from "./_components/CommentSection";
+import PostBody from "./_components/PostBody";
 
 interface Props {
   params: { id: string };
@@ -39,7 +40,7 @@ export default async function PostPage({ params: { id } }: Props) {
           </div>
         </div>
         <div className="py-2 flex flex-col gap-4">
-          <p className="text-md px-4 ">{post.body}</p>
+          <PostBody postBody={post.body} />
           <PostButtons post={post} />
         </div>
         <CommentSection post={post} />
