@@ -1,11 +1,11 @@
 "use client";
 
-import { Post } from "@/server/db/schema/types";
+import { type Comment, Post, PostWithComments } from "@/server/db/schema/types";
 import { CommentForm } from "./CommentForm";
 import { Button } from "@/components/ui/button";
 
 interface Props {
-  post: Post;
+  post: PostWithComments;
 }
 
 export default function CommentSection({ post }: Props) {
@@ -17,18 +17,25 @@ export default function CommentSection({ post }: Props) {
       </div>
       <CommentForm post={post} />
       <div className="flex flex-col gap-3 divide-y divide-foreground-lighter">
-        <Comment post={post} />
-        <Comment post={post} />
-        <Comment post={post} />
+        {post.comments.map((v) => (
+          <Comment comment={v} key={v.id} />
+        ))}
+        {post.comments.length === 0 && (
+          <div className="text-center text-sm font-light text-foreground-lighter">
+            No comments yet..
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
-function Comment({ post }: { post: Post }) {
+function Comment({ comment }: { comment: Comment }) {
   return (
     <div className="flex flex-col gap-2 py-2">
-      <span className="text-sm">@username</span>
+      <span className="text-sm">
+        @{comment.commenter?.username ?? "deleted"}
+      </span>
       <span className="text-xs font-light text-foreground-lighter">
         1 hour ago
       </span>
