@@ -67,6 +67,7 @@ function PostPreview({ post }: { post: Post }) {
               <Heart fill={post.isLiked ? "currentColor" : ""} />{" "}
               {post.likeCount}
             </Button>
+            <span>{post.commentCount} comments</span>
           </div>
         </div>
       </Link>

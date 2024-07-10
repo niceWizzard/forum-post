@@ -13,10 +13,10 @@ export type Post = InferSelectModel<typeof postTable> & {
   poster: User | null;
   isLiked: boolean | null;
   likeCount: number;
+  commentCount: number;
 };
 export type PostWithComments = Post & {
   initialComments: Comment[];
-  commentCount: number;
 };
 
 export type RawComment = InferSelectModel<typeof commentTable>;

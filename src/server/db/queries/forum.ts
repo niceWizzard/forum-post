@@ -1,6 +1,6 @@
 import "server-only";
 import { db } from "..";
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { forumMemberTable, forumTable } from "../schema/forum";
 import { postLikeTable, postTable } from "../schema/post";
 import { cache } from "react";
@@ -10,6 +10,7 @@ import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
 import { getAuth } from "@/server/auth";
 import { isTuple } from "@/lib/utils.server";
+import { commentTable } from "../schema/comment";
 
 export const getJoinedForums = cache(async (userId: string) => {
   try {
@@ -90,7 +91,15 @@ export const getForumPosts = cache(
           where: eq(postLikeTable.postId, v.post.id),
         });
       });
-      if (!isTuple(likeCountQuery)) {
+
+      const commentCountQuery = posts.map((v) => {
+        return db
+          .select({ count: count() })
+          .from(commentTable)
+          .where(eq(commentTable.postId, v.post.id));
+      });
+
+      if (!isTuple(likeCountQuery) || !isTuple(commentCountQuery)) {
         return ApiRes.error({
           message: "Failed to get user likes",
           code: ApiError.UnknownError,
@@ -98,6 +107,7 @@ export const getForumPosts = cache(
       }
 
       const batchedQuery = await db.batch([...likeCountQuery]);
+      const commentCountRes = await db.batch(commentCountQuery);
 
       const a = posts.map((v, index): Post => {
         const poster = v.user ? exposeUserType(v.user) : null;
@@ -105,6 +115,10 @@ export const getForumPosts = cache(
         let isLiked: boolean | null = null;
         const postLikeData = batchedQuery[index];
         const likeCount = postLikeData.length;
+        const commentCount =
+          commentCountRes[index].length == 1
+            ? commentCountRes[index][0].count
+            : 0;
         if (user) {
           isLiked = !!postLikeData.find((p) => p.userId == user.id);
         }
@@ -116,6 +130,7 @@ export const getForumPosts = cache(
           },
           likeCount,
           isLiked,
+          commentCount,
           ...v.post,
         };
       });
