@@ -7,6 +7,7 @@ import {
   exposeUserType,
   minimizeData,
   Post,
+  PostWithComments,
   PrivateUser,
   User,
 } from "../schema/types";
@@ -15,10 +16,11 @@ import { forumTable } from "../schema/forum";
 import { getAuth } from "@/server/auth";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
+import { commentTable } from "../schema/comment";
 
 export const getPostById = cache(
-  async (id: string): Promise<ApiResponse<Post>> => {
-    const [likeCount, res] = await db.batch([
+  async (id: string): Promise<ApiResponse<PostWithComments>> => {
+    const [likeCount, res, comments] = await db.batch([
       db.select({}).from(postLikeTable).where(eq(postLikeTable.postId, id)),
       db
         .select({
@@ -30,6 +32,9 @@ export const getPostById = cache(
         .where(eq(postTable.id, id))
         .leftJoin(userTable, eq(userTable.id, postTable.posterId))
         .leftJoin(forumTable, eq(forumTable.id, postTable.forumId)),
+      db.query.commentTable.findMany({
+        where: eq(commentTable.postId, id),
+      }),
     ]);
 
     if (res.length == 0)
@@ -60,6 +65,7 @@ export const getPostById = cache(
         poster,
         forum,
         isLiked,
+        comments,
         likeCount: likeCount.length,
         ...data.post,
       },
