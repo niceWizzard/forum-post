@@ -22,6 +22,7 @@ export enum ApiError {
   UserAlreadyExists = 16,
   UserDoesNotExist = 17,
   ProviderNotConnected = 18,
+  CommentNotFound = 19,
 }
 
 export function getErrorMessage(err: ApiError | string): string {
