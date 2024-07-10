@@ -5,6 +5,7 @@ import { Post } from "@/server/db/schema/types";
 import { useUserStore } from "@/store/userStore";
 import { Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 function PostButtons({ post }: { post: Post }) {
   const router = useRouter();
@@ -23,7 +24,10 @@ function PostButtons({ post }: { post: Post }) {
             ? unlikePost(post.id)
             : likePost(post.id));
           if (res.error) {
-            console.error(res.error);
+            console.error(res.message);
+            toast.error("An error has occurred", {
+              description: res.message,
+            });
             return;
           }
           router.refresh();

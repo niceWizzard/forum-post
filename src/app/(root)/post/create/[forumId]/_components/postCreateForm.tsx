@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { LoadingButton } from "@/components/ui/loadingButton";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 interface Props {
   forumId: string;
@@ -45,7 +46,12 @@ export default function PostCreateForm({ forumId }: Props) {
       content,
       forumId,
     });
-    if (!res.error && res.data) {
+    if (res.error) {
+      setHasSubmitted(false);
+      toast("An error has occured", {
+        description: res.message,
+      });
+    } else if (res.data) {
       router.push(`/post/${res.data.postId}`);
     }
   }

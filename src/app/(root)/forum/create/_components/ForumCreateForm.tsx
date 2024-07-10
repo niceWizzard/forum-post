@@ -23,6 +23,7 @@ import { useState } from "react";
 import { LoadingButton } from "@/components/ui/loadingButton";
 import { forumCreateSchema } from "@/server/db/actions/schema";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 const formSchema = forumCreateSchema;
 
@@ -64,7 +65,11 @@ function ForumCreateForm({ userId }: { userId: string }) {
       forumName: values.name,
       userId,
     });
-    if (!res.error && res.data) {
+    if (res.error) {
+      toast.error("An error has occurred", {
+        description: res.message,
+      });
+    } else if (res.data) {
       router.push(`/forum/${res.data.forumId}`);
     }
   }
@@ -87,6 +92,9 @@ function ForumCreateForm({ userId }: { userId: string }) {
     const a: ApiResponse<boolean> = await (await fetch(url)).json();
     if (a.error) {
       reset();
+      toast.error("An error has occurred", {
+        description: a.message,
+      });
     } else {
       finish(a.data ?? false);
     }

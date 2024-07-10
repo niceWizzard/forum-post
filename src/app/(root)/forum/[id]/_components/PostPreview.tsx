@@ -5,6 +5,7 @@ import { type Post } from "@/server/db/schema/types";
 import { Heart } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 function PostPreview({ post }: { post: Post }) {
   const router = useRouter();
@@ -56,6 +57,9 @@ function PostPreview({ post }: { post: Post }) {
                 const res = await action(post.id);
                 if (res.error) {
                   console.error(res.message);
+                  toast.error("An error has occurred", {
+                    description: res.message,
+                  });
                 }
                 router.refresh();
               }}

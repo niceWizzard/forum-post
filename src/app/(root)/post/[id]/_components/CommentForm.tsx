@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const commentFormSchema = z.object({
@@ -51,6 +52,9 @@ export function CommentForm({ post }: { post: Post }) {
     });
     if (res.error) {
       console.error(res.message);
+      toast.error("An error has occurred", {
+        description: res.message,
+      });
       return;
     }
     setHasSubmitted(false);
@@ -84,6 +88,7 @@ export function CommentForm({ post }: { post: Post }) {
           className="md:self-end"
           isLoading={hasSubmitted}
           loadingText="Creating..."
+          disabledOnLoading
         >
           Create
         </LoadingButton>

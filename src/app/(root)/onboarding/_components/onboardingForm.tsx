@@ -21,6 +21,7 @@ import { ApiResponse } from "@/server/apiResponse";
 import { env } from "@/env/client.mjs";
 import { useEffectUpdate } from "@/lib/utils";
 import { LoadingButton } from "@/components/ui/loadingButton";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   username: z
@@ -79,9 +80,13 @@ function OnBoardingForm() {
     }
     setHasSubmitted(true);
     const res = await saveRequiredUserFields(values);
-    if (!res.error) {
-      setUser(res.data ?? null);
+    if (res.error) {
+      toast.error("An error has occurred", {
+        description: res.message,
+      });
+      return;
     }
+    setUser(res.data ?? null);
     router.push("/feed");
   }
 
@@ -98,6 +103,9 @@ function OnBoardingForm() {
     url.searchParams.append("name", username);
     const a: ApiResponse<boolean> = await (await fetch(url)).json();
     if (a.error) {
+      toast.error("An error has occurred", {
+        description: a.message,
+      });
       reset();
     } else {
       finish(a.data ?? false);
