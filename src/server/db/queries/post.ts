@@ -93,12 +93,12 @@ export const getPostById = cache(
           poster,
           forum,
           isLiked,
-          initialComments: rawComments.map(({ user, comment }) => {
-            const thisCommentLikeTables = individualCommentLikeCountRes[0];
+          initialComments: rawComments.map(({ user, comment }, index) => {
+            const thisCommentLikeTables = individualCommentLikeCountRes[index];
             let isLiked = null;
             if (user) {
               isLiked = !!thisCommentLikeTables.find(
-                (v) => v.userId === user.id
+                (v) => v.userId === user.id && v.commentId === comment.id
               );
             }
             return {
