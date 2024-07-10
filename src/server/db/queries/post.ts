@@ -65,7 +65,7 @@ export const getPostById = cache(
           poster,
           forum,
           isLiked,
-          comments: rawComments.map(({ user, comment }) => ({
+          initialComments: rawComments.map(({ user, comment }) => ({
             commenter: user,
             ...comment,
           })),
