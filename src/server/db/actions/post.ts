@@ -9,6 +9,7 @@ import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { getPostById } from "../queries/post";
 
 export const unlikePost = async (postId: string) => {
   const { user } = await getAuth();
@@ -94,4 +95,47 @@ export const createForumPost = async ({
       postId: res[0].id,
     },
   });
+};
+
+export const deletePost = async (postId: string) => {
+  const { user } = await getAuth();
+  if (!user) {
+    return ApiRes.error({
+      message: "Please login",
+      code: ApiError.AuthRequired,
+    });
+  }
+
+  const postRes = await getPostById(postId);
+  if (postRes.error) {
+    return postRes;
+  }
+
+  const post = postRes.data;
+
+  if (post.posterId !== user.id) {
+    return ApiRes.error({
+      message: "Unauthorized to delete the post.",
+      code: ApiError.Unathorized,
+    });
+  }
+
+  try {
+    await db
+      .delete(postTable)
+      .where(and(eq(postTable.posterId, user.id), eq(postTable.id, postId)));
+
+    revalidatePath(`/post/${postId}`);
+    revalidatePath(`/forum/${post.forumId}`);
+
+    return ApiRes.success({
+      data: true,
+    });
+  } catch (err: any) {
+    const e = err as Error;
+    return ApiRes.error({
+      message: e.message,
+      code: ApiError.UnknownError,
+    });
+  }
 };
