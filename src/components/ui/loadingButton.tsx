@@ -23,7 +23,16 @@ export const LoadingButton = ({
     </span>
   );
   return (
-    <Button disabled={disabledOnLoading ? isLoading : disabled} {...props}>
+    <Button
+      disabled={
+        disabledOnLoading == undefined
+          ? isLoading
+          : disabledOnLoading
+          ? isLoading
+          : disabled
+      }
+      {...props}
+    >
       {isLoading ? loadingComp : props.children}
     </Button>
   );
