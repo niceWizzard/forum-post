@@ -2,6 +2,7 @@ import { InferSelectModel } from "drizzle-orm";
 import { forumTable } from "./forum";
 import { postTable } from "./post";
 import { userTable } from ".";
+import { commentTable } from "./comment";
 
 type StrictOmit<T, K extends keyof T> = Omit<T, K>;
 
@@ -13,6 +14,9 @@ export type Post = InferSelectModel<typeof postTable> & {
   isLiked: boolean | null;
   likeCount: number;
 };
+
+export type Comment = InferSelectModel<typeof commentTable>;
+
 export type PrivateUser = InferSelectModel<typeof userTable>;
 export type User = StrictOmit<PrivateUser, "github_id">;
 
