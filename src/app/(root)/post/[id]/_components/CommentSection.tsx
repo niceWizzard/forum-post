@@ -14,7 +14,7 @@ export default function CommentSection({ post }: Props) {
   return (
     <section className="">
       <div className="border-b pb-2 flex justify-between">
-        <h4>{2} Comments</h4>
+        <h4>{post.commentCount} Comments</h4>
         <button>Sort</button>
       </div>
       <CommentForm post={post} />

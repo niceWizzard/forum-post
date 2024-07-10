@@ -16,6 +16,7 @@ export type Post = InferSelectModel<typeof postTable> & {
 };
 export type PostWithComments = Post & {
   initialComments: Comment[];
+  commentCount: number;
 };
 
 export type RawComment = InferSelectModel<typeof commentTable>;

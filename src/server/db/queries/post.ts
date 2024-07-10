@@ -1,7 +1,7 @@
 import "server-only";
 import { db } from "../index";
 import { postLikeTable, postTable } from "../schema/post";
-import { and, eq } from "drizzle-orm";
+import { and, asc, count, eq } from "drizzle-orm";
 import { userTable } from "../schema";
 import {
   exposeUserType,
@@ -18,24 +18,32 @@ import { commentTable } from "../schema/comment";
 export const getPostById = cache(
   async (id: string): Promise<ApiResponse<PostWithComments>> => {
     try {
-      const [likeCount, res, rawComments] = await db.batch([
-        db.select({}).from(postLikeTable).where(eq(postLikeTable.postId, id)),
-        db
-          .select({
-            user: { ...userTable },
-            forum: { ...forumTable },
-            post: { ...postTable },
-          })
-          .from(postTable)
-          .where(eq(postTable.id, id))
-          .leftJoin(userTable, eq(userTable.id, postTable.posterId))
-          .leftJoin(forumTable, eq(forumTable.id, postTable.forumId)),
-        db
-          .select()
-          .from(commentTable)
-          .where(eq(commentTable.postId, id))
-          .leftJoin(userTable, eq(userTable.id, commentTable.commenterId)),
-      ]);
+      const [likeCount, res, rawComments, commentCountQueryRes] =
+        await db.batch([
+          db.select({}).from(postLikeTable).where(eq(postLikeTable.postId, id)),
+          db
+            .select({
+              user: { ...userTable },
+              forum: { ...forumTable },
+              post: { ...postTable },
+            })
+            .from(postTable)
+            .where(eq(postTable.id, id))
+            .leftJoin(userTable, eq(userTable.id, postTable.posterId))
+            .leftJoin(forumTable, eq(forumTable.id, postTable.forumId)),
+          db
+            .select()
+            .from(commentTable)
+            .where(eq(commentTable.postId, id))
+            .orderBy(asc(commentTable.createdAt))
+            .limit(10)
+            .offset(0)
+            .leftJoin(userTable, eq(userTable.id, commentTable.commenterId)),
+          db
+            .select({ count: count() })
+            .from(commentTable)
+            .where(eq(commentTable.postId, id)),
+        ]);
 
       if (res.length == 0)
         return ApiRes.error({
@@ -70,6 +78,9 @@ export const getPostById = cache(
             ...comment,
           })),
           likeCount: likeCount.length,
+          commentCount: commentCountQueryRes.length
+            ? commentCountQueryRes[0].count
+            : 0,
           ...data.post,
         },
       });
