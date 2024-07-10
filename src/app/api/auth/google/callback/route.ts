@@ -71,7 +71,7 @@ export async function GET(request: Request): Promise<NextApiResponse> {
     });
 
     const existingUser = await db.query.userTable.findFirst({
-      where: eq(userTable.github_id, googleUser.sub),
+      where: eq(userTable.google_id, googleUser.sub),
     });
 
     switch (type) {
