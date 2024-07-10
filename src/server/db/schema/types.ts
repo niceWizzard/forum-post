@@ -14,6 +14,9 @@ export type Post = InferSelectModel<typeof postTable> & {
   isLiked: boolean | null;
   likeCount: number;
 };
+export type PostWithComments = Post & {
+  comments: Comment[];
+};
 
 export type Comment = InferSelectModel<typeof commentTable>;
 
