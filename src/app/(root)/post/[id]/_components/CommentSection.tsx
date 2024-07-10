@@ -34,7 +34,7 @@ export default function CommentSection({ post }: Props) {
 
 function Comment({ comment }: { comment: Comment }) {
   return (
-    <div className="flex flex-col gap-2 py-2">
+    <div className="space-y-2 py-2">
       {comment.commenter ? (
         <Link
           className="text-sm hover:underline"
@@ -45,7 +45,7 @@ function Comment({ comment }: { comment: Comment }) {
       ) : (
         <span className="text-sm">deleted</span>
       )}
-      <span className="text-xs font-light text-foreground-lighter">
+      <span className="text-xs font-light text-foreground-lighter block">
         {formatDistance(new Date(comment.createdAt), new Date(), {
           addSuffix: true,
         })}
