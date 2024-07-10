@@ -1,8 +1,9 @@
 "use client";
 
-import { type Comment, Post, PostWithComments } from "@/server/db/schema/types";
+import { type Comment, PostWithComments } from "@/server/db/schema/types";
 import { CommentForm } from "./CommentForm";
 import { Button } from "@/components/ui/button";
+import { formatDistance } from "date-fns";
 
 interface Props {
   post: PostWithComments;
@@ -37,21 +38,11 @@ function Comment({ comment }: { comment: Comment }) {
         @{comment.commenter?.username ?? "deleted"}
       </span>
       <span className="text-xs font-light text-foreground-lighter">
-        1 hour ago
+        {formatDistance(new Date(comment.createdAt), new Date(), {
+          addSuffix: true,
+        })}
       </span>
-      <p className="text-sm">
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Obcaecati,
-        perferendis quidem asperiores iusto dolorem excepturi, ea culpa nesciunt
-        quia voluptate aspernatur aliquid quibusdam magni molestias temporibus
-        modi, necessitatibus aut numquam quae magnam inventore deserunt et
-        doloremque? Cum magni libero ullam? Soluta esse amet porro quos itaque
-        blanditiis praesentium corrupti eveniet laudantium est corporis numquam
-        iste ipsa, natus nemo rerum, iusto, cum dolorum molestias. Quibusdam
-        praesentium vero possimus beatae totam. Quaerat soluta dignissimos quasi
-        autem accusantium, dolorum voluptates reiciendis! Nemo quo numquam
-        mollitia quam commodi debitis dolore, magnam totam asperiores sit ipsum
-        a ex fugiat similique consectetur velit ducimus beatae culpa.
-      </p>
+      <p className="text-sm">{comment.body}</p>
       <div className="flex gap-2">
         <Button variant="ghost">Like</Button>
         <Button variant="ghost">Reply</Button>
