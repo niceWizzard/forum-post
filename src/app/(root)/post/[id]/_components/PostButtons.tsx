@@ -35,7 +35,6 @@ function PostButtons({ post }: { post: Post }) {
       >
         <Heart fill={post.isLiked ? "currentColor" : ""} /> {post.likeCount}
       </Button>
-      <button>Comment</button>
       <button>Share</button>
     </div>
   );
