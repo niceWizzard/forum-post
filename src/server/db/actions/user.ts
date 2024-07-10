@@ -17,15 +17,15 @@ export async function saveRequiredUserFields({
   name,
   username,
 }: Fields): Promise<ApiResponse<User>> {
-  const { user } = await getAuth();
-  if (!user) {
-    return ApiRes.error({
-      message: "Please sign in",
-      code: ApiError.AuthRequired,
-    });
-  }
-
   try {
+    const { user } = await getAuth();
+    if (!user) {
+      return ApiRes.error({
+        message: "Please sign in",
+        code: ApiError.AuthRequired,
+      });
+    }
+
     await db
       .update(userTable)
       .set({

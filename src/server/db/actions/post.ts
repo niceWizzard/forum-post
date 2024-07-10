@@ -11,54 +11,70 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export const unlikePost = async (postId: string) => {
-  const { user } = await getAuth();
-  if (!user) {
+  try {
+    const { user } = await getAuth();
+    if (!user) {
+      return ApiRes.error({
+        message: "Please login",
+        code: ApiError.AuthRequired,
+      });
+    }
+
+    const res = await db
+      .delete(postLikeTable)
+      .where(
+        and(eq(postLikeTable.postId, postId), eq(postLikeTable.userId, user.id))
+      )
+      .returning();
+
+    revalidatePath("/forum");
+    revalidatePath(`/post/${postId}`);
+
+    return ApiRes.success({
+      message: "Post liked successfully",
+      data: true,
+    });
+  } catch (e: any) {
+    const err = e as Error;
     return ApiRes.error({
-      message: "Please login",
-      code: ApiError.AuthRequired,
+      message: e.message,
+      code: ApiError.UnknownError,
     });
   }
-
-  const res = await db
-    .delete(postLikeTable)
-    .where(
-      and(eq(postLikeTable.postId, postId), eq(postLikeTable.userId, user.id))
-    )
-    .returning();
-
-  revalidatePath("/forum");
-  revalidatePath(`/post/${postId}`);
-
-  return ApiRes.success({
-    message: "Post liked successfully",
-    data: true,
-  });
 };
 
 export const likePost = async (postId: string) => {
-  const { user } = await getAuth();
-  if (!user) {
+  try {
+    const { user } = await getAuth();
+    if (!user) {
+      return ApiRes.error({
+        message: "Please login",
+        code: ApiError.AuthRequired,
+      });
+    }
+
+    const res = await db
+      .insert(postLikeTable)
+      .values({
+        postId,
+        userId: user.id,
+      })
+      .onConflictDoNothing();
+
+    revalidatePath("/forum");
+    revalidatePath(`/post/${postId}`);
+
+    return ApiRes.success({
+      message: "Post liked successfully",
+      data: true,
+    });
+  } catch (e: unknown) {
+    const err = e as Error;
     return ApiRes.error({
-      message: "Please login",
-      code: ApiError.AuthRequired,
+      message: err.message,
+      code: ApiError.UnknownError,
     });
   }
-
-  const res = await db
-    .insert(postLikeTable)
-    .values({
-      postId,
-      userId: user.id,
-    })
-    .onConflictDoNothing();
-
-  revalidatePath("/forum");
-  revalidatePath(`/post/${postId}`);
-
-  return ApiRes.success({
-    message: "Post liked successfully",
-    data: true,
-  });
 };
 
 export const createForumPost = async ({
@@ -68,44 +84,52 @@ export const createForumPost = async ({
 }: { forumId: string } & z.infer<typeof postCreateFormSchema>): Promise<
   ApiResponse<{ postId: string }>
 > => {
-  const { user } = await getAuth();
+  try {
+    const { user } = await getAuth();
 
-  if (!user) {
+    if (!user) {
+      return ApiRes.error({
+        message: "Please login",
+        code: ApiError.AuthRequired,
+      });
+    }
+
+    const res = await db
+      .insert(postTable)
+      .values({
+        title,
+        body: content,
+        forumId,
+        posterId: user.id,
+      })
+      .returning();
+
+    revalidatePath(`/forum/${forumId}`);
+
+    return ApiRes.success({
+      data: {
+        postId: res[0].id,
+      },
+    });
+  } catch (e) {
+    const err = e as Error;
     return ApiRes.error({
-      message: "Please login",
-      code: ApiError.AuthRequired,
+      message: err.message,
+      code: ApiError.UnknownError,
     });
   }
-
-  const res = await db
-    .insert(postTable)
-    .values({
-      title,
-      body: content,
-      forumId,
-      posterId: user.id,
-    })
-    .returning();
-
-  revalidatePath(`/forum/${forumId}`);
-
-  return ApiRes.success({
-    data: {
-      postId: res[0].id,
-    },
-  });
 };
 
 export const deletePost = async (postId: string) => {
-  const { user } = await getAuth();
-  if (!user) {
-    return ApiRes.error({
-      message: "Please login",
-      code: ApiError.AuthRequired,
-    });
-  }
-
   try {
+    const { user } = await getAuth();
+    if (!user) {
+      return ApiRes.error({
+        message: "Please login",
+        code: ApiError.AuthRequired,
+      });
+    }
+
     const post = await db.query.postTable.findFirst({
       where: and(eq(postTable.id, postId), eq(postTable.posterId, user.id)),
     });

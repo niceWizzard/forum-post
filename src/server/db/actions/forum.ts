@@ -14,33 +14,41 @@ export async function createForum({
   forumName: string;
   forumDesc: string;
 }): Promise<ApiResponse<{ forumId: string }>> {
-  const { user } = await getAuth();
-  if (!user) {
+  try {
+    const { user } = await getAuth();
+    if (!user) {
+      return ApiRes.error({
+        message: "Please login",
+        code: ApiError.AuthRequired,
+      });
+    }
+
+    if (user.id !== userId) {
+      return ApiRes.error({
+        message: "Unauthorized",
+        code: ApiError.Unathorized,
+      });
+    }
+
+    const res = await db
+      .insert(forumTable)
+      .values({
+        name: forumName,
+        description: forumDesc,
+        ownerId: userId,
+      })
+      .returning();
+
+    return ApiRes.success({
+      data: {
+        forumId: res[0].id,
+      },
+    });
+  } catch (e) {
+    const err = e as Error;
     return ApiRes.error({
-      message: "Please login",
-      code: ApiError.AuthRequired,
+      message: err.message,
+      code: ApiError.UnknownError,
     });
   }
-
-  if (user.id !== userId) {
-    return ApiRes.error({
-      message: "Unauthorized",
-      code: ApiError.Unathorized,
-    });
-  }
-
-  const res = await db
-    .insert(forumTable)
-    .values({
-      name: forumName,
-      description: forumDesc,
-      ownerId: userId,
-    })
-    .returning();
-
-  return ApiRes.success({
-    data: {
-      forumId: res[0].id,
-    },
-  });
 }
