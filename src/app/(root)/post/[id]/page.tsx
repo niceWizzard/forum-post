@@ -2,6 +2,7 @@ import { getPostById } from "@/server/db/queries/post";
 import Link from "next/link";
 import PostButtons from "./_components/PostButtons";
 import PostMenu from "./_components/PostMenu";
+import CommentSection from "./_components/CommentSection";
 
 interface Props {
   params: { id: string };
@@ -41,6 +42,7 @@ export default async function PostPage({ params: { id } }: Props) {
           <p className="text-md px-4 ">{post.body}</p>
           <PostButtons post={post} />
         </div>
+        <CommentSection post={post} />
       </div>
     </section>
   );
