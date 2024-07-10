@@ -51,3 +51,17 @@ export const getUserProfile = cache(
     });
   }
 );
+
+export const getUserByUsername = cache(
+  async (username: string): Promise<ApiResponse<User | null>> => {
+    try {
+      const user = await db.query.userTable.findFirst({
+        where: eq(userTable.username, username),
+      });
+      return ApiRes.success({ data: user ? exposeUserType(user) : null });
+    } catch (_e: any) {
+      const e = _e as Error;
+      return ApiRes.error({ message: e.message, code: ApiError.UnknownError });
+    }
+  }
+);
