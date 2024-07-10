@@ -7,6 +7,7 @@ import { formatDistance } from "date-fns";
 import Link from "next/link";
 import { toggleLikeComment } from "@/server/db/actions/comment";
 import { toast } from "sonner";
+import { useDebouncedCallback } from "use-debounce";
 
 interface Props {
   post: PostWithComments;
@@ -35,6 +36,18 @@ export default function CommentSection({ post }: Props) {
 }
 
 function Comment({ comment }: { comment: Comment }) {
+  const onLikeButtonClick = useDebouncedCallback(async () => {
+    const res = await toggleLikeComment(comment.id);
+    console.log("CLICKEd");
+
+    if (res.error) {
+      toast.error("An error has occurred", {
+        description: res.message,
+      });
+      return;
+    }
+  }, 300);
+
   return (
     <div className="space-y-2 py-2">
       {comment.commenter ? (
@@ -56,15 +69,7 @@ function Comment({ comment }: { comment: Comment }) {
       <div className="flex gap-2">
         <Button
           variant={comment.isLiked ? "secondary" : "ghost"}
-          onClick={async () => {
-            const res = await toggleLikeComment(comment.id);
-            if (res.error) {
-              toast.error("An error has occurred", {
-                description: res.message,
-              });
-              return;
-            }
-          }}
+          onClick={onLikeButtonClick}
         >
           {comment.likeCount} {comment.isLiked ? `Liked` : "Like"}
         </Button>
