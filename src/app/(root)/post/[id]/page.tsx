@@ -1,6 +1,7 @@
 import { getPostById } from "@/server/db/queries/post";
 import Link from "next/link";
 import PostButtons from "./_components/PostButtons";
+import PostMenu from "./_components/PostMenu";
 
 interface Props {
   params: { id: string };
@@ -18,7 +19,10 @@ export default async function PostPage({ params: { id } }: Props) {
     <section className="py-6">
       <div className="container flex flex-col">
         <div className="flex-flex-col bg-card px-4 py-2">
-          <h3>{post.title}</h3>
+          <div className="flex justify-between">
+            <h3>{post.title}</h3>
+            <PostMenu post={post} />
+          </div>
           <div className="flex gap-3 text-foreground-lighter font-light text-sm items-center mt-2">
             <Link href={`/forum/${post.forumId}`} className="underline">
               f/{post.forum.name}
