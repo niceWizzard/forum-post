@@ -24,6 +24,7 @@ export type RawComment = InferSelectModel<typeof commentTable>;
 export type Comment = RawComment & {
   commenter: User | null;
   likeCount: number;
+  isLiked: boolean | null;
 };
 
 export type PrivateUser = InferSelectModel<typeof userTable>;

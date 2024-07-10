@@ -74,6 +74,7 @@ export const getPostById = cache(
           where: eq(commentLikeTable.commentId, c.comment.id),
           columns: {
             commentId: true,
+            userId: true,
           },
         })
       );
@@ -92,11 +93,21 @@ export const getPostById = cache(
           poster,
           forum,
           isLiked,
-          initialComments: rawComments.map(({ user, comment }) => ({
-            commenter: user,
-            likeCount: individualCommentLikeCountRes[0].length,
-            ...comment,
-          })),
+          initialComments: rawComments.map(({ user, comment }) => {
+            const thisCommentLikeTables = individualCommentLikeCountRes[0];
+            let isLiked = null;
+            if (user) {
+              isLiked = !!thisCommentLikeTables.find(
+                (v) => v.userId === user.id
+              );
+            }
+            return {
+              commenter: user,
+              likeCount: thisCommentLikeTables.length,
+              isLiked,
+              ...comment,
+            };
+          }),
           likeCount: likeCount.length,
           commentCount: commentCountQueryRes.length
             ? commentCountQueryRes[0].count

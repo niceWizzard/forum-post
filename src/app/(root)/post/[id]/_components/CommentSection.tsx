@@ -66,7 +66,7 @@ function Comment({ comment }: { comment: Comment }) {
             }
           }}
         >
-          {comment.likeCount} Like
+          {comment.likeCount} {comment.isLiked ? `Liked` : "Like"}
         </Button>
         <Button variant="ghost">Reply</Button>
       </div>
