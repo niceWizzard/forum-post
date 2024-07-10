@@ -18,7 +18,9 @@ export type PostWithComments = Post & {
   comments: Comment[];
 };
 
-export type Comment = InferSelectModel<typeof commentTable> & {
+export type RawComment = InferSelectModel<typeof commentTable>;
+
+export type Comment = RawComment & {
   commenter: User | null;
 };
 
