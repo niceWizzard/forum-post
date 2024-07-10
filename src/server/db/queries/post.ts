@@ -20,7 +20,7 @@ import { commentTable } from "../schema/comment";
 
 export const getPostById = cache(
   async (id: string): Promise<ApiResponse<PostWithComments>> => {
-    const [likeCount, res, comments] = await db.batch([
+    const [likeCount, res, rawComments] = await db.batch([
       db.select({}).from(postLikeTable).where(eq(postLikeTable.postId, id)),
       db
         .select({
@@ -32,9 +32,11 @@ export const getPostById = cache(
         .where(eq(postTable.id, id))
         .leftJoin(userTable, eq(userTable.id, postTable.posterId))
         .leftJoin(forumTable, eq(forumTable.id, postTable.forumId)),
-      db.query.commentTable.findMany({
-        where: eq(commentTable.postId, id),
-      }),
+      db
+        .select()
+        .from(commentTable)
+        .where(eq(commentTable.postId, id))
+        .leftJoin(userTable, eq(userTable.id, commentTable.commenterId)),
     ]);
 
     if (res.length == 0)
@@ -65,7 +67,10 @@ export const getPostById = cache(
         poster,
         forum,
         isLiked,
-        comments,
+        comments: rawComments.map(({ user, comment }) => ({
+          commenter: user,
+          ...comment,
+        })),
         likeCount: likeCount.length,
         ...data.post,
       },

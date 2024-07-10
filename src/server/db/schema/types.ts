@@ -18,7 +18,9 @@ export type PostWithComments = Post & {
   comments: Comment[];
 };
 
-export type Comment = InferSelectModel<typeof commentTable>;
+export type Comment = InferSelectModel<typeof commentTable> & {
+  commenter: User | null;
+};
 
 export type PrivateUser = InferSelectModel<typeof userTable>;
 export type User = StrictOmit<PrivateUser, "github_id">;
