@@ -17,7 +17,7 @@ The todo list of the website
 
 - [x] Login with github
 - [x] Basic auth with github
-- [ ] Login with google
+- [x] Login with google
 - [ ] User login session management (logout specific devices)
 
 ### User DB
