@@ -56,6 +56,7 @@ export function CommentForm({ post }: { post: Post }) {
       return;
     }
     setHasSubmitted(false);
+    form.reset();
   }
 
   return (
