@@ -21,11 +21,19 @@ export const GET = async (req: NextRequest) => {
       }
     );
   }
-  switch (type) {
-    case "forum":
-      return await handleForumCheck(name);
-    case "username":
-      return await handleUsernameCheck(name);
+  try {
+    switch (type) {
+      case "forum":
+        return await handleForumCheck(name);
+      case "username":
+        return await handleUsernameCheck(name);
+    }
+  } catch (e) {
+    const err = e as Error;
+    return ApiRes.error({
+      message: err.message,
+      code: ApiError.UnknownError,
+    });
   }
 
   return Response.json(
