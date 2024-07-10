@@ -5,6 +5,8 @@ import { CommentForm } from "./CommentForm";
 import { Button } from "@/components/ui/button";
 import { formatDistance } from "date-fns";
 import Link from "next/link";
+import { toggleLikeComment } from "@/server/db/actions/comment";
+import { toast } from "sonner";
 
 interface Props {
   post: PostWithComments;
@@ -52,7 +54,20 @@ function Comment({ comment }: { comment: Comment }) {
       </span>
       <p className="text-sm">{comment.body}</p>
       <div className="flex gap-2">
-        <Button variant="ghost">{comment.likeCount} Like</Button>
+        <Button
+          variant="ghost"
+          onClick={async () => {
+            const res = await toggleLikeComment(comment.id);
+            if (res.error) {
+              toast.error("An error has occurred", {
+                description: res.message,
+              });
+              return;
+            }
+          }}
+        >
+          {comment.likeCount} Like
+        </Button>
         <Button variant="ghost">Reply</Button>
       </div>
     </div>

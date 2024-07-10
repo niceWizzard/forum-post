@@ -4,11 +4,12 @@ import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { getAuth } from "@/server/auth";
 import "server-only";
 import { db } from "..";
-import { commentTable } from "../schema/comment";
+import { commentLikeTable, commentTable } from "../schema/comment";
 import { postTable } from "../schema/post";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { type RawComment } from "../schema/types";
 import { revalidatePath } from "next/cache";
+import { getRawComment } from "../queries/comment";
 
 export const createComment = async ({
   commentBody,
@@ -67,6 +68,62 @@ export const createComment = async ({
   } catch (e: any) {
     const err = e as Error;
 
+    return ApiRes.error({
+      message: err.message,
+      code: ApiError.UnknownError,
+    });
+  }
+};
+
+export const toggleLikeComment = async (
+  commentId: string
+): Promise<ApiResponse<boolean>> => {
+  try {
+    const { user } = await getAuth();
+    if (!user) {
+      return ApiRes.error({
+        message: "Please login",
+        code: ApiError.AuthRequired,
+      });
+    }
+
+    const commentRes = await getRawComment(commentId);
+    if (commentRes.error) {
+      return commentRes;
+    }
+
+    const comment = commentRes.data;
+
+    const likeExists = await db.query.commentLikeTable.findFirst({
+      where: and(
+        eq(commentLikeTable.commentId, comment.id),
+        eq(commentLikeTable.userId, user.id)
+      ),
+    });
+
+    if (!likeExists) {
+      await db.insert(commentLikeTable).values({
+        userId: user.id,
+        commentId,
+      });
+    } else {
+      await db
+        .delete(commentLikeTable)
+        .where(
+          and(
+            eq(commentLikeTable.commentId, comment.id),
+            eq(commentLikeTable.userId, user.id)
+          )
+        );
+    }
+
+    revalidatePath(`/post/${comment.postId}`);
+
+    return ApiRes.success({
+      data: !likeExists,
+    });
+  } catch (e) {
+    const err = e as Error;
     return ApiRes.error({
       message: err.message,
       code: ApiError.UnknownError,
