@@ -4,6 +4,7 @@ import { type Comment, PostWithComments } from "@/server/db/schema/types";
 import { CommentForm } from "./CommentForm";
 import { Button } from "@/components/ui/button";
 import { formatDistance } from "date-fns";
+import Link from "next/link";
 
 interface Props {
   post: PostWithComments;
@@ -34,9 +35,16 @@ export default function CommentSection({ post }: Props) {
 function Comment({ comment }: { comment: Comment }) {
   return (
     <div className="flex flex-col gap-2 py-2">
-      <span className="text-sm">
-        @{comment.commenter?.username ?? "deleted"}
-      </span>
+      {comment.commenter ? (
+        <Link
+          className="text-sm hover:underline"
+          href={`/user/${comment.commenter?.username}`}
+        >
+          @{comment.commenter.username}
+        </Link>
+      ) : (
+        <span className="text-sm">deleted</span>
+      )}
       <span className="text-xs font-light text-foreground-lighter">
         {formatDistance(new Date(comment.createdAt), new Date(), {
           addSuffix: true,
