@@ -18,5 +18,5 @@ export const postCreateFormSchema = z.object({
   content: z
     .string()
     .min(1, { message: "Post content is required." })
-    .max(512, { message: "Post content must not exceed 512 characters" }),
+    .max(10240, { message: "Post content must not exceed 10240 characters" }),
 });
