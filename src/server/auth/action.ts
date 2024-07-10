@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { lucia, getAuth } from "./index";
 
-import { redirect, RedirectType } from "next/navigation";
+import { redirect } from "next/navigation";
 
 export async function logout(): Promise<ActionResult> {
   const { session } = await getAuth();

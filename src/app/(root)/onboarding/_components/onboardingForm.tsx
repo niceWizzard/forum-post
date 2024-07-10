@@ -1,9 +1,8 @@
 "use client";
-
 import { saveRequiredUserFields } from "@/server/db/actions/user";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
   Form,
@@ -14,13 +13,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useDebouncedCallback } from "use-debounce";
-import { useFormState } from "react-dom";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
 import { ApiResponse } from "@/server/apiResponse";
 import { env } from "@/env/client.mjs";
 import { useEffectUpdate } from "@/lib/utils";

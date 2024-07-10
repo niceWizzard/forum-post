@@ -1,4 +1,4 @@
-import { ApiError, getErrorMessage } from "@/server/apiErrors";
+import { getErrorMessage } from "@/server/apiErrors";
 import { unathenticatedOnly } from "@/server/auth/validate";
 import Link from "next/link";
 

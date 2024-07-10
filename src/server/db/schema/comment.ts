@@ -2,7 +2,6 @@ import {
   foreignKey,
   pgTable,
   primaryKey,
-  text,
   timestamp,
   uuid,
   varchar,

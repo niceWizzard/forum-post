@@ -1,18 +1,11 @@
 import { lucia } from "@/server/auth";
 import { cookies } from "next/headers";
 import { OAuth2RequestError } from "arctic";
-import { generateIdFromEntropySize } from "lucia";
 import { github } from "@/server/auth/providers";
 import { db } from "@/server/db";
 import { userTable } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
-import {
-  ApiRes,
-  ApiResponse,
-  NextApiRes,
-  NextApiResponse,
-} from "@/server/apiResponse";
+import { NextApiRes, NextApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
 import { AuthFlowType, isAuthType } from "@/lib/utils.server";
 import { CookieName } from "@/server/cookieName";

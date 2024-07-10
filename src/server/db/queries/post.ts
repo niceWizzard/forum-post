@@ -1,15 +1,12 @@
 import "server-only";
 import { db } from "../index";
 import { postLikeTable, postTable } from "../schema/post";
-import { and, count, eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { userTable } from "../schema";
 import {
   exposeUserType,
   minimizeData,
-  Post,
   PostWithComments,
-  PrivateUser,
-  User,
 } from "../schema/types";
 import { cache } from "react";
 import { forumTable } from "../schema/forum";

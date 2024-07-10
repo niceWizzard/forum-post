@@ -1,5 +1,5 @@
 import { getUserProfile } from "@/server/db/queries/user";
-import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 
 interface Props {

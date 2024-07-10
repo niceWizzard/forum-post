@@ -1,9 +1,7 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -14,15 +12,14 @@ import { env } from "@/env/client.mjs";
 import { cn, useEffectUpdate } from "@/lib/utils";
 import { ApiResponse } from "@/server/apiResponse";
 import { createForum } from "@/server/db/actions/forum";
-import { useUserStore } from "@/store/userStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import clsx from "clsx";
-import { Loader2, LoaderCircle } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LoadingButton } from "@/components/ui/loadingButton";
 import { forumCreateSchema } from "@/server/db/actions/schema";
 import { Textarea } from "@/components/ui/textarea";

@@ -1,6 +1,6 @@
 import "server-only";
 import { db } from "..";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { forumMemberTable, forumTable } from "../schema/forum";
 import { postLikeTable, postTable } from "../schema/post";
 import { cache } from "react";

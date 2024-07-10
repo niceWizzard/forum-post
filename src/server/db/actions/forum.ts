@@ -1,8 +1,6 @@
 "use server";
-
 import { getAuth } from "@/server/auth";
 import { db } from "../index";
-import { eq } from "drizzle-orm";
 import { forumTable } from "../schema/forum";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";

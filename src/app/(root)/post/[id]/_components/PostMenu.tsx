@@ -1,6 +1,4 @@
 "use client";
-
-import { Button } from "@/components/ui/button";
 import { LoadingButton } from "@/components/ui/loadingButton";
 import {
   Popover,
@@ -10,7 +8,7 @@ import {
 import { deletePost } from "@/server/db/actions/post";
 import { Post } from "@/server/db/schema/types";
 import { useUserStore } from "@/store/userStore";
-import { Menu, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 

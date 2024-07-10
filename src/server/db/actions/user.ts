@@ -3,7 +3,6 @@ import "server-only";
 import { db } from "../index";
 import { userTable } from "../schema";
 import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
 import { getAuth } from "@/server/auth";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { User } from "lucia";
