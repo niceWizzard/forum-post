@@ -55,7 +55,7 @@ function Comment({ comment }: { comment: Comment }) {
       <p className="text-sm">{comment.body}</p>
       <div className="flex gap-2">
         <Button
-          variant="ghost"
+          variant={comment.isLiked ? "secondary" : "ghost"}
           onClick={async () => {
             const res = await toggleLikeComment(comment.id);
             if (res.error) {
