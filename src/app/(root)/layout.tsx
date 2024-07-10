@@ -5,6 +5,7 @@ import Header from "./_components/header";
 import Footer from "./_components/footer";
 import StoreProvider from "./_components/storeProvider";
 import { getAuth } from "@/server/auth";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,6 +29,7 @@ export default async function RootLayout({
           <Header />
           <main className="flex-grow">{children}</main>
           <Footer />
+          <Toaster />
         </div>
       </body>
     </html>
