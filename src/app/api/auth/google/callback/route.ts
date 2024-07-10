@@ -78,7 +78,7 @@ export async function GET(request: Request): Promise<NextApiResponse> {
       case "register":
         if (existingUser) {
           return NextApiRes.error({
-            message: "User with the github account already exists",
+            message: "User with the google account already exists",
             code: ApiError.UserAlreadyExists,
             status: 302,
             headers: {
@@ -110,7 +110,7 @@ export async function GET(request: Request): Promise<NextApiResponse> {
         if (!existingUser) {
           if (existingUserWithEmail)
             return NextApiRes.error({
-              message: "User with the github account does not exist",
+              message: "User with the google account does not exist",
               code: ApiError.ProviderNotConnected,
               status: 302,
               headers: {
