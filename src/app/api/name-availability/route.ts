@@ -1,17 +1,17 @@
 import { ApiError } from "@/server/apiErrors";
-import { ApiRes } from "@/server/apiResponse";
+import { ApiRes, NextApiRes } from "@/server/apiResponse";
 import { db } from "@/server/db";
 import { userTable } from "@/server/db/schema";
 import { forumTable } from "@/server/db/schema/forum";
 import { eq } from "drizzle-orm";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export const GET = async (req: NextRequest) => {
+export const GET = async (req: NextRequest): Promise<NextResponse> => {
   const { searchParams } = new URL(req.url);
   const type = searchParams.get("type");
   const name = searchParams.get("name");
   if (name == null || name.length < 3) {
-    return Response.json(
+    return NextResponse.json(
       ApiRes.error({
         message: "Name is missing or invalid.",
         code: ApiError.MissingParameter,
@@ -30,13 +30,13 @@ export const GET = async (req: NextRequest) => {
     }
   } catch (e) {
     const err = e as Error;
-    return ApiRes.error({
+    return NextApiRes.error({
       message: err.message,
       code: ApiError.UnknownError,
     });
   }
 
-  return Response.json(
+  return NextResponse.json(
     ApiRes.error({
       message: "Invalid type",
       code: ApiError.InvalidParameter,
@@ -52,7 +52,7 @@ async function handleForumCheck(name: string) {
     where: eq(forumTable.name, name),
   });
 
-  return Response.json(
+  return NextResponse.json(
     ApiRes.success({
       data: res == null,
     })
@@ -64,7 +64,7 @@ async function handleUsernameCheck(name: string) {
     where: eq(userTable.username, name),
   });
 
-  return Response.json(
+  return NextResponse.json(
     ApiRes.success({
       data: res == null,
     })
