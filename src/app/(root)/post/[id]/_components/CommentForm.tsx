@@ -10,8 +10,11 @@ import {
 } from "@/components/ui/form";
 import { LoadingButton } from "@/components/ui/loadingButton";
 import { Textarea } from "@/components/ui/textarea";
+import { createComment } from "@/server/db/actions/comment";
 import { Post } from "@/server/db/schema/types";
+import { useUserStore } from "@/store/userStore";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -33,9 +36,27 @@ export function CommentForm({ post }: { post: Post }) {
     },
   });
 
+  const user = useUserStore((v) => v.user);
+  const router = useRouter();
+
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  async function onSubmit(values: FormType) {}
+  async function onSubmit(values: FormType) {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    setHasSubmitted(true);
+    const res = await createComment({
+      postId: post.id,
+      commentBody: values.comment,
+    });
+    if (res.error) {
+      console.error(res.message);
+      return;
+    }
+    setHasSubmitted(false);
+  }
 
   return (
     <Form {...form}>
