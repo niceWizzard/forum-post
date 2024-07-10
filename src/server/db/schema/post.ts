@@ -19,7 +19,7 @@ export const postTable = pgTable("post", {
       onDelete: "cascade",
     }),
   title: varchar("title", { length: 64 }).notNull(),
-  body: varchar("body", { length: 512 }).notNull(),
+  body: varchar("body", { length: 10240 }).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

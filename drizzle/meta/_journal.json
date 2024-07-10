@@ -15,6 +15,13 @@
       "when": 1720521748170,
       "tag": "0001_opposite_sage",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1720601795019,
+      "tag": "0002_chunky_dexter_bennett",
+      "breakpoints": true
     }
   ]
 }

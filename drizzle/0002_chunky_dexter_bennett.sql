@@ -1,0 +1,1 @@
+ALTER TABLE "post" ALTER COLUMN "body" SET DATA TYPE varchar(10240);
