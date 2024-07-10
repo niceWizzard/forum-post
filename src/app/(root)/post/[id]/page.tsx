@@ -12,7 +12,7 @@ interface Props {
 export default async function PostPage({ params: { id } }: Props) {
   const res = await getPostById(id);
   if (res.error) {
-    return "Invalid post";
+    return res.message;
   }
 
   const post = res.data;

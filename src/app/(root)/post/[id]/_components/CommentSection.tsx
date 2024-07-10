@@ -52,7 +52,7 @@ function Comment({ comment }: { comment: Comment }) {
       </span>
       <p className="text-sm">{comment.body}</p>
       <div className="flex gap-2">
-        <Button variant="ghost">Like</Button>
+        <Button variant="ghost">{comment.likeCount} Like</Button>
         <Button variant="ghost">Reply</Button>
       </div>
     </div>

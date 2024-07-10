@@ -13,7 +13,8 @@ import { forumTable } from "../schema/forum";
 import { getAuth } from "@/server/auth";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
-import { commentTable } from "../schema/comment";
+import { commentLikeTable, commentTable } from "../schema/comment";
+import { isTuple } from "@/lib/utils.server";
 
 export const getPostById = cache(
   async (id: string): Promise<ApiResponse<PostWithComments>> => {
@@ -68,6 +69,24 @@ export const getPostById = cache(
         isLiked = likeRes ? true : false;
       }
 
+      const commentLikeQuery = rawComments.map((c) =>
+        db.query.commentLikeTable.findMany({
+          where: eq(commentLikeTable.commentId, c.comment.id),
+          columns: {
+            commentId: true,
+          },
+        })
+      );
+
+      if (!isTuple(commentLikeQuery)) {
+        return ApiRes.error({
+          message: "Failed to get comment likes",
+          code: ApiError.UnknownError,
+        });
+      }
+
+      const individualCommentLikeCountRes = await db.batch(commentLikeQuery);
+
       return ApiRes.success({
         data: {
           poster,
@@ -75,6 +94,7 @@ export const getPostById = cache(
           isLiked,
           initialComments: rawComments.map(({ user, comment }) => ({
             commenter: user,
+            likeCount: individualCommentLikeCountRes[0].length,
             ...comment,
           })),
           likeCount: likeCount.length,
