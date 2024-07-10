@@ -9,7 +9,6 @@ import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { getPostById } from "../queries/post";
 
 export const unlikePost = async (postId: string) => {
   const { user } = await getAuth();
@@ -106,21 +105,25 @@ export const deletePost = async (postId: string) => {
     });
   }
 
-  const postRes = await getPostById(postId);
-  if (postRes.error) {
-    return postRes;
-  }
-
-  const post = postRes.data;
-
-  if (post.posterId !== user.id) {
-    return ApiRes.error({
-      message: "Unauthorized to delete the post.",
-      code: ApiError.Unathorized,
-    });
-  }
-
   try {
+    const post = await db.query.postTable.findFirst({
+      where: and(eq(postTable.id, postId), eq(postTable.posterId, user.id)),
+    });
+
+    if (!post) {
+      return ApiRes.error({
+        message: "No such post found",
+        code: ApiError.PostNotFound,
+      });
+    }
+
+    if (post.posterId !== user.id) {
+      return ApiRes.error({
+        message: "Unauthorized to delete the post.",
+        code: ApiError.Unathorized,
+      });
+    }
+
     await db
       .delete(postTable)
       .where(and(eq(postTable.posterId, user.id), eq(postTable.id, postId)));
