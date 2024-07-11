@@ -5,9 +5,12 @@ import { CommentForm } from "./CommentForm";
 import { Button } from "@/components/ui/button";
 import { formatDistance } from "date-fns";
 import Link from "next/link";
-import { toggleLikeComment } from "@/server/db/actions/comment";
+import { deleteComment, toggleLikeComment } from "@/server/db/actions/comment";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
+import { useUserStore } from "@/store/userStore";
+import { useState } from "react";
+import { LoadingButton } from "@/components/ui/loadingButton";
 
 interface Props {
   post: PostWithComments;
@@ -36,6 +39,7 @@ export default function CommentSection({ post }: Props) {
 }
 
 function Comment({ comment }: { comment: Comment }) {
+  const user = useUserStore((v) => v.user);
   const onLikeButtonClick = useDebouncedCallback(async () => {
     const res = await toggleLikeComment(comment.id);
     console.log("CLICKEd");
@@ -48,18 +52,40 @@ function Comment({ comment }: { comment: Comment }) {
     }
   }, 300);
 
+  const [isDeleting, setIsDeleting] = useState(false);
+
   return (
     <div className="space-y-2 py-2">
-      {comment.commenter ? (
-        <Link
-          className="text-sm hover:underline"
-          href={`/user/${comment.commenter?.username}`}
-        >
-          @{comment.commenter.username}
-        </Link>
-      ) : (
-        <span className="text-sm">deleted</span>
-      )}
+      <div className="flex justify-between w-full">
+        {comment.commenter ? (
+          <Link
+            className="text-sm hover:underline"
+            href={`/user/${comment.commenter?.username}`}
+          >
+            @{comment.commenter.username}
+          </Link>
+        ) : (
+          <span className="text-sm">deleted</span>
+        )}
+        {user && user.id == comment.commenterId && (
+          <LoadingButton
+            isLoading={isDeleting}
+            loadingText="Deleting..."
+            onClick={async () => {
+              setIsDeleting(true);
+              const res = await deleteComment(comment.id);
+              setIsDeleting(false);
+              if (res.error) {
+                toast.error("An error has occurred", {
+                  description: res.message,
+                });
+              }
+            }}
+          >
+            Delete
+          </LoadingButton>
+        )}
+      </div>
       <span className="text-xs font-light text-foreground-lighter block">
         {formatDistance(new Date(comment.createdAt), new Date(), {
           addSuffix: true,

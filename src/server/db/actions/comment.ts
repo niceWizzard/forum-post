@@ -115,7 +115,18 @@ export const deleteComment = async (
       });
     }
 
-    await db.delete(commentTable).where(eq(commentTable.id, commentId));
+    const serverlessDb = await createCustomDb();
+    await serverlessDb.transaction(async () => {
+      await db.delete(commentTable).where(eq(commentTable.id, commentId));
+      await db
+        .update(postTable)
+        .set({
+          commentCount: sql`${postTable.commentCount} - 1`,
+        })
+        .where(eq(postTable.id, comment.postId!));
+    });
+
+    revalidatePath(`/post/${comment.postId}`);
 
     return ApiRes.success({ data: true });
   } catch (e) {
