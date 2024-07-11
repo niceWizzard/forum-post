@@ -1,5 +1,6 @@
 import {
   foreignKey,
+  integer,
   pgTable,
   primaryKey,
   timestamp,
@@ -21,6 +22,7 @@ export const commentTable = pgTable(
     }),
     replyToId: uuid("reply_to_id"),
     body: varchar("body", { length: 512 }).notNull(),
+    likeCount: integer("like_count").notNull().default(0),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (table) => ({

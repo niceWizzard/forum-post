@@ -22,6 +22,13 @@
       "when": 1720601795019,
       "tag": "0002_chunky_dexter_bennett",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1720661246007,
+      "tag": "0003_dry_master_chief",
+      "breakpoints": true
     }
   ]
 }
