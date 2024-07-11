@@ -18,6 +18,7 @@ import { isTuple } from "@/lib/utils.server";
 
 export const getPostById = cache(
   async (id: string): Promise<ApiResponse<PostWithComments>> => {
+    const { user } = await getAuth();
     try {
       const [likeCount, res, rawComments, commentCountQueryRes] =
         await db.batch([
@@ -39,7 +40,17 @@ export const getPostById = cache(
             .orderBy(asc(commentTable.createdAt))
             .limit(10)
             .offset(0)
-            .leftJoin(userTable, eq(userTable.id, commentTable.commenterId)),
+            .leftJoin(userTable, eq(userTable.id, commentTable.commenterId))
+            .leftJoin(
+              commentLikeTable,
+              and(
+                eq(commentLikeTable.commentId, commentTable.id),
+                eq(
+                  commentLikeTable.userId,
+                  user?.id ?? "11111111-1111-1111-1111-1ce992f5e2db" // Some nonsense uuid just to not have an error.
+                )
+              )
+            ),
           db
             .select({ count: count() })
             .from(commentTable)
@@ -58,7 +69,6 @@ export const getPostById = cache(
 
       let isLiked: boolean | null = null;
 
-      const { user } = await getAuth();
       if (user) {
         const likeRes = await db.query.postLikeTable.findFirst({
           where: and(
@@ -69,44 +79,24 @@ export const getPostById = cache(
         isLiked = likeRes ? true : false;
       }
 
-      const commentLikeQuery = rawComments.map((c) =>
-        db.query.commentLikeTable.findMany({
-          where: eq(commentLikeTable.commentId, c.comment.id),
-          columns: {
-            commentId: true,
-            userId: true,
-          },
-        })
-      );
-
-      if (!isTuple(commentLikeQuery)) {
-        return ApiRes.error({
-          message: "Failed to get comment likes",
-          code: ApiError.UnknownError,
-        });
-      }
-
-      const individualCommentLikeCountRes = await db.batch(commentLikeQuery);
-
       return ApiRes.success({
         data: {
           poster,
           forum,
           isLiked,
-          initialComments: rawComments.map(({ user, comment }, index) => {
-            const thisCommentLikeTables = individualCommentLikeCountRes[index];
-            let isLiked = null;
-            if (user) {
-              isLiked = !!thisCommentLikeTables.find(
-                (v) => v.userId === user.id && v.commentId === comment.id
-              );
+          initialComments: rawComments.map(
+            ({ user, comment, comment_like }) => {
+              let isLiked = null;
+              if (user) {
+                isLiked = !!comment_like;
+              }
+              return {
+                commenter: user,
+                isLiked,
+                ...comment,
+              };
             }
-            return {
-              commenter: user,
-              isLiked,
-              ...comment,
-            };
-          }),
+          ),
           likeCount: likeCount.length,
           commentCount: commentCountQueryRes.length
             ? commentCountQueryRes[0].count
