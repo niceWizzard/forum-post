@@ -29,6 +29,20 @@
       "when": 1720661246007,
       "tag": "0003_dry_master_chief",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1720664283915,
+      "tag": "0004_last_songbird",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1720664373185,
+      "tag": "0005_gorgeous_proemial_gods",
+      "breakpoints": true
     }
   ]
 }

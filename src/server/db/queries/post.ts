@@ -20,42 +20,36 @@ export const getPostById = cache(
   async (id: string): Promise<ApiResponse<PostWithComments>> => {
     const { user } = await getAuth();
     try {
-      const [likeCount, res, rawComments, commentCountQueryRes] =
-        await db.batch([
-          db.select({}).from(postLikeTable).where(eq(postLikeTable.postId, id)),
-          db
-            .select({
-              user: { ...userTable },
-              forum: { ...forumTable },
-              post: { ...postTable },
-            })
-            .from(postTable)
-            .where(eq(postTable.id, id))
-            .leftJoin(userTable, eq(userTable.id, postTable.posterId))
-            .leftJoin(forumTable, eq(forumTable.id, postTable.forumId)),
-          db
-            .select()
-            .from(commentTable)
-            .where(eq(commentTable.postId, id))
-            .orderBy(asc(commentTable.createdAt))
-            .limit(10)
-            .offset(0)
-            .leftJoin(userTable, eq(userTable.id, commentTable.commenterId))
-            .leftJoin(
-              commentLikeTable,
-              and(
-                eq(commentLikeTable.commentId, commentTable.id),
-                eq(
-                  commentLikeTable.userId,
-                  user?.id ?? "11111111-1111-1111-1111-1ce992f5e2db" // Some nonsense uuid just to not have an error.
-                )
+      const [res, rawComments] = await db.batch([
+        db
+          .select({
+            user: { ...userTable },
+            forum: { ...forumTable },
+            post: { ...postTable },
+          })
+          .from(postTable)
+          .where(eq(postTable.id, id))
+          .leftJoin(userTable, eq(userTable.id, postTable.posterId))
+          .leftJoin(forumTable, eq(forumTable.id, postTable.forumId)),
+        db
+          .select()
+          .from(commentTable)
+          .where(eq(commentTable.postId, id))
+          .orderBy(asc(commentTable.createdAt))
+          .limit(10)
+          .offset(0)
+          .leftJoin(userTable, eq(userTable.id, commentTable.commenterId))
+          .leftJoin(
+            commentLikeTable,
+            and(
+              eq(commentLikeTable.commentId, commentTable.id),
+              eq(
+                commentLikeTable.userId,
+                user?.id ?? "11111111-1111-1111-1111-1ce992f5e2db" // Some nonsense uuid just to not have an error.
               )
-            ),
-          db
-            .select({ count: count() })
-            .from(commentTable)
-            .where(eq(commentTable.postId, id)),
-        ]);
+            )
+          ),
+      ]);
 
       if (res.length == 0)
         return ApiRes.error({
@@ -97,10 +91,6 @@ export const getPostById = cache(
               };
             }
           ),
-          likeCount: likeCount.length,
-          commentCount: commentCountQueryRes.length
-            ? commentCountQueryRes[0].count
-            : 0,
           ...data.post,
         },
       });
