@@ -9,6 +9,8 @@ interface Props {
   params: { id: string };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function PostPage({ params: { id } }: Props) {
   const res = await getPostById(id);
   if (res.error) {

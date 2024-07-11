@@ -7,6 +7,8 @@ interface Props {
   params: { id: string };
 }
 
+export const dynamic = "force-dynamic";
+
 const ForumWithIdPage = async ({ params: { id } }: Props) => {
   const res = await getForumById(id);
   if (res.error) {
