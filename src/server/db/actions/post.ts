@@ -2,12 +2,12 @@
 import "server-only";
 import { z } from "zod";
 import { postCreateFormSchema } from "./schema";
-import { db } from "../index";
+import { createCustomDb, db } from "../index";
 import { getAuth } from "@/server/auth";
 import { postLikeTable, postTable } from "../schema/post";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export const unlikePost = async (postId: string) => {
@@ -20,12 +20,21 @@ export const unlikePost = async (postId: string) => {
       });
     }
 
-    const res = await db
-      .delete(postLikeTable)
-      .where(
-        and(eq(postLikeTable.postId, postId), eq(postLikeTable.userId, user.id))
-      )
-      .returning();
+    const serverlessDb = await createCustomDb();
+
+    await serverlessDb.transaction(async () => {
+      await serverlessDb
+        .delete(postLikeTable)
+        .where(
+          and(
+            eq(postLikeTable.postId, postId),
+            eq(postLikeTable.userId, user.id)
+          )
+        );
+      await serverlessDb.update(postTable).set({
+        likeCount: sql`${postTable.likeCount} - 1`,
+      });
+    });
 
     revalidatePath("/forum");
     revalidatePath(`/post/${postId}`);
@@ -52,14 +61,20 @@ export const likePost = async (postId: string) => {
         code: ApiError.AuthRequired,
       });
     }
+    const serverlessDb = await createCustomDb();
 
-    const res = await db
-      .insert(postLikeTable)
-      .values({
-        postId,
-        userId: user.id,
-      })
-      .onConflictDoNothing();
+    await serverlessDb.transaction(async () => {
+      await serverlessDb
+        .insert(postLikeTable)
+        .values({
+          postId,
+          userId: user.id,
+        })
+        .onConflictDoNothing();
+      await serverlessDb.update(postTable).set({
+        likeCount: sql`${postTable.likeCount} + 1`,
+      });
+    });
 
     revalidatePath("/forum");
     revalidatePath(`/post/${postId}`);
