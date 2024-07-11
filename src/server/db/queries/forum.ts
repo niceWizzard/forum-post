@@ -1,6 +1,6 @@
 import "server-only";
 import { db } from "..";
-import { count, eq , and} from "drizzle-orm";
+import { count, eq, and } from "drizzle-orm";
 import { forumMemberTable, forumTable } from "../schema/forum";
 import { postLikeTable, postTable } from "../schema/post";
 import { cache } from "react";
@@ -10,7 +10,7 @@ import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
 import { getAuth } from "@/server/auth";
 import { isTuple } from "@/lib/utils.server";
-import { commentTable } from "../schema/comment";
+import { commentLikeTable, commentTable } from "../schema/comment";
 
 export const getJoinedForums = cache(async (userId: string) => {
   try {
@@ -77,20 +77,24 @@ export const getForumById = cache(
 export const getForumPosts = cache(
   async (forumId: string): Promise<ApiResponse<Post[]>> => {
     try {
+      const { user } = await getAuth();
+
       const posts = await db
         .select()
         .from(postTable)
         .where(eq(postTable.forumId, forumId))
         .leftJoin(userTable, eq(postTable.posterId, userTable.id))
         .leftJoin(forumTable, eq(postTable.forumId, forumTable.id))
-        .leftJoin(commentLikeTable, and(eq(commentLikeTable.userId, postTable.posterId), eq(commentLikeTable.postId, postTable.id))))
-;
-
-      const { user } = await getAuth();
-
-
-
-    
+        .leftJoin(
+          postLikeTable,
+          and(
+            eq(postLikeTable.postId, postTable.id),
+            eq(
+              postLikeTable.userId,
+              user?.id ?? "11111111-1111-1111-1111-1ce992f5e2db"
+            )
+          )
+        );
 
       const a = posts.map((v, index): Post => {
         const poster = v.user ? exposeUserType(v.user) : null;
@@ -98,7 +102,7 @@ export const getForumPosts = cache(
         let isLiked: boolean | null = null;
 
         if (user) {
-          isLiked = !!v.comment_like;
+          isLiked = !!v.post_like;
         }
         return {
           poster,
@@ -106,10 +110,7 @@ export const getForumPosts = cache(
             name,
             id,
           },
-
           isLiked,
-
-
           ...v.post,
         };
       });
