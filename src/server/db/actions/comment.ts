@@ -88,6 +88,45 @@ export const createComment = async ({
   }
 };
 
+export const deleteComment = async (
+  commentId: string
+): Promise<ApiResponse<boolean>> => {
+  try {
+    const { user } = await getAuth();
+    if (!user) {
+      return ApiRes.error({
+        message: "Please login",
+        code: ApiError.AuthRequired,
+      });
+    }
+
+    const commentRes = await getRawComment(commentId);
+
+    if (commentRes.error) {
+      return commentRes;
+    }
+
+    const comment = commentRes.data;
+
+    if (comment.commenterId !== user.id) {
+      return ApiRes.error({
+        message: "You are not the owner of this comment",
+        code: ApiError.Unathorized,
+      });
+    }
+
+    await db.delete(commentTable).where(eq(commentTable.id, commentId));
+
+    return ApiRes.success({ data: true });
+  } catch (e) {
+    const err = e as Error;
+    return ApiRes.error({
+      message: err.message,
+      code: ApiError.UnknownError,
+    });
+  }
+};
+
 export const toggleLikeComment = async (
   commentId: string
 ): Promise<ApiResponse<boolean>> => {
