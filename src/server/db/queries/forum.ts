@@ -1,6 +1,6 @@
 import "server-only";
 import { db } from "..";
-import { count, eq } from "drizzle-orm";
+import { count, eq , and} from "drizzle-orm";
 import { forumMemberTable, forumTable } from "../schema/forum";
 import { postLikeTable, postTable } from "../schema/post";
 import { cache } from "react";
@@ -82,7 +82,9 @@ export const getForumPosts = cache(
         .from(postTable)
         .where(eq(postTable.forumId, forumId))
         .leftJoin(userTable, eq(postTable.posterId, userTable.id))
-        .leftJoin(forumTable, eq(postTable.forumId, forumTable.id));
+        .leftJoin(forumTable, eq(postTable.forumId, forumTable.id))
+        .leftJoin(commentLikeTable, and(eq(commentLikeTable.userId, postTable.posterId), eq(commentLikeTable.postId, postTable.id))))
+;
 
       const { user } = await getAuth();
 
@@ -96,7 +98,7 @@ export const getForumPosts = cache(
         let isLiked: boolean | null = null;
 
         if (user) {
-          isLiked = !!postLikeData.find((p) => p.userId == user.id);
+          isLiked = !!v.comment_like;
         }
         return {
           poster,
