@@ -86,39 +86,15 @@ export const getForumPosts = cache(
 
       const { user } = await getAuth();
 
-      const likeCountQuery = posts.map((v) => {
-        return db.query.postLikeTable.findMany({
-          where: eq(postLikeTable.postId, v.post.id),
-        });
-      });
 
-      const commentCountQuery = posts.map((v) => {
-        return db
-          .select({ count: count() })
-          .from(commentTable)
-          .where(eq(commentTable.postId, v.post.id));
-      });
 
-      if (!isTuple(likeCountQuery) || !isTuple(commentCountQuery)) {
-        return ApiRes.error({
-          message: "Failed to get user likes",
-          code: ApiError.UnknownError,
-        });
-      }
-
-      const batchedQuery = await db.batch([...likeCountQuery]);
-      const commentCountRes = await db.batch(commentCountQuery);
+    
 
       const a = posts.map((v, index): Post => {
         const poster = v.user ? exposeUserType(v.user) : null;
         const { name, id } = v.forum!;
         let isLiked: boolean | null = null;
-        const postLikeData = batchedQuery[index];
-        const likeCount = postLikeData.length;
-        const commentCount =
-          commentCountRes[index].length == 1
-            ? commentCountRes[index][0].count
-            : 0;
+
         if (user) {
           isLiked = !!postLikeData.find((p) => p.userId == user.id);
         }
@@ -128,9 +104,10 @@ export const getForumPosts = cache(
             name,
             id,
           },
-          likeCount,
+
           isLiked,
-          commentCount,
+
+
           ...v.post,
         };
       });
