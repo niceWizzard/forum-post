@@ -44,26 +44,39 @@ export const createComment = async ({
       });
     }
 
-    const comment = await db
-      .insert(commentTable)
-      .values({
-        body: commentBody,
-        commenterId: user.id,
-        postId,
-      })
-      .returning();
-
-    if (comment.length == 0) {
-      return ApiRes.error({
-        message: "Failed to create comment",
-        code: ApiError.UnknownError,
+    const serverlessDb = await createCustomDb();
+    const comment = await serverlessDb.transaction(async (tx) => {
+      const comment = await serverlessDb
+        .insert(commentTable)
+        .values({
+          body: commentBody,
+          commenterId: user.id,
+          postId,
+        })
+        .returning();
+      if (comment.length == 0) {
+        tx.rollback();
+        return ApiRes.error({
+          message: "Failed to create comment",
+          code: ApiError.UnknownError,
+        });
+      }
+      await serverlessDb.update(postTable).set({
+        commentCount: sql`${postTable.commentCount} + 1`,
       });
+      return ApiRes.success({
+        data: comment[0],
+      });
+    });
+
+    if (comment.error) {
+      return comment;
     }
 
     revalidatePath(`/post/${postId}`);
 
     return ApiRes.success({
-      data: comment[0],
+      data: comment.data,
     });
   } catch (e: any) {
     const err = e as Error;
