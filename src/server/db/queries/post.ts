@@ -103,7 +103,6 @@ export const getPostById = cache(
             }
             return {
               commenter: user,
-              likeCount: thisCommentLikeTables.length,
               isLiked,
               ...comment,
             };
