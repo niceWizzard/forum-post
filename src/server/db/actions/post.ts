@@ -22,8 +22,8 @@ export const unlikePost = async (postId: string) => {
 
     const serverlessDb = await createCustomDb();
 
-    await serverlessDb.transaction(async () => {
-      await serverlessDb
+    await serverlessDb.transaction(async (tx) => {
+      await tx
         .delete(postLikeTable)
         .where(
           and(
@@ -31,7 +31,7 @@ export const unlikePost = async (postId: string) => {
             eq(postLikeTable.userId, user.id)
           )
         );
-      await serverlessDb.update(postTable).set({
+      await tx.update(postTable).set({
         likeCount: sql`${postTable.likeCount} - 1`,
       });
     });
@@ -63,15 +63,15 @@ export const likePost = async (postId: string) => {
     }
     const serverlessDb = await createCustomDb();
 
-    await serverlessDb.transaction(async () => {
-      await serverlessDb
+    await serverlessDb.transaction(async (tx) => {
+      await tx
         .insert(postLikeTable)
         .values({
           postId,
           userId: user.id,
         })
         .onConflictDoNothing();
-      await serverlessDb.update(postTable).set({
+      await tx.update(postTable).set({
         likeCount: sql`${postTable.likeCount} + 1`,
       });
     });

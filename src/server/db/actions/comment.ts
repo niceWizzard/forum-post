@@ -46,7 +46,7 @@ export const createComment = async ({
 
     const serverlessDb = await createCustomDb();
     const comment = await serverlessDb.transaction(async (tx) => {
-      const comment = await serverlessDb
+      const comment = await tx
         .insert(commentTable)
         .values({
           body: commentBody,
@@ -61,7 +61,7 @@ export const createComment = async ({
           code: ApiError.UnknownError,
         });
       }
-      await serverlessDb.update(postTable).set({
+      await tx.update(postTable).set({
         commentCount: sql`${postTable.commentCount} + 1`,
       });
       return ApiRes.success({
@@ -116,9 +116,9 @@ export const deleteComment = async (
     }
 
     const serverlessDb = await createCustomDb();
-    await serverlessDb.transaction(async () => {
-      await db.delete(commentTable).where(eq(commentTable.id, commentId));
-      await db
+    await serverlessDb.transaction(async (tx) => {
+      await tx.delete(commentTable).where(eq(commentTable.id, commentId));
+      await tx
         .update(postTable)
         .set({
           commentCount: sql`${postTable.commentCount} - 1`,
@@ -165,20 +165,20 @@ export const toggleLikeComment = async (
     });
 
     const customDb = await createCustomDb();
-    await customDb.transaction(async () => {
+    await customDb.transaction(async (tx) => {
       if (!likeExists) {
-        await customDb.insert(commentLikeTable).values({
+        await tx.insert(commentLikeTable).values({
           userId: user.id,
           commentId,
         });
-        await customDb
+        await tx
           .update(commentTable)
           .set({
             likeCount: sql`${commentTable.likeCount} + 1`,
           })
           .where(eq(commentTable.id, commentId));
       } else {
-        await customDb
+        await tx
           .delete(commentLikeTable)
           .where(
             and(
@@ -186,7 +186,7 @@ export const toggleLikeComment = async (
               eq(commentLikeTable.userId, user.id)
             )
           );
-        await customDb
+        await tx
           .update(commentTable)
           .set({
             likeCount: sql`${commentTable.likeCount} - 1`,
