@@ -3,10 +3,10 @@ import { ApiError } from "@/server/apiErrors";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { getAuth } from "@/server/auth";
 import "server-only";
-import { db } from "..";
+import { createCustomDb, db } from "..";
 import { commentLikeTable, commentTable } from "../schema/comment";
 import { postTable } from "../schema/post";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { type RawComment } from "../schema/types";
 import { revalidatePath } from "next/cache";
 import { getRawComment } from "../queries/comment";
@@ -101,21 +101,36 @@ export const toggleLikeComment = async (
       ),
     });
 
-    if (!likeExists) {
-      await db.insert(commentLikeTable).values({
-        userId: user.id,
-        commentId,
-      });
-    } else {
-      await db
-        .delete(commentLikeTable)
-        .where(
-          and(
-            eq(commentLikeTable.commentId, comment.id),
-            eq(commentLikeTable.userId, user.id)
-          )
-        );
-    }
+    const customDb = await createCustomDb();
+    await customDb.transaction(async () => {
+      if (!likeExists) {
+        await customDb.insert(commentLikeTable).values({
+          userId: user.id,
+          commentId,
+        });
+        await customDb
+          .update(commentTable)
+          .set({
+            likeCount: sql`${commentTable.likeCount} + 1`,
+          })
+          .where(eq(commentTable.id, commentId));
+      } else {
+        await customDb
+          .delete(commentLikeTable)
+          .where(
+            and(
+              eq(commentLikeTable.commentId, comment.id),
+              eq(commentLikeTable.userId, user.id)
+            )
+          );
+        await customDb
+          .update(commentTable)
+          .set({
+            likeCount: sql`${commentTable.likeCount} - 1`,
+          })
+          .where(eq(commentTable.id, commentId));
+      }
+    });
 
     revalidatePath(`/post/${comment.postId}`);
 
