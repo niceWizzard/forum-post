@@ -75,6 +75,7 @@ function CommentSortButton() {
       Array.from(searchParams.entries())
     );
     currentParams.set("sort", val);
+    currentParams.delete("commentPage");
     router.push(`${pathName}?${currentParams.toString()}`);
   }
   return (
