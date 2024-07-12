@@ -9,7 +9,7 @@ import { deleteComment, toggleLikeComment } from "@/server/db/actions/comment";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { useUserStore } from "@/store/userStore";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { LoadingButton } from "@/components/ui/loadingButton";
 import {
   Pagination,
@@ -20,6 +20,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { usePathname, useSearchParams } from "next/navigation";
+import { env } from "@/env/client.mjs";
 interface Props {
   post: PostWithComments;
   pageNumber: number;
@@ -54,16 +56,26 @@ function PaginationRow({ post, pageNumber }: Props) {
   const totalCommentPages = Math.ceil(post.commentCount / 10);
   const [prevPageHref, setPrevPageHref] = useState("");
   const [nextPageHref, setNextPageHref] = useState("");
+  const path = usePathname();
+  const searchParams = useSearchParams();
+
+  const toUrlPath = useCallback(
+    (pageNum: number): string => {
+      const url = new URL(env.PUBLIC_BASE_URL + path);
+      searchParams.forEach((value, key) => url.searchParams.set(key, value));
+      url.searchParams.set("commentPage", String(pageNum));
+      return url.toString();
+    },
+    [path, searchParams]
+  );
+
   useEffect(() => {
-    setPrevPageHref(
-      pageNumber == 1 ? "#" : `/post/${post.id}?commentPage=${pageNumber - 1}`
-    );
-    setNextPageHref(
-      pageNumber == totalCommentPages
-        ? "#"
-        : `/post/${post.id}?commentPage=${pageNumber + 1}`
-    );
-  }, [pageNumber, totalCommentPages, post.id]);
+    console.log(path);
+    const prevPageUrl = toUrlPath(pageNumber - 1);
+    const nextPageUrl = toUrlPath(pageNumber + 1);
+    setPrevPageHref(pageNumber == 1 ? "#" : prevPageUrl);
+    setNextPageHref(pageNumber == totalCommentPages ? "#" : nextPageUrl);
+  }, [pageNumber, totalCommentPages, post.id, path, toUrlPath]);
   return (
     <Pagination className="mt-3">
       <PaginationContent>
@@ -73,7 +85,7 @@ function PaginationRow({ post, pageNumber }: Props) {
         {...new Array(totalCommentPages).fill(1).map((v, i) => (
           <PaginationItem key={`page-${i}`}>
             <PaginationLink
-              href={`/post/${post.id}?commentPage=${i + 1}`}
+              href={toUrlPath(i + 1)}
               isActive={i + 1 == pageNumber}
             >
               {i + 1}
