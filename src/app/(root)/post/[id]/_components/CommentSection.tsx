@@ -109,10 +109,11 @@ function PaginationRow({ post, pageNumber }: Props) {
 
   const toUrlPath = useCallback(
     (pageNum: number): string => {
-      const url = new URL(env.PUBLIC_BASE_URL + path);
-      searchParams.forEach((value, key) => url.searchParams.set(key, value));
-      url.searchParams.set("commentPage", String(pageNum));
-      return url.toString();
+      const currentParams = new URLSearchParams(
+        Array.from(searchParams.entries())
+      );
+      currentParams.set("commentPage", String(pageNum));
+      return `${path}?${currentParams.toString()}`;
     },
     [path, searchParams]
   );
