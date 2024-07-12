@@ -70,6 +70,8 @@ function CommentSortButton() {
   const router = useRouter();
   const pathName = usePathname();
 
+  const [isOpen, setIsOpen] = useState(false);
+
   function onSortButtonClick(val: "newest" | "likes"): void {
     const currentParams = new URLSearchParams(
       Array.from(searchParams.entries())
@@ -77,9 +79,10 @@ function CommentSortButton() {
     currentParams.set("sort", val);
     currentParams.delete("commentPage");
     router.push(`${pathName}?${currentParams.toString()}`);
+    setIsOpen(false);
   }
   return (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={(v) => setIsOpen(v)}>
       <PopoverTrigger>Sort</PopoverTrigger>
       <PopoverContent>
         <div className="flex gap-2 flex-col">

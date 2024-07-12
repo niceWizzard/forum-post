@@ -1,12 +1,13 @@
 import "server-only";
 import { db } from "../index";
 import { postLikeTable, postTable } from "../schema/post";
-import { and, asc, count, eq } from "drizzle-orm";
+import { and, asc, count, eq, desc } from "drizzle-orm";
 import { userTable } from "../schema";
 import {
   exposeUserType,
   minimizeData,
   PostWithComments,
+  SortType,
 } from "../schema/types";
 import { cache } from "react";
 import { forumTable } from "../schema/forum";
@@ -17,12 +18,17 @@ import { commentLikeTable, commentTable } from "../schema/comment";
 import { isTuple } from "@/lib/utils.server";
 
 export const getPostById = cache(
-  async (
-    id: string,
-    commentPageNumber: number
-  ): Promise<ApiResponse<PostWithComments>> => {
+  async ({
+    id,
+    commentPageNumber,
+    sort,
+  }: {
+    id: string;
+    commentPageNumber: number;
+    sort: SortType;
+  }): Promise<ApiResponse<PostWithComments>> => {
     const { user } = await getAuth();
-    console.log(commentPageNumber);
+    console.log();
     try {
       const [res, rawComments] = await db.batch([
         db
@@ -39,7 +45,11 @@ export const getPostById = cache(
           .select()
           .from(commentTable)
           .where(eq(commentTable.postId, id))
-          .orderBy(asc(commentTable.createdAt))
+          .orderBy(
+            sort == "newest"
+              ? desc(commentTable.createdAt)
+              : desc(commentTable.likeCount)
+          )
           .limit(10)
           .offset((commentPageNumber - 1) * 10)
           .leftJoin(userTable, eq(userTable.id, commentTable.commenterId))
