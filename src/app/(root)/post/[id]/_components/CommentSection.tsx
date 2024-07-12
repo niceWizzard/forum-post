@@ -42,8 +42,10 @@ export default function CommentSection({ post, pageNumber }: Props) {
             No comments yet..
           </div>
         )}
-        <PaginationRow post={post} pageNumber={pageNumber} />
       </div>
+      {post.commentCount > 10 && (
+        <PaginationRow post={post} pageNumber={pageNumber} />
+      )}
     </section>
   );
 }
@@ -63,7 +65,7 @@ function PaginationRow({ post, pageNumber }: Props) {
     );
   }, [pageNumber, totalCommentPages, post.id]);
   return (
-    <Pagination>
+    <Pagination className="mt-3">
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious href={prevPageHref} />
