@@ -9,14 +9,23 @@ import { deleteComment, toggleLikeComment } from "@/server/db/actions/comment";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { useUserStore } from "@/store/userStore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoadingButton } from "@/components/ui/loadingButton";
-
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 interface Props {
   post: PostWithComments;
+  pageNumber: number;
 }
 
-export default function CommentSection({ post }: Props) {
+export default function CommentSection({ post, pageNumber }: Props) {
   return (
     <section className="">
       <div className="border-b pb-2 flex justify-between">
@@ -33,8 +42,44 @@ export default function CommentSection({ post }: Props) {
             No comments yet..
           </div>
         )}
+        <PaginationRow post={post} pageNumber={pageNumber} />
       </div>
     </section>
+  );
+}
+
+function PaginationRow({ post, pageNumber }: Props) {
+  const totalCommentPages = Math.ceil(post.commentCount / 10);
+  const [prevPageHref, setPrevPageHref] = useState("");
+  const [nextPageHref, setNextPageHref] = useState("");
+  useEffect(() => {
+    setPrevPageHref(
+      pageNumber == 1 ? "#" : `/post/${post.id}?commentPage=${pageNumber - 1}`
+    );
+    setNextPageHref(
+      pageNumber == totalCommentPages
+        ? "#"
+        : `/post/${post.id}?commentPage=${pageNumber + 1}`
+    );
+  }, [pageNumber, totalCommentPages, post.id]);
+  return (
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious href={prevPageHref} />
+        </PaginationItem>
+        {...new Array(totalCommentPages).fill(1).map((v, i) => (
+          <PaginationItem key={`page-${i}`}>
+            <PaginationLink href={`/post/${post.id}?commentPage=${i + 1}`}>
+              {i + 1}
+            </PaginationLink>
+          </PaginationItem>
+        ))}
+        <PaginationItem>
+          <PaginationNext href={nextPageHref} />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
   );
 }
 

@@ -26,7 +26,6 @@ export type Comment = RawComment & {
 };
 
 export type PaginatedComments = {
-  hasNext: boolean;
   comments: Comment[];
 };
 

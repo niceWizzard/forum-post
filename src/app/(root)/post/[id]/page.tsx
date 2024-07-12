@@ -7,12 +7,18 @@ import PostBody from "./_components/PostBody";
 
 interface Props {
   params: { id: string };
+  searchParams: { commentPage?: string };
 }
 
 export const dynamic = "force-dynamic";
 
-export default async function PostPage({ params: { id } }: Props) {
-  const res = await getPostById(id);
+export default async function PostPage({
+  params: { id },
+  searchParams: { commentPage },
+}: Props) {
+  const commentPageNumber = commentPage ? Number(commentPage) : 1;
+
+  const res = await getPostById(id, commentPageNumber);
   if (res.error) {
     return res.message;
   }
@@ -45,7 +51,7 @@ export default async function PostPage({ params: { id } }: Props) {
           <PostBody postBody={post.body} />
           <PostButtons post={post} />
         </div>
-        <CommentSection post={post} />
+        <CommentSection post={post} pageNumber={commentPageNumber} />
       </div>
     </section>
   );

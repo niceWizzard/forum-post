@@ -17,8 +17,12 @@ import { commentLikeTable, commentTable } from "../schema/comment";
 import { isTuple } from "@/lib/utils.server";
 
 export const getPostById = cache(
-  async (id: string): Promise<ApiResponse<PostWithComments>> => {
+  async (
+    id: string,
+    commentPageNumber: number
+  ): Promise<ApiResponse<PostWithComments>> => {
     const { user } = await getAuth();
+    console.log(commentPageNumber);
     try {
       const [res, rawComments] = await db.batch([
         db
@@ -36,8 +40,8 @@ export const getPostById = cache(
           .from(commentTable)
           .where(eq(commentTable.postId, id))
           .orderBy(asc(commentTable.createdAt))
-          .limit(11)
-          .offset(0)
+          .limit(10)
+          .offset((commentPageNumber - 1) * 10)
           .leftJoin(userTable, eq(userTable.id, commentTable.commenterId))
           .leftJoin(
             commentLikeTable,
@@ -73,8 +77,6 @@ export const getPostById = cache(
         isLiked = likeRes ? true : false;
       }
 
-      const hasNextComment = rawComments.length == 11;
-      if (hasNextComment) rawComments.pop();
       return ApiRes.success({
         data: {
           poster,
@@ -92,7 +94,6 @@ export const getPostById = cache(
                 ...comment,
               };
             }),
-            hasNext: hasNextComment,
           },
           ...data.post,
         },
