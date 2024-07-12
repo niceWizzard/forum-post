@@ -20,8 +20,15 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { env } from "@/env/client.mjs";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
 interface Props {
   post: PostWithComments;
   pageNumber: number;
@@ -32,7 +39,7 @@ export default function CommentSection({ post, pageNumber }: Props) {
     <section className="">
       <div className="border-b pb-2 flex justify-between">
         <h4>{post.commentCount} Comments</h4>
-        <button>Sort</button>
+        <CommentSortButton />
       </div>
       <CommentForm post={post} />
       <div className="flex flex-col gap-3 divide-y divide-foreground-lighter">
@@ -49,6 +56,47 @@ export default function CommentSection({ post, pageNumber }: Props) {
         <PaginationRow post={post} pageNumber={pageNumber} />
       )}
     </section>
+  );
+}
+
+function CommentSortButton() {
+  const searchParams = useSearchParams();
+  const sortRaw = searchParams.get("sort")?.toLowerCase();
+  const sort: "newest" | "likes" = sortRaw
+    ? sortRaw == "likes"
+      ? "likes"
+      : "newest"
+    : "newest";
+  const router = useRouter();
+  const pathName = usePathname();
+
+  function onSortButtonClick(val: "newest" | "likes"): void {
+    const currentParams = new URLSearchParams(
+      Array.from(searchParams.entries())
+    );
+    currentParams.set("sort", val);
+    router.push(`${pathName}?${currentParams.toString()}`);
+  }
+  return (
+    <Popover>
+      <PopoverTrigger>Sort</PopoverTrigger>
+      <PopoverContent>
+        <div className="flex gap-2 flex-col">
+          <Button
+            variant={sort == "newest" ? "default" : "ghost"}
+            onClick={() => onSortButtonClick("newest")}
+          >
+            Newest
+          </Button>
+          <Button
+            variant={sort == "likes" ? "default" : "ghost"}
+            onClick={() => onSortButtonClick("likes")}
+          >
+            Likes
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 
