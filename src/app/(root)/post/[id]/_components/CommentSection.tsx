@@ -34,10 +34,10 @@ export default function CommentSection({ post, pageNumber }: Props) {
       </div>
       <CommentForm post={post} />
       <div className="flex flex-col gap-3 divide-y divide-foreground-lighter">
-        {post.initialComments.comments.map((v) => (
+        {post.initialComments.map((v) => (
           <Comment comment={v} key={v.id} />
         ))}
-        {post.initialComments.comments.length === 0 && (
+        {post.initialComments.length === 0 && (
           <div className="text-center text-sm font-light text-foreground-lighter">
             No comments yet..
           </div>
@@ -70,7 +70,10 @@ function PaginationRow({ post, pageNumber }: Props) {
         </PaginationItem>
         {...new Array(totalCommentPages).fill(1).map((v, i) => (
           <PaginationItem key={`page-${i}`}>
-            <PaginationLink href={`/post/${post.id}?commentPage=${i + 1}`}>
+            <PaginationLink
+              href={`/post/${post.id}?commentPage=${i + 1}`}
+              isActive={i + 1 == pageNumber}
+            >
               {i + 1}
             </PaginationLink>
           </PaginationItem>

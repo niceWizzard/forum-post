@@ -82,8 +82,8 @@ export const getPostById = cache(
           poster,
           forum,
           isLiked,
-          initialComments: {
-            comments: rawComments.map(({ user, comment, comment_like }) => {
+          initialComments: rawComments.map(
+            ({ user, comment, comment_like }) => {
               let isLiked = null;
               if (user) {
                 isLiked = !!comment_like;
@@ -93,8 +93,8 @@ export const getPostById = cache(
                 isLiked,
                 ...comment,
               };
-            }),
-          },
+            }
+          ),
           ...data.post,
         },
       });

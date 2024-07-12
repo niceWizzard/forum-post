@@ -14,7 +14,7 @@ export type Post = InferSelectModel<typeof postTable> & {
   isLiked: boolean | null;
 };
 export type PostWithComments = Post & {
-  initialComments: PaginatedComments;
+  initialComments: Comment[];
 };
 
 export type RawComment = InferSelectModel<typeof commentTable>;
@@ -23,10 +23,6 @@ export type Comment = RawComment & {
   commenter: User | null;
   likeCount: number;
   isLiked: boolean | null;
-};
-
-export type PaginatedComments = {
-  comments: Comment[];
 };
 
 export type PrivateUser = InferSelectModel<typeof userTable>;
