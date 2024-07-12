@@ -25,10 +25,10 @@ export default function CommentSection({ post }: Props) {
       </div>
       <CommentForm post={post} />
       <div className="flex flex-col gap-3 divide-y divide-foreground-lighter">
-        {post.initialComments.map((v) => (
+        {post.initialComments.comments.map((v) => (
           <Comment comment={v} key={v.id} />
         ))}
-        {post.initialComments.length === 0 && (
+        {post.initialComments.comments.length === 0 && (
           <div className="text-center text-sm font-light text-foreground-lighter">
             No comments yet..
           </div>

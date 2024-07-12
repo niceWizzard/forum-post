@@ -36,7 +36,7 @@ export const getPostById = cache(
           .from(commentTable)
           .where(eq(commentTable.postId, id))
           .orderBy(asc(commentTable.createdAt))
-          .limit(10)
+          .limit(11)
           .offset(0)
           .leftJoin(userTable, eq(userTable.id, commentTable.commenterId))
           .leftJoin(
@@ -73,13 +73,15 @@ export const getPostById = cache(
         isLiked = likeRes ? true : false;
       }
 
+      const hasNextComment = rawComments.length == 11;
+      if (hasNextComment) rawComments.pop();
       return ApiRes.success({
         data: {
           poster,
           forum,
           isLiked,
-          initialComments: rawComments.map(
-            ({ user, comment, comment_like }) => {
+          initialComments: {
+            comments: rawComments.map(({ user, comment, comment_like }) => {
               let isLiked = null;
               if (user) {
                 isLiked = !!comment_like;
@@ -89,8 +91,9 @@ export const getPostById = cache(
                 isLiked,
                 ...comment,
               };
-            }
-          ),
+            }),
+            hasNext: hasNextComment,
+          },
           ...data.post,
         },
       });
