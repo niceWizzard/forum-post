@@ -25,6 +25,11 @@ export type Comment = RawComment & {
   isLiked: boolean | null;
 };
 
+export type PaginatedComments = {
+  hasNext: boolean;
+  comments: Comment[];
+};
+
 export type PrivateUser = InferSelectModel<typeof userTable>;
 export type User = StrictOmit<PrivateUser, "github_id">;
 
