@@ -43,6 +43,13 @@
       "when": 1720664373185,
       "tag": "0005_gorgeous_proemial_gods",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1720844520134,
+      "tag": "0006_right_thena",
+      "breakpoints": true
     }
   ]
 }

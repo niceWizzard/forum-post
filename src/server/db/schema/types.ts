@@ -15,6 +15,8 @@ export type Post = InferSelectModel<typeof postTable> & {
 };
 export type PostWithComments = Post & {
   initialComments: Comment[];
+  likeCount: number;
+  commentCount: number;
 };
 
 export type SortType = "newest" | "likes";

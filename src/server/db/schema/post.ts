@@ -21,8 +21,6 @@ export const postTable = pgTable("post", {
     }),
   title: varchar("title", { length: 64 }).notNull(),
   body: varchar("body", { length: 10240 }).notNull(),
-  likeCount: integer("like_count").notNull().default(0),
-  commentCount: integer("comment_count").notNull().default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
