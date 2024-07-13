@@ -1,11 +1,11 @@
 import "server-only";
 import { db } from "..";
-import { count, eq, and, countDistinct, sql } from "drizzle-orm";
+import { count, eq, and, countDistinct, sql, desc } from "drizzle-orm";
 import { forumMemberTable, forumTable } from "../schema/forum";
 import { postLikeTable, postTable } from "../schema/post";
 import { cache } from "react";
 import { userTable } from "../schema";
-import { exposeUserType, Forum, Post } from "../schema/types";
+import { exposeUserType, Forum, Post, RawForum } from "../schema/types";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
 import { getAuth } from "@/server/auth";
@@ -53,7 +53,7 @@ export const getForumById = cache(
       const { user } = await getAuth();
       const res = await db
         .select({
-          forumMembersCount: count(),
+          forumMembersCount: count(forumMemberTable.userId),
           forum: { ...forumTable },
           isJoined: sql<boolean>`SUM( CASE
             WHEN ${forumMemberTable.userId} = ${
@@ -139,6 +139,45 @@ export const getForumPosts = cache(
 
       return ApiRes.success({
         data: a,
+      });
+    } catch (e) {
+      const err = e as Error;
+      return ApiRes.error({
+        message: err.message,
+        code: ApiError.UnknownError,
+      });
+    }
+  }
+);
+
+export const getTrendingForums = cache(
+  async (): Promise<ApiResponse<Forum[]>> => {
+    try {
+      const { user } = await getAuth();
+      if (!user) {
+        return ApiRes.error({
+          message: "User not authenticated",
+          code: ApiError.AuthRequired,
+        });
+      }
+
+      const trendingForums = await db
+        .select({
+          forum: { ...forumTable },
+          forumMemberCount: sql<number>`COUNT(DISTINCT ${forumMemberTable.userId}) AS forum_member_count`,
+        })
+        .from(forumTable)
+        .leftJoin(forumMemberTable, eq(forumMemberTable.forumId, forumTable.id))
+        .orderBy(desc(sql`forum_member_count`))
+        .groupBy(forumTable.id)
+        .limit(10);
+
+      return ApiRes.success({
+        data: trendingForums.map((v) => ({
+          ...v.forum,
+          forumMembersCount: v.forumMemberCount,
+          isJoined: null,
+        })),
       });
     } catch (e) {
       const err = e as Error;
