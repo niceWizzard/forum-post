@@ -2,13 +2,13 @@
 import "server-only";
 import { z } from "zod";
 import { postCreateFormSchema } from "./schema";
-import { createCustomDb, db } from "../index";
 import { getAuth } from "@/server/auth";
 import { postLikeTable, postTable } from "../schema/post";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
 import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { db } from "../";
 
 export const unlikePost = async (postId: string) => {
   try {
