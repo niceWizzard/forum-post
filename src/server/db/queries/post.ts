@@ -56,7 +56,8 @@ export const getPostById = cache(
           .orderBy(
             sort == "newest"
               ? orderFunc(commentTable.createdAt)
-              : orderFunc(commentTable.likeCount)
+              : orderFunc(commentTable.likeCount),
+            asc(commentTable.createdAt)
           )
           .limit(10)
           .offset((commentPageNumber - 1) * 10)
