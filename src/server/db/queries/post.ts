@@ -95,8 +95,6 @@ export const getPostById = cache(
         isLiked = likeRes ? true : false;
       }
 
-      console.log(rawComments.length);
-
       return ApiRes.success({
         data: {
           poster,
