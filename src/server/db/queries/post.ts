@@ -7,6 +7,7 @@ import {
   exposeUserType,
   minimizeData,
   PostWithComments,
+  SortOrder,
   SortType,
 } from "../schema/types";
 import { cache } from "react";
@@ -22,13 +23,16 @@ export const getPostById = cache(
     id,
     commentPageNumber,
     sort,
+    sortOrder,
   }: {
     id: string;
     commentPageNumber: number;
     sort: SortType;
+    sortOrder: SortOrder;
   }): Promise<ApiResponse<PostWithComments>> => {
     const { user } = await getAuth();
-    console.log();
+    console.log(sortOrder);
+    const orderFunc = sortOrder == "down" ? desc : asc;
     try {
       const [res, rawComments] = await db.batch([
         db
@@ -47,8 +51,8 @@ export const getPostById = cache(
           .where(eq(commentTable.postId, id))
           .orderBy(
             sort == "newest"
-              ? desc(commentTable.createdAt)
-              : desc(commentTable.likeCount)
+              ? orderFunc(commentTable.createdAt)
+              : orderFunc(commentTable.likeCount)
           )
           .limit(10)
           .offset((commentPageNumber - 1) * 10)

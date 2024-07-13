@@ -36,6 +36,11 @@ export function isSortOrder(order?: string): order is SortOrder {
   return ["up", "down"].includes(order);
 }
 
+export function asSortOrder(order?: string): SortOrder {
+  if (!isSortOrder(order)) return "up";
+  return order;
+}
+
 export type RawComment = InferSelectModel<typeof commentTable>;
 
 export type Comment = RawComment & {

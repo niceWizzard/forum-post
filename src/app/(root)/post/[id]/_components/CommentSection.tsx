@@ -1,6 +1,13 @@
 "use client";
 
-import { asSortType, type Comment, PostWithComments, SortType } from "@/server/db/schema/types";
+import {
+  asSortOrder,
+  asSortType,
+  type Comment,
+  PostWithComments,
+  SortOrder,
+  SortType,
+} from "@/server/db/schema/types";
 import { CommentForm } from "./CommentForm";
 import { Button } from "@/components/ui/button";
 import { formatDistance } from "date-fns";
@@ -28,6 +35,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { ArrowDown, ArrowUp } from "lucide-react";
 
 interface Props {
   post: PostWithComments;
@@ -62,7 +70,8 @@ export default function CommentSection({ post, pageNumber }: Props) {
 function CommentSortButton() {
   const searchParams = useSearchParams();
   const sortRaw = searchParams.get("sort")?.toLowerCase();
-  const sort: SortType = asSortType(sortRaw)
+  const sort = asSortType(sortRaw);
+  const sortOrder = asSortOrder(searchParams.get("order")?.toLowerCase());
   const router = useRouter();
   const pathName = usePathname();
 
@@ -73,6 +82,9 @@ function CommentSortButton() {
       Array.from(searchParams.entries())
     );
     currentParams.set("sort", val);
+    if (sort == val) {
+      currentParams.set("order", sortOrder == "down" ? "up" : "down");
+    }
     currentParams.delete("commentPage");
     router.push(`${pathName}?${currentParams.toString()}`);
     setIsOpen(false);
@@ -85,14 +97,21 @@ function CommentSortButton() {
           <Button
             variant={sort == "newest" ? "default" : "ghost"}
             onClick={() => onSortButtonClick("newest")}
+            className="flex  items-center gap-3 justify-start"
           >
-            Newest
+            <span className="flex-grow text-start">Date</span>
+
+            {sort == "newest" &&
+              (sortOrder == "up" ? <ArrowUp /> : <ArrowDown />)}
           </Button>
           <Button
             variant={sort == "likes" ? "default" : "ghost"}
             onClick={() => onSortButtonClick("likes")}
+            className="flex  items-center gap-3 justify-start"
           >
-            Likes
+            <span className="flex-grow text-start">Likes</span>
+            {sort == "likes" &&
+              (sortOrder == "up" ? <ArrowUp /> : <ArrowDown />)}
           </Button>
         </div>
       </PopoverContent>

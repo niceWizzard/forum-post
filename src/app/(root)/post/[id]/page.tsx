@@ -4,24 +4,30 @@ import PostButtons from "./_components/PostButtons";
 import PostMenu from "./_components/PostMenu";
 import CommentSection from "./_components/CommentSection";
 import PostBody from "./_components/PostBody";
-import { isSortType, SortType } from "@/server/db/schema/types";
+import { asSortOrder, isSortType, SortType } from "@/server/db/schema/types";
 
 interface Props {
   params: { id: string };
-  searchParams: { commentPage?: string; sort?: string };
+  searchParams: { commentPage?: string; sort?: string; order?: string };
 }
 
 export const dynamic = "force-dynamic";
 
 export default async function PostPage({
   params: { id },
-  searchParams: { commentPage, sort },
+  searchParams: { commentPage, sort, order },
 }: Props) {
   const commentPageNumber = commentPage ? Number(commentPage) : 1;
 
   const sortBy = isSortType(sort) ? sort : "newest";
+  const sortOrder = asSortOrder(order);
 
-  const res = await getPostById({ id, commentPageNumber, sort: sortBy });
+  const res = await getPostById({
+    id,
+    commentPageNumber,
+    sort: sortBy,
+    sortOrder,
+  });
   if (res.error) {
     return res.message;
   }
