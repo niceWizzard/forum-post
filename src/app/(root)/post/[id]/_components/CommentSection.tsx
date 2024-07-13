@@ -1,6 +1,6 @@
 "use client";
 
-import { type Comment, PostWithComments } from "@/server/db/schema/types";
+import { asSortType, type Comment, PostWithComments, SortType } from "@/server/db/schema/types";
 import { CommentForm } from "./CommentForm";
 import { Button } from "@/components/ui/button";
 import { formatDistance } from "date-fns";
@@ -62,17 +62,13 @@ export default function CommentSection({ post, pageNumber }: Props) {
 function CommentSortButton() {
   const searchParams = useSearchParams();
   const sortRaw = searchParams.get("sort")?.toLowerCase();
-  const sort: "newest" | "likes" = sortRaw
-    ? sortRaw == "likes"
-      ? "likes"
-      : "newest"
-    : "newest";
+  const sort: SortType = asSortType(sortRaw)
   const router = useRouter();
   const pathName = usePathname();
 
   const [isOpen, setIsOpen] = useState(false);
 
-  function onSortButtonClick(val: "newest" | "likes"): void {
+  function onSortButtonClick(val: SortType): void {
     const currentParams = new URLSearchParams(
       Array.from(searchParams.entries())
     );

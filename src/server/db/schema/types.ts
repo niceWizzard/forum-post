@@ -24,6 +24,11 @@ export function isSortType(type?: string): type is SortType {
   return ["newest", "likes"].includes(type);
 }
 
+export function asSortType(type?: string): SortType {
+  if (!isSortType(type)) return "likes";
+  return type;
+}
+
 export type RawComment = InferSelectModel<typeof commentTable>;
 
 export type Comment = RawComment & {
