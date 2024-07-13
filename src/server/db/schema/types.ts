@@ -57,7 +57,7 @@ export type Comment = RawComment & {
 };
 
 export type PrivateUser = InferSelectModel<typeof userTable>;
-export type User = StrictOmit<PrivateUser, "github_id">;
+export type User = StrictOmit<PrivateUser, "github_id" | "google_id">;
 
 export function exposeUserType(user: PrivateUser): User {
   const { github_id, ...output } = user;
