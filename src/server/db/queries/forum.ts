@@ -88,27 +88,20 @@ export const getForumPosts = cache(
 
       const posts = await db
         .select({
+          like_count: countDistinct(postLikeTable.postId),
+          comment_count: countDistinct(commentTable),
+          isLiked: checkIsLiked(user?.id),
           user: { ...userTable },
           post: { ...postTable },
           forum: { ...forumTable },
-          likeCount: countDistinct(postLikeTable.postId),
-          commentCount: count(commentTable),
-          isLiked: checkIsLiked(user?.id),
         })
-
         .from(postTable)
         .where(eq(postTable.forumId, forumId))
-        .leftJoin(userTable, eq(postTable.posterId, userTable.id))
-        .leftJoin(forumTable, eq(postTable.forumId, forumTable.id))
+        .leftJoin(forumTable, eq(forumTable.id, postTable.forumId))
+        .leftJoin(userTable, eq(userTable.id, postTable.posterId))
         .leftJoin(postLikeTable, eq(postLikeTable.postId, postTable.id))
         .leftJoin(commentTable, eq(commentTable.postId, postTable.id))
-        .groupBy(
-          postTable.id,
-          userTable.id,
-          forumTable.id,
-          postLikeTable.userId,
-          postLikeTable.postId
-        );
+        .groupBy(userTable.id, forumTable.id, postTable.id);
 
       const a = posts.map((v, index): Post => {
         const poster = v.user ? exposeUserType(v.user) : null;
@@ -121,8 +114,8 @@ export const getForumPosts = cache(
             name,
             id,
           },
-          likeCount: v.likeCount,
-          commentCount: v.commentCount,
+          likeCount: v.like_count,
+          commentCount: v.comment_count,
           isLiked,
           ...v.post,
         };

@@ -40,7 +40,7 @@ export const getPostById = cache(
             forum: { ...forumTable },
             post: { ...postTable },
             likeCount: countDistinct(postLikeTable),
-            commentCount: count(commentTable.postId),
+            commentCount: countDistinct(commentTable),
           })
           .from(postTable)
           .where(eq(postTable.id, id))
