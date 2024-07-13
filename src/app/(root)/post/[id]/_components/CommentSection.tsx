@@ -99,7 +99,13 @@ function CommentSortButton() {
             onClick={() => onSortButtonClick("newest")}
             className="flex  items-center gap-3 justify-start"
           >
-            <span className="flex-grow text-start">Date</span>
+            <span className="flex-grow text-start">
+              {sort == "newest"
+                ? sortOrder == "down"
+                  ? "Newest"
+                  : "Oldest"
+                : "Date"}
+            </span>
 
             {sort == "newest" &&
               (sortOrder == "up" ? <ArrowUp /> : <ArrowDown />)}
@@ -109,7 +115,13 @@ function CommentSortButton() {
             onClick={() => onSortButtonClick("likes")}
             className="flex  items-center gap-3 justify-start"
           >
-            <span className="flex-grow text-start">Likes</span>
+            <span className="flex-grow text-start">
+              {sort == "likes"
+                ? sortOrder == "up"
+                  ? "Least likes"
+                  : "Most likes"
+                : "Likes"}
+            </span>
             {sort == "likes" &&
               (sortOrder == "up" ? <ArrowUp /> : <ArrowDown />)}
           </Button>
