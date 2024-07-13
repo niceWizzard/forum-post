@@ -37,7 +37,10 @@ export const getPostById = cache(
         db
           .select({
             user: { ...userTable },
-            forum: { ...forumTable },
+            forum: {
+              name: forumTable.name,
+              id: forumTable.id,
+            },
             post: { ...postTable },
             likeCount: countDistinct(postLikeTable),
             commentCount: countDistinct(commentTable),
@@ -85,7 +88,7 @@ export const getPostById = cache(
 
       const { likeCount, commentCount, ...data } = res[0];
       const poster = data.user ? exposeUserType(data.user) : null;
-      const forum = minimizeData(data.forum!);
+      const forum = data.forum!;
 
       let isLiked: boolean | null = null;
 
