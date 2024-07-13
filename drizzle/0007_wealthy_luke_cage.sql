@@ -1,0 +1,1 @@
+ALTER TABLE "comment" DROP COLUMN IF EXISTS "like_count";
