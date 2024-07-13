@@ -20,21 +20,11 @@ export const unlikePost = async (postId: string) => {
       });
     }
 
-    const serverlessDb = await createCustomDb();
-
-    await serverlessDb.transaction(async (tx) => {
-      await tx
-        .delete(postLikeTable)
-        .where(
-          and(
-            eq(postLikeTable.postId, postId),
-            eq(postLikeTable.userId, user.id)
-          )
-        );
-      await tx.update(postTable).set({
-        likeCount: sql`${postTable.likeCount} - 1`,
-      });
-    });
+    await db
+      .delete(postLikeTable)
+      .where(
+        and(eq(postLikeTable.postId, postId), eq(postLikeTable.userId, user.id))
+      );
 
     revalidatePath("/forum");
     revalidatePath(`/post/${postId}`);
@@ -61,20 +51,14 @@ export const likePost = async (postId: string) => {
         code: ApiError.AuthRequired,
       });
     }
-    const serverlessDb = await createCustomDb();
 
-    await serverlessDb.transaction(async (tx) => {
-      await tx
-        .insert(postLikeTable)
-        .values({
-          postId,
-          userId: user.id,
-        })
-        .onConflictDoNothing();
-      await tx.update(postTable).set({
-        likeCount: sql`${postTable.likeCount} + 1`,
-      });
-    });
+    await db
+      .insert(postLikeTable)
+      .values({
+        postId,
+        userId: user.id,
+      })
+      .onConflictDoNothing();
 
     revalidatePath("/forum");
     revalidatePath(`/post/${postId}`);

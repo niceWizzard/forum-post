@@ -1,7 +1,7 @@
 import "server-only";
 import { db } from "../index";
 import { postLikeTable, postTable } from "../schema/post";
-import { and, asc, count, eq, desc } from "drizzle-orm";
+import { and, asc, count, eq, desc, countDistinct } from "drizzle-orm";
 import { userTable } from "../schema";
 import {
   exposeUserType,
@@ -39,11 +39,16 @@ export const getPostById = cache(
             user: { ...userTable },
             forum: { ...forumTable },
             post: { ...postTable },
+            likeCount: countDistinct(postLikeTable),
+            commentCount: count(commentTable.postId),
           })
           .from(postTable)
           .where(eq(postTable.id, id))
           .leftJoin(userTable, eq(userTable.id, postTable.posterId))
-          .leftJoin(forumTable, eq(forumTable.id, postTable.forumId)),
+          .leftJoin(forumTable, eq(forumTable.id, postTable.forumId))
+          .leftJoin(postLikeTable, eq(postLikeTable.postId, postTable.id))
+          .leftJoin(commentTable, eq(commentTable.postId, postTable.id))
+          .groupBy(userTable.id, forumTable.id, postTable.id),
         db
           .select()
           .from(commentTable)
@@ -74,7 +79,7 @@ export const getPostById = cache(
           code: ApiError.PostNotFound,
         });
 
-      const data = res[0];
+      const { likeCount, commentCount, ...data } = res[0];
       const poster = data.user ? exposeUserType(data.user) : null;
       const forum = minimizeData(data.forum!);
 
@@ -89,6 +94,8 @@ export const getPostById = cache(
         });
         isLiked = likeRes ? true : false;
       }
+
+      console.log(rawComments.length);
 
       return ApiRes.success({
         data: {
@@ -108,6 +115,8 @@ export const getPostById = cache(
               };
             }
           ),
+          likeCount,
+          commentCount,
           ...data.post,
         },
       });

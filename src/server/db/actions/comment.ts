@@ -44,39 +44,25 @@ export const createComment = async ({
       });
     }
 
-    const serverlessDb = await createCustomDb();
-    const comment = await serverlessDb.transaction(async (tx) => {
-      const comment = await tx
-        .insert(commentTable)
-        .values({
-          body: commentBody,
-          commenterId: user.id,
-          postId,
-        })
-        .returning();
-      if (comment.length == 0) {
-        tx.rollback();
-        return ApiRes.error({
-          message: "Failed to create comment",
-          code: ApiError.UnknownError,
-        });
-      }
-      await tx.update(postTable).set({
-        commentCount: sql`${postTable.commentCount} + 1`,
+    const comment = await db
+      .insert(commentTable)
+      .values({
+        body: commentBody,
+        commenterId: user.id,
+        postId,
+      })
+      .returning();
+    if (comment.length == 0) {
+      return ApiRes.error({
+        message: "Failed to create comment",
+        code: ApiError.UnknownError,
       });
-      return ApiRes.success({
-        data: comment[0],
-      });
-    });
-
-    if (comment.error) {
-      return comment;
     }
-
+    console.log("CREATED ", comment[0]);
     revalidatePath(`/post/${postId}`);
 
     return ApiRes.success({
-      data: comment.data,
+      data: comment[0],
     });
   } catch (e: any) {
     const err = e as Error;
@@ -115,16 +101,7 @@ export const deleteComment = async (
       });
     }
 
-    const serverlessDb = await createCustomDb();
-    await serverlessDb.transaction(async (tx) => {
-      await tx.delete(commentTable).where(eq(commentTable.id, commentId));
-      await tx
-        .update(postTable)
-        .set({
-          commentCount: sql`${postTable.commentCount} - 1`,
-        })
-        .where(eq(postTable.id, comment.postId!));
-    });
+    await db.delete(commentTable).where(eq(commentTable.id, commentId));
 
     revalidatePath(`/post/${comment.postId}`);
 

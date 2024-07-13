@@ -12,11 +12,11 @@ export type Post = InferSelectModel<typeof postTable> & {
   forum: MinimizedForum;
   poster: User | null;
   isLiked: boolean | null;
+  likeCount: number;
+  commentCount: number;
 };
 export type PostWithComments = Post & {
   initialComments: Comment[];
-  likeCount: number;
-  commentCount: number;
 };
 
 export type SortType = "newest" | "likes";

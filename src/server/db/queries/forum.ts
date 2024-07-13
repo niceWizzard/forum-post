@@ -1,6 +1,6 @@
 import "server-only";
 import { db } from "..";
-import { count, eq, and } from "drizzle-orm";
+import { count, eq, and, countDistinct, sql } from "drizzle-orm";
 import { forumMemberTable, forumTable } from "../schema/forum";
 import { postLikeTable, postTable } from "../schema/post";
 import { cache } from "react";
@@ -80,21 +80,22 @@ export const getForumPosts = cache(
       const { user } = await getAuth();
 
       const posts = await db
-        .select()
+        .select({
+          user: { ...userTable },
+          post: { ...postTable },
+          forum: { ...forumTable },
+          post_like: { ...postLikeTable },
+          likeCount: countDistinct(postLikeTable.postId),
+          commentCount: count(commentTable)
+        })
+
         .from(postTable)
         .where(eq(postTable.forumId, forumId))
         .leftJoin(userTable, eq(postTable.posterId, userTable.id))
         .leftJoin(forumTable, eq(postTable.forumId, forumTable.id))
-        .leftJoin(
-          postLikeTable,
-          and(
-            eq(postLikeTable.postId, postTable.id),
-            eq(
-              postLikeTable.userId,
-              user?.id ?? "11111111-1111-1111-1111-1ce992f5e2db"
-            )
-          )
-        );
+        .leftJoin(postLikeTable, eq(postLikeTable.postId, postTable.id))
+        .leftJoin(commentTable, eq(commentTable.postId, postTable.id))
+        .groupBy(postTable.id, userTable.id, forumTable.id, postLikeTable.userId, postLikeTable.postId);
 
       const a = posts.map((v, index): Post => {
         const poster = v.user ? exposeUserType(v.user) : null;
@@ -110,6 +111,8 @@ export const getForumPosts = cache(
             name,
             id,
           },
+          likeCount: v.likeCount,
+          commentCount: v.commentCount,
           isLiked,
           ...v.post,
         };
