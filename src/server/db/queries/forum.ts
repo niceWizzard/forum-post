@@ -50,19 +50,35 @@ export const getCreatedForums = cache(async (userId: string) => {
 export const getForumById = cache(
   async (forumId: string): Promise<ApiResponse<Forum>> => {
     try {
-      const forum = await db.query.forumTable.findFirst({
-        where: eq(forumTable.id, forumId),
-      });
+      const { user } = await getAuth();
+      const res = await db
+        .select({
+          forumMembersCount: count(),
+          forum: { ...forumTable },
+          isJoined: sql<boolean>`SUM( CASE
+            WHEN ${forumMemberTable.userId} = ${
+            user?.id ?? "11111111-1111-1111-1111-1ce992f5e2db"
+          } THEN 1 ELSE 0 END) > 0 AS is_joined`,
+        })
+        .from(forumTable)
+        .where(eq(forumTable.id, forumId))
+        .leftJoin(forumMemberTable, eq(forumMemberTable.forumId, forumTable.id))
+        .groupBy(forumTable.id);
 
-      if (!forum) {
+      if (res.length == 0) {
         return ApiRes.error({
           message: "Forum not found",
           code: ApiError.ForumNotFound,
         });
       }
 
+      let isJoined: boolean | null = user ? res[0].isJoined : null;
       return ApiRes.success({
-        data: forum,
+        data: {
+          forumMembersCount: res[0].forumMembersCount,
+          isJoined,
+          ...res[0].forum,
+        },
       });
     } catch (e) {
       const err = e as Error;

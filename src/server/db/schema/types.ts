@@ -6,8 +6,12 @@ import { commentTable } from "./comment";
 
 type StrictOmit<T, K extends keyof T> = Omit<T, K>;
 
-export type Forum = InferSelectModel<typeof forumTable>;
-export type MinimizedForum = Pick<Forum, "id" | "name">;
+export type RawForum = InferSelectModel<typeof forumTable>;
+export type Forum = RawForum & {
+  forumMembersCount: number;
+  isJoined: boolean | null;
+};
+export type MinimizedForum = Pick<RawForum, "id" | "name">;
 export type Post = InferSelectModel<typeof postTable> & {
   forum: MinimizedForum;
   poster: User | null;

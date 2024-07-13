@@ -67,8 +67,10 @@ function ForumHeader({ forum }: { forum: Forum }) {
       <div className="container gap-6 flex flex-col ">
         <div className="row-span-2 flex gap-4 items-center">
           <h3 className="text-xl font-semibold flex-grow">{forum.name}</h3>
-          <span className="">500k members</span>
-          <button className="row-span-1">Join now</button>
+          <span className="">{forum.forumMembersCount} members</span>
+          <button className="row-span-1">
+            {forum.isJoined ? "Joined" : "Join now"}
+          </button>
         </div>
         <p className="text-sm font-light text-foreground-lighter row-span-1 col-span-1 text-ellipsis ">
           {forum.description || "nothing to see here... :)"}
