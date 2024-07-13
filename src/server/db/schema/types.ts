@@ -56,6 +56,12 @@ export type Comment = RawComment & {
   replyCount: number;
 };
 
+export type ReplyComment = RawComment & {
+  commenter: User | null;
+  likeCount: number;
+  isLiked: boolean | null;
+};
+
 export type PrivateUser = InferSelectModel<typeof userTable>;
 export type User = StrictOmit<PrivateUser, "github_id" | "google_id">;
 
