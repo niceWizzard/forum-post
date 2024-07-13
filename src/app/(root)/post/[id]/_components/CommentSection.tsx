@@ -195,6 +195,7 @@ function Comment({ comment }: { comment: Comment }) {
   }, 300);
 
   const [isDeleting, setIsDeleting] = useState(false);
+  const [replies, setReplies] = useState<ReplyComment[]>([]);
 
   return (
     <div className="space-y-2 py-2">
@@ -244,26 +245,36 @@ function Comment({ comment }: { comment: Comment }) {
           {<Heart fill={comment.isLiked ? "currentColor" : ""} />}
         </Button>
 
-        <Button
-          variant="ghost"
-          onClick={async () => {
-            const res: ApiResponse<ReplyComment[]> = await (
-              await fetch(
-                `${env.PUBLIC_BASE_URL}api/replies?commentId=${comment.id}`
-              )
-            ).json();
-            if (res.error) {
-              toast.error("An error has occurred", {
-                description: res.message,
-              });
-              return;
-            }
-            console.log(res.data);
-          }}
-        >
-          {comment.replyCount} replies
-        </Button>
+        {comment.replyCount > 0 && (
+          <Button
+            variant="ghost"
+            onClick={async () => {
+              const res: ApiResponse<ReplyComment[]> = await (
+                await fetch(
+                  `${env.PUBLIC_BASE_URL}api/replies?commentId=${comment.id}`
+                )
+              ).json();
+              if (res.error) {
+                toast.error("An error has occurred", {
+                  description: res.message,
+                });
+                return;
+              }
+              setReplies(res.data);
+            }}
+          >
+            {comment.replyCount} replies
+          </Button>
+        )}
         <Button variant="ghost">Reply</Button>
+      </div>
+      <div className="flex flex-col pl-6">
+        {replies.map((reply) => (
+          <div key={reply.id} className="bg-card px-4 py-2">
+            <span>{reply.commenter?.username ?? "deleted"}</span>
+            <p className="text-foreground-light">{reply.body}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
