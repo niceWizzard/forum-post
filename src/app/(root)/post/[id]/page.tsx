@@ -4,7 +4,12 @@ import PostButtons from "./_components/PostButtons";
 import PostMenu from "./_components/PostMenu";
 import CommentSection from "./_components/CommentSection";
 import PostBody from "./_components/PostBody";
-import { asSortOrder, isSortType, SortType } from "@/server/db/schema/types";
+import {
+  asSortOrder,
+  asSortType,
+  isSortType,
+  SortType,
+} from "@/server/db/schema/types";
 
 interface Props {
   params: { id: string };
@@ -19,7 +24,7 @@ export default async function PostPage({
 }: Props) {
   const commentPageNumber = commentPage ? Number(commentPage) : 1;
 
-  const sortBy = isSortType(sort) ? sort : "newest";
+  const sortBy = asSortType(sort);
   const sortOrder = asSortOrder(order);
 
   const res = await getPostById({
