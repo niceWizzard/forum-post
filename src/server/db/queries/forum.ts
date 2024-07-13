@@ -74,6 +74,13 @@ export const getForumById = cache(
   }
 );
 
+function checkIsLiked(userId?: string | null) {
+  return sql<boolean>`SUM( CASE
+           WHEN ${postLikeTable.userId} = ${
+    userId ?? "11111111-1111-1111-1111-1ce992f5e2db"
+  } THEN 1 ELSE 0 END) > 0`;
+}
+
 export const getForumPosts = cache(
   async (forumId: string): Promise<ApiResponse<Post[]>> => {
     try {
@@ -84,9 +91,9 @@ export const getForumPosts = cache(
           user: { ...userTable },
           post: { ...postTable },
           forum: { ...forumTable },
-          post_like: { ...postLikeTable },
           likeCount: countDistinct(postLikeTable.postId),
-          commentCount: count(commentTable)
+          commentCount: count(commentTable),
+          isLiked: checkIsLiked(user?.id),
         })
 
         .from(postTable)
@@ -95,16 +102,19 @@ export const getForumPosts = cache(
         .leftJoin(forumTable, eq(postTable.forumId, forumTable.id))
         .leftJoin(postLikeTable, eq(postLikeTable.postId, postTable.id))
         .leftJoin(commentTable, eq(commentTable.postId, postTable.id))
-        .groupBy(postTable.id, userTable.id, forumTable.id, postLikeTable.userId, postLikeTable.postId);
+        .groupBy(
+          postTable.id,
+          userTable.id,
+          forumTable.id,
+          postLikeTable.userId,
+          postLikeTable.postId
+        );
 
       const a = posts.map((v, index): Post => {
         const poster = v.user ? exposeUserType(v.user) : null;
         const { name, id } = v.forum!;
-        let isLiked: boolean | null = null;
+        let isLiked = user ? v.isLiked : null;
 
-        if (user) {
-          isLiked = !!v.post_like;
-        }
         return {
           poster,
           forum: {
