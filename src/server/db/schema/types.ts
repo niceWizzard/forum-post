@@ -19,6 +19,8 @@ export type PostWithComments = Post & {
 
 export type SortType = "newest" | "likes";
 
+export type SortOrder = "up" | "down";
+
 export function isSortType(type?: string): type is SortType {
   if (!type) return false;
   return ["newest", "likes"].includes(type);
@@ -27,6 +29,11 @@ export function isSortType(type?: string): type is SortType {
 export function asSortType(type?: string): SortType {
   if (!isSortType(type)) return "likes";
   return type;
+}
+
+export function isSortOrder(order?: string): order is SortOrder {
+  if (!order) return false;
+  return ["up", "down"].includes(order);
 }
 
 export type RawComment = InferSelectModel<typeof commentTable>;
