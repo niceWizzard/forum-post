@@ -1,6 +1,6 @@
 import "server-only";
 import { db } from "..";
-import { count, eq, and, countDistinct, sql, desc } from "drizzle-orm";
+import { count, eq, and, countDistinct, sql, desc, isNull } from "drizzle-orm";
 import { forumMemberTable, forumTable } from "../schema/forum";
 import { postLikeTable, postTable } from "../schema/post";
 import { cache } from "react";
@@ -116,7 +116,13 @@ export const getForumPosts = cache(
         .leftJoin(forumTable, eq(forumTable.id, postTable.forumId))
         .leftJoin(userTable, eq(userTable.id, postTable.posterId))
         .leftJoin(postLikeTable, eq(postLikeTable.postId, postTable.id))
-        .leftJoin(commentTable, eq(commentTable.postId, postTable.id))
+        .leftJoin(
+          commentTable,
+          and(
+            eq(commentTable.postId, postTable.id),
+            isNull(commentTable.replyToId)
+          )
+        )
         .groupBy(userTable.id, forumTable.id, postTable.id);
 
       const a = posts.map((v, index): Post => {

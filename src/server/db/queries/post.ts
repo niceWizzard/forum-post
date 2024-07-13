@@ -1,7 +1,16 @@
 import "server-only";
 import { db } from "../index";
 import { postLikeTable, postTable } from "../schema/post";
-import { and, asc, count, eq, desc, countDistinct, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  eq,
+  desc,
+  countDistinct,
+  sql,
+  isNull,
+} from "drizzle-orm";
 import { userTable } from "../schema";
 import {
   exposeUserType,
@@ -50,7 +59,13 @@ export const getPostById = cache(
           .leftJoin(userTable, eq(userTable.id, postTable.posterId))
           .leftJoin(forumTable, eq(forumTable.id, postTable.forumId))
           .leftJoin(postLikeTable, eq(postLikeTable.postId, postTable.id))
-          .leftJoin(commentTable, eq(commentTable.postId, postTable.id))
+          .leftJoin(
+            commentTable,
+            and(
+              eq(commentTable.postId, postTable.id),
+              isNull(commentTable.replyToId)
+            )
+          )
           .groupBy(userTable.id, forumTable.id, postTable.id),
         db
           .select({
