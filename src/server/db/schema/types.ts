@@ -27,7 +27,7 @@ export function isSortType(type?: string): type is SortType {
 }
 
 export function asSortType(type?: string): SortType {
-  if (!isSortType(type)) return "newest";
+  if (!isSortType(type)) return "likes";
   return type;
 }
 
