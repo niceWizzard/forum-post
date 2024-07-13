@@ -5,6 +5,7 @@ import {
   asSortType,
   type Comment,
   PostWithComments,
+  ReplyComment,
   SortOrder,
   SortType,
 } from "@/server/db/schema/types";
@@ -36,6 +37,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ArrowDown, ArrowUp, Heart, ThumbsUp } from "lucide-react";
+import { ApiResponse } from "@/server/apiResponse";
 
 interface Props {
   post: PostWithComments;
@@ -242,7 +244,25 @@ function Comment({ comment }: { comment: Comment }) {
           {<Heart fill={comment.isLiked ? "currentColor" : ""} />}
         </Button>
 
-        <Button variant="ghost">{comment.replyCount} replies</Button>
+        <Button
+          variant="ghost"
+          onClick={async () => {
+            const res: ApiResponse<ReplyComment[]> = await (
+              await fetch(
+                `${env.PUBLIC_BASE_URL}api/replies?commentId=${comment.id}`
+              )
+            ).json();
+            if (res.error) {
+              toast.error("An error has occurred", {
+                description: res.message,
+              });
+              return;
+            }
+            console.log(res.data);
+          }}
+        >
+          {comment.replyCount} replies
+        </Button>
         <Button variant="ghost">Reply</Button>
       </div>
     </div>
