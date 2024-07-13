@@ -76,6 +76,7 @@ export const getPostById = cache(
             WHEN ${commentLikeTable.userId} = ${
               user?.id ?? "11111111-1111-1111-1111-1ce992f5e2db"
             } THEN 1 ELSE 0 END) > 0`,
+            replyCount: countDistinct(sql`reply`),
           })
           .from(commentTable)
           .where(eq(commentTable.postId, id))
@@ -91,6 +92,10 @@ export const getPostById = cache(
           .leftJoin(
             commentLikeTable,
             eq(commentLikeTable.commentId, commentTable.id)
+          )
+          .leftJoin(
+            sql`${commentTable} AS reply`,
+            sql`reply.reply_to_id = ${commentTable.id}`
           )
           .groupBy(commentTable.commenterId, userTable.id, commentTable.id),
       ]);
@@ -129,7 +134,7 @@ export const getPostById = cache(
                 commenter: user,
                 likeCount,
                 isLiked,
-                replyCount: 0,
+                replyCount: v.replyCount,
                 ...comment,
               };
             }
