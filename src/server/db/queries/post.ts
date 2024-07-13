@@ -114,6 +114,7 @@ export const getPostById = cache(
                 commenter: user,
                 likeCount,
                 isLiked,
+                replyCount: 0,
                 ...comment,
               };
             }

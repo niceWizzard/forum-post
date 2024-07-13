@@ -241,6 +241,8 @@ function Comment({ comment }: { comment: Comment }) {
           {comment.likeCount}
           {<Heart fill={comment.isLiked ? "currentColor" : ""} />}
         </Button>
+
+        <Button variant="ghost">{comment.replyCount} replies</Button>
         <Button variant="ghost">Reply</Button>
       </div>
     </div>
