@@ -2,6 +2,7 @@ import { getForumById, getForumPosts } from "@/server/db/queries/forum";
 import { type Forum, type Post } from "@/server/db/schema/types";
 import Link from "next/link";
 import PostPreview from "./_components/PostPreview";
+import JoinButton from "./_components/JoinButton";
 
 interface Props {
   params: { id: string };
@@ -68,9 +69,7 @@ function ForumHeader({ forum }: { forum: Forum }) {
         <div className="row-span-2 flex gap-4 items-center">
           <h3 className="text-xl font-semibold flex-grow">{forum.name}</h3>
           <span className="">{forum.forumMembersCount} members</span>
-          <button className="row-span-1">
-            {forum.isJoined ? "Joined" : "Join now"}
-          </button>
+          <JoinButton forum={forum} />
         </div>
         <p className="text-sm font-light text-foreground-lighter row-span-1 col-span-1 text-ellipsis ">
           {forum.description || "nothing to see here... :)"}

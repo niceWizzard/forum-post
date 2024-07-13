@@ -1,9 +1,11 @@
 "use server";
 import { getAuth } from "@/server/auth";
 import { db } from "../index";
-import { forumTable } from "../schema/forum";
+import { forumMemberTable, forumTable } from "../schema/forum";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
+import { and, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 export async function createForum({
   forumDesc,
@@ -43,6 +45,95 @@ export async function createForum({
       data: {
         forumId: res[0].id,
       },
+    });
+  } catch (e) {
+    const err = e as Error;
+    return ApiRes.error({
+      message: err.message,
+      code: ApiError.UnknownError,
+    });
+  }
+}
+
+export async function joinForum(
+  forumId: string
+): Promise<ApiResponse<boolean>> {
+  try {
+    const { user } = await getAuth();
+    if (!user) {
+      return ApiRes.error({
+        message: "Please login",
+        code: ApiError.AuthRequired,
+      });
+    }
+
+    const forum = await db.query.forumTable.findFirst({
+      where: eq(forumTable.id, forumId),
+    });
+
+    if (!forum)
+      return ApiRes.error({
+        message: "Forum not found",
+        code: ApiError.ForumNotFound,
+      });
+
+    await db
+      .insert(forumMemberTable)
+      .values({
+        forumId,
+        userId: user.id,
+      })
+      .onConflictDoNothing();
+
+    revalidatePath(`/forum/${forumId}`);
+
+    return ApiRes.success({
+      data: true,
+    });
+  } catch (e) {
+    const err = e as Error;
+    return ApiRes.error({
+      message: err.message,
+      code: ApiError.UnknownError,
+    });
+  }
+}
+
+export async function leaveForum(
+  forumId: string
+): Promise<ApiResponse<boolean>> {
+  try {
+    const { user } = await getAuth();
+    if (!user) {
+      return ApiRes.error({
+        message: "Please login",
+        code: ApiError.AuthRequired,
+      });
+    }
+
+    const forum = await db.query.forumTable.findFirst({
+      where: eq(forumTable.id, forumId),
+    });
+
+    if (!forum)
+      return ApiRes.error({
+        message: "Forum not found",
+        code: ApiError.ForumNotFound,
+      });
+
+    const res = await db
+      .delete(forumMemberTable)
+      .where(
+        and(
+          eq(forumMemberTable.forumId, forumId),
+          eq(forumMemberTable.userId, user.id)
+        )
+      )
+      .returning();
+
+    revalidatePath(`/forum/${forumId}`);
+    return ApiRes.success({
+      data: res.length == 1,
     });
   } catch (e) {
     const err = e as Error;
