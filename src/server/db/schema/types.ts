@@ -37,7 +37,7 @@ export function isSortOrder(order?: string): order is SortOrder {
 }
 
 export function asSortOrder(order?: string): SortOrder {
-  if (!isSortOrder(order)) return "up";
+  if (!isSortOrder(order)) return "down";
   return order;
 }
 
