@@ -31,7 +31,6 @@ export const getPostById = cache(
     sortOrder: SortOrder;
   }): Promise<ApiResponse<PostWithComments>> => {
     const { user } = await getAuth();
-    console.log(sortOrder);
     const orderFunc = sortOrder == "down" ? desc : asc;
     try {
       const [res, rawComments] = await db.batch([

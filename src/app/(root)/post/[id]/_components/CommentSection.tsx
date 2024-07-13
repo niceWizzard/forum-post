@@ -150,7 +150,6 @@ function PaginationRow({ post, pageNumber }: Props) {
   );
 
   useEffect(() => {
-    console.log(path);
     const prevPageUrl = toUrlPath(pageNumber - 1);
     const nextPageUrl = toUrlPath(pageNumber + 1);
     setPrevPageHref(pageNumber == 1 ? "#" : prevPageUrl);
@@ -184,7 +183,6 @@ function Comment({ comment }: { comment: Comment }) {
   const user = useUserStore((v) => v.user);
   const onLikeButtonClick = useDebouncedCallback(async () => {
     const res = await toggleLikeComment(comment.id);
-    console.log("CLICKEd");
 
     if (res.error) {
       toast.error("An error has occurred", {
