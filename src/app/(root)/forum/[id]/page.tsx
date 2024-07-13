@@ -40,7 +40,7 @@ function ForumContent({ posts, forumId }: { posts: Post[]; forumId: string }) {
         href={`/post/create/${forumId}`}
         className="border border-secondary rounded-md px-3 py-2 self-end"
       >
-        Post something bitch
+        Create a Post
       </Link>
       <div className="h-full mt-6">
         <div className="flex flex-col h-full divide-y divide-foreground-lighter ">
