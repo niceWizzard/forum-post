@@ -61,7 +61,12 @@ export type User = StrictOmit<PrivateUser, "github_id" | "google_id">;
 
 export function exposeUserType(user: PrivateUser): User {
   const { github_id, ...output } = user;
-  return output;
+  return {
+    email: output.email,
+    id: output.id,
+    name: output.name,
+    username: output.username,
+  };
 }
 
 export function minimizeData(forum: Forum): MinimizedForum {
