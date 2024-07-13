@@ -35,7 +35,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, Heart, ThumbsUp } from "lucide-react";
 
 interface Props {
   post: PostWithComments;
@@ -236,10 +236,12 @@ function Comment({ comment }: { comment: Comment }) {
       <p className="text-sm">{comment.body}</p>
       <div className="flex gap-2">
         <Button
-          variant={comment.isLiked ? "secondary" : "ghost"}
+          variant={"ghost"}
           onClick={onLikeButtonClick}
+          className="flex items-center gap-2"
         >
-          {comment.likeCount} {comment.isLiked ? `Liked` : "Like"}
+          {comment.likeCount}
+          {<Heart fill={comment.isLiked ? "currentColor" : ""} />}
         </Button>
         <Button variant="ghost">Reply</Button>
       </div>
