@@ -35,18 +35,18 @@ The todo list of the website
 ### Post Tables
 
 - [ ] Share button on post
-- [ ] Implement delete post
+- [x] Implement delete post
 - [x] Like posts
 - [x] Delete posts
-- [ ] Comment on posts
+- [x] Comment on posts
 - [ ] Implement post privacy settings
-- [ ] Count comments
+- [x] Count comments
 
 ### Comment Tables
 
 - [x] Create comments
-- [ ] Delete comments
-- [ ] Like comments
-- [ ] Count likes
+- [x] Delete comments
+- [x] Like comments
+- [x] Count likes
 - [ ] Count replies
 - [ ] Reply to comment
