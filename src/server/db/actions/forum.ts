@@ -41,6 +41,8 @@ export async function createForum({
       })
       .returning();
 
+    revalidatePath(`/feed`);
+
     return ApiRes.success({
       data: {
         forumId: res[0].id,
