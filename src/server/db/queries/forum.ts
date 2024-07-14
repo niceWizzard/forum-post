@@ -48,23 +48,29 @@ export const getCreatedForums = cache(async (userId: string) => {
   }
 });
 
+export function fetchForum(userId?: string | null) {
+  return db
+    .select({
+      forumMembersCount: sql<number>`${count(
+        forumMemberTable.userId
+      )} as forum_members_count`,
+      forum: { ...forumTable },
+      isJoined: sql<boolean>`SUM( CASE
+      WHEN ${forumMemberTable.userId} = ${
+        userId ?? "11111111-1111-1111-1111-1ce992f5e2db"
+      } THEN 1 ELSE 0 END) > 0 AS is_joined`,
+    })
+    .from(forumTable)
+    .leftJoin(forumMemberTable, eq(forumMemberTable.forumId, forumTable.id))
+    .groupBy(forumTable.id)
+    .$dynamic();
+}
+
 export const getForumById = cache(
   async (forumId: string): Promise<ApiResponse<Forum>> => {
     try {
       const { user } = await getAuth();
-      const res = await db
-        .select({
-          forumMembersCount: count(forumMemberTable.userId),
-          forum: { ...forumTable },
-          isJoined: sql<boolean>`SUM( CASE
-            WHEN ${forumMemberTable.userId} = ${
-            user?.id ?? "11111111-1111-1111-1111-1ce992f5e2db"
-          } THEN 1 ELSE 0 END) > 0 AS is_joined`,
-        })
-        .from(forumTable)
-        .where(eq(forumTable.id, forumId))
-        .leftJoin(forumMemberTable, eq(forumMemberTable.forumId, forumTable.id))
-        .groupBy(forumTable.id);
+      const res = await fetchForum(user?.id).where(eq(forumTable.id, forumId));
 
       if (res.length == 0) {
         return ApiRes.error({
@@ -141,21 +147,14 @@ export const getTrendingForums = cache(
         });
       }
 
-      const trendingForums = await db
-        .select({
-          forum: { ...forumTable },
-          forumMemberCount: sql<number>`COUNT(DISTINCT ${forumMemberTable.userId}) AS forum_member_count`,
-        })
-        .from(forumTable)
-        .leftJoin(forumMemberTable, eq(forumMemberTable.forumId, forumTable.id))
-        .orderBy(desc(sql`forum_member_count`))
-        .groupBy(forumTable.id)
+      const trendingForums = await fetchForum(user?.id)
+        .orderBy(desc(sql`forum_members_count`))
         .limit(10);
 
       return ApiRes.success({
         data: trendingForums.map((v) => ({
           ...v.forum,
-          forumMembersCount: v.forumMemberCount,
+          forumMembersCount: v.forumMembersCount,
           isJoined: null,
         })),
       });
