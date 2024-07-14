@@ -67,17 +67,7 @@ export const getPostById = cache(
       const poster = data.user ? exposeUserType(data.user) : null;
       const forum = data.forum!;
 
-      let isLiked: boolean | null = null;
-
-      if (user) {
-        const likeRes = await db.query.postLikeTable.findFirst({
-          where: and(
-            eq(postLikeTable.postId, data.post.id),
-            eq(postLikeTable.userId, user.id)
-          ),
-        });
-        isLiked = likeRes ? true : false;
-      }
+      let isLiked: boolean | null = user ? data.isLiked : null;
 
       return ApiRes.success({
         data: {
