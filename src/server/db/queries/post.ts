@@ -43,30 +43,7 @@ export const getPostById = cache(
     const orderFunc = sortOrder == "down" ? desc : asc;
     try {
       const [res, rawComments] = await db.batch([
-        db
-          .select({
-            user: { ...userTable },
-            forum: {
-              name: forumTable.name,
-              id: forumTable.id,
-            },
-            post: { ...postTable },
-            likeCount: countDistinct(postLikeTable),
-            commentCount: countDistinct(commentTable),
-          })
-          .from(postTable)
-          .where(eq(postTable.id, id))
-          .leftJoin(userTable, eq(userTable.id, postTable.posterId))
-          .leftJoin(forumTable, eq(forumTable.id, postTable.forumId))
-          .leftJoin(postLikeTable, eq(postLikeTable.postId, postTable.id))
-          .leftJoin(
-            commentTable,
-            and(
-              eq(commentTable.postId, postTable.id),
-              isNull(commentTable.replyToId)
-            )
-          )
-          .groupBy(userTable.id, forumTable.id, postTable.id),
+        fetchPost(user?.id).where(eq(postTable.id, id)),
         db
           .select({
             user: { ...userTable },
@@ -153,3 +130,32 @@ export const getPostById = cache(
     }
   }
 );
+
+function checkIsLiked(userId?: string | null) {
+  return sql<boolean>`SUM( CASE
+           WHEN ${postLikeTable.userId} = ${
+    userId ?? "11111111-1111-1111-1111-1ce992f5e2db"
+  } THEN 1 ELSE 0 END) > 0`;
+}
+
+export function fetchPost(userId?: string | null) {
+  return db
+    .select({
+      likeCount: countDistinct(postLikeTable.userId),
+      commentCount: countDistinct(commentTable),
+      isLiked: checkIsLiked(userId),
+      user: { ...userTable },
+      post: { ...postTable },
+      forum: { ...forumTable },
+    })
+    .from(postTable)
+    .leftJoin(userTable, eq(userTable.id, postTable.posterId))
+    .leftJoin(forumTable, eq(forumTable.id, postTable.forumId))
+    .leftJoin(postLikeTable, eq(postLikeTable.postId, postTable.id))
+    .leftJoin(
+      commentTable,
+      and(eq(commentTable.postId, postTable.id), isNull(commentTable.replyToId))
+    )
+    .groupBy(userTable.id, forumTable.id, postTable.id)
+    .$dynamic();
+}

@@ -11,6 +11,7 @@ import { ApiError } from "@/server/apiErrors";
 import { getAuth } from "@/server/auth";
 import { isTuple } from "@/lib/utils.server";
 import { commentLikeTable, commentTable } from "../schema/comment";
+import { fetchPost } from "./post";
 
 export const getJoinedForums = cache(async (userId: string) => {
   try {
@@ -90,41 +91,14 @@ export const getForumById = cache(
   }
 );
 
-function checkIsLiked(userId?: string | null) {
-  return sql<boolean>`SUM( CASE
-           WHEN ${postLikeTable.userId} = ${
-    userId ?? "11111111-1111-1111-1111-1ce992f5e2db"
-  } THEN 1 ELSE 0 END) > 0`;
-}
-
 export const getForumPosts = cache(
   async (forumId: string): Promise<ApiResponse<Post[]>> => {
     try {
       const { user } = await getAuth();
 
-      const posts = await db
-        .select({
-          likeCount: countDistinct(postLikeTable.userId),
-          commentCount: countDistinct(commentTable),
-          isLiked: checkIsLiked(user?.id),
-          user: { ...userTable },
-          post: { ...postTable },
-          forum: { ...forumTable },
-        })
-        .from(postTable)
-        .where(eq(postTable.forumId, forumId))
-        .leftJoin(forumTable, eq(forumTable.id, postTable.forumId))
-        .leftJoin(userTable, eq(userTable.id, postTable.posterId))
-        .leftJoin(postLikeTable, eq(postLikeTable.postId, postTable.id))
-        .leftJoin(
-          commentTable,
-          and(
-            eq(commentTable.postId, postTable.id),
-            isNull(commentTable.replyToId)
-          )
-        )
-        .groupBy(userTable.id, forumTable.id, postTable.id);
-
+      const posts = await fetchPost(user?.id).where(
+        eq(postTable.forumId, forumId)
+      );
       const a = posts.map((v, index): Post => {
         const poster = v.user ? exposeUserType(v.user) : null;
         const { name, id } = v.forum!;
