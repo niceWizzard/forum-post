@@ -37,7 +37,7 @@ export const getCommentReplies = cache(
   async (commentId: string): Promise<ApiResponse<ReplyComment[]>> => {
     try {
       const { user } = await getAuth();
-      const res = await fetchComment()
+      const res = await fetchComment(user?.id)
         .where(eq(commentTable.id, commentId))
         .orderBy(asc(commentTable.createdAt));
 

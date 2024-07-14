@@ -45,7 +45,7 @@ export const getPostById = cache(
     try {
       const [res, rawComments] = await db.batch([
         fetchPost(user?.id).where(eq(postTable.id, id)),
-        fetchComment()
+        fetchComment(user?.id)
           .where(eq(commentTable.postId, id))
           .orderBy(
             sort == "newest"
