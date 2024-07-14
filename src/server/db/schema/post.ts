@@ -27,12 +27,16 @@ export const postTable = pgTable("post", {
 export const postLikeTable = pgTable(
   "post_like",
   {
-    userId: uuid("user_id").references(() => userTable.id, {
-      onDelete: "cascade",
-    }),
-    postId: uuid("post_id").references(() => postTable.id, {
-      onDelete: "cascade",
-    }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => userTable.id, {
+        onDelete: "cascade",
+      }),
+    postId: uuid("post_id")
+      .notNull()
+      .references(() => postTable.id, {
+        onDelete: "cascade",
+      }),
     likedAt: timestamp("liked_at").notNull().defaultNow(),
   },
   (table) => ({

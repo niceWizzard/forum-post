@@ -57,6 +57,13 @@
       "when": 1720851900235,
       "tag": "0007_wealthy_luke_cage",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1720920206460,
+      "tag": "0008_clear_sally_floyd",
+      "breakpoints": true
     }
   ]
 }

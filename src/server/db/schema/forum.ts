@@ -20,12 +20,16 @@ export const forumTable = pgTable("forum", {
 export const forumMemberTable = pgTable(
   "forum_member",
   {
-    forumId: uuid("forum_id").references(() => forumTable.id, {
-      onDelete: "cascade",
-    }),
-    userId: uuid("user_id").references(() => userTable.id, {
-      onDelete: "cascade",
-    }),
+    forumId: uuid("forum_id")
+      .notNull()
+      .references(() => forumTable.id, {
+        onDelete: "cascade",
+      }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => userTable.id, {
+        onDelete: "cascade",
+      }),
     joinedAt: timestamp("joined_at").notNull().defaultNow(),
   },
   (table) => ({
