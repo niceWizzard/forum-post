@@ -3,6 +3,7 @@ import { type Forum, type Post } from "@/server/db/schema/types";
 import Link from "next/link";
 import PostPreview from "./_components/PostPreview";
 import JoinButton from "./_components/JoinButton";
+import ForumSettings from "./_components/ForumSettings";
 
 interface Props {
   params: { id: string };
@@ -70,6 +71,7 @@ function ForumHeader({ forum }: { forum: Forum }) {
           <h3 className="text-xl font-semibold flex-grow">{forum.name}</h3>
           <span className="">{forum.forumMembersCount} members</span>
           <JoinButton forum={forum} />
+          <ForumSettings forum={forum} />
         </div>
         <p className="text-sm font-light text-foreground-lighter row-span-1 col-span-1 text-ellipsis ">
           {forum.description || "nothing to see here... :)"}

@@ -183,6 +183,9 @@ export async function deleteForum(
       });
     }
 
+    revalidatePath(`/forum/${forumId}`);
+    revalidatePath(`/feed`);
+
     return ApiRes.success({
       data: true,
     });

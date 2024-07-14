@@ -3,6 +3,8 @@ import { getCreatedForums, getTrendingForums } from "@/server/db/queries/forum";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default async function FeedPage() {
   const { user } = await authenticatedOnly();
 
