@@ -26,6 +26,7 @@ import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
 import { commentLikeTable, commentTable } from "../schema/comment";
 import { isTuple } from "@/lib/utils.server";
+import { fetchComment } from "./comment";
 
 export const getPostById = cache(
   async ({
@@ -44,18 +45,7 @@ export const getPostById = cache(
     try {
       const [res, rawComments] = await db.batch([
         fetchPost(user?.id).where(eq(postTable.id, id)),
-        db
-          .select({
-            user: { ...userTable },
-            comment: { ...commentTable },
-            likeCount: sql<number>`COUNT(DISTINCT ${commentLikeTable.userId}) AS like_count`,
-            isLiked: sql<boolean>`SUM( CASE
-            WHEN ${commentLikeTable.userId} = ${
-              user?.id ?? "11111111-1111-1111-1111-1ce992f5e2db"
-            } THEN 1 ELSE 0 END) > 0`,
-            replyCount: countDistinct(sql`reply`),
-          })
-          .from(commentTable)
+        fetchComment()
           .where(eq(commentTable.postId, id))
           .orderBy(
             sort == "newest"
@@ -64,17 +54,7 @@ export const getPostById = cache(
             asc(commentTable.createdAt)
           )
           .limit(10)
-          .offset((commentPageNumber - 1) * 10)
-          .leftJoin(userTable, eq(userTable.id, commentTable.commenterId))
-          .leftJoin(
-            commentLikeTable,
-            eq(commentLikeTable.commentId, commentTable.id)
-          )
-          .leftJoin(
-            sql`${commentTable} AS reply`,
-            sql`reply.reply_to_id = ${commentTable.id}`
-          )
-          .groupBy(commentTable.commenterId, userTable.id, commentTable.id),
+          .offset((commentPageNumber - 1) * 10),
       ]);
 
       if (res.length == 0)
