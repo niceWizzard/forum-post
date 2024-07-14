@@ -143,3 +143,54 @@ export async function leaveForum(
     });
   }
 }
+
+export async function deleteForum(
+  forumId: string
+): Promise<ApiResponse<boolean>> {
+  try {
+    const { user } = await getAuth();
+    if (!user)
+      return ApiRes.error({
+        message: "Please login",
+        code: ApiError.AuthRequired,
+      });
+
+    const forum = await db.query.forumTable.findFirst({
+      where: eq(forumTable.id, forumId),
+    });
+
+    if (!forum)
+      return ApiRes.error({
+        message: "Forum not found",
+        code: ApiError.ForumNotFound,
+      });
+
+    if (forum.ownerId !== user.id) {
+      return ApiRes.error({
+        message: "Unauthorized",
+        code: ApiError.Unathorized,
+      });
+    }
+
+    const res = await db
+      .delete(forumTable)
+      .where(eq(forumTable.id, forumId))
+      .returning();
+    if (res.length == 0) {
+      return ApiRes.error({
+        message: "Forum not found",
+        code: ApiError.ForumNotFound,
+      });
+    }
+
+    return ApiRes.success({
+      data: true,
+    });
+  } catch (e) {
+    const err = e as Error;
+    return ApiRes.error({
+      message: err.message,
+      code: ApiError.UnknownError,
+    });
+  }
+}
