@@ -104,8 +104,8 @@ export const getForumPosts = cache(
 
       const posts = await db
         .select({
-          like_count: countDistinct(postLikeTable.userId),
-          comment_count: countDistinct(commentTable),
+          likeCount: countDistinct(postLikeTable.userId),
+          commentCount: countDistinct(commentTable),
           isLiked: checkIsLiked(user?.id),
           user: { ...userTable },
           post: { ...postTable },
@@ -136,8 +136,8 @@ export const getForumPosts = cache(
             name,
             id,
           },
-          likeCount: v.like_count,
-          commentCount: v.comment_count,
+          likeCount: v.likeCount,
+          commentCount: v.commentCount,
           isLiked,
           ...v.post,
         };
