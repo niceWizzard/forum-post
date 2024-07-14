@@ -48,7 +48,7 @@ export const getCreatedForums = cache(async (userId: string) => {
   }
 });
 
-export function fetchForum(userId?: string | null) {
+export function fetchForum(userId: string | null) {
   return db
     .select({
       forumMembersCount: sql<number>`${count(
@@ -70,7 +70,9 @@ export const getForumById = cache(
   async (forumId: string): Promise<ApiResponse<Forum>> => {
     try {
       const { user } = await getAuth();
-      const res = await fetchForum(user?.id).where(eq(forumTable.id, forumId));
+      const res = await fetchForum(user?.id ?? null).where(
+        eq(forumTable.id, forumId)
+      );
 
       if (res.length == 0) {
         return ApiRes.error({
@@ -102,7 +104,7 @@ export const getForumPosts = cache(
     try {
       const { user } = await getAuth();
 
-      const posts = await fetchPost(user?.id).where(
+      const posts = await fetchPost(user?.id ?? null).where(
         eq(postTable.forumId, forumId)
       );
       const a = posts.map((v, index): Post => {

@@ -44,8 +44,8 @@ export const getPostById = cache(
     const orderFunc = sortOrder == "down" ? desc : asc;
     try {
       const [res, rawComments] = await db.batch([
-        fetchPost(user?.id).where(eq(postTable.id, id)),
-        fetchComment(user?.id)
+        fetchPost(user?.id ?? null).where(eq(postTable.id, id)),
+        fetchComment(user?.id ?? null)
           .where(eq(commentTable.postId, id))
           .orderBy(
             sort == "newest"
@@ -108,7 +108,7 @@ function checkIsLiked(userId?: string | null) {
   } THEN 1 ELSE 0 END) > 0`;
 }
 
-export function fetchPost(userId?: string | null) {
+export function fetchPost(userId: string | null) {
   return db
     .select({
       likeCount: countDistinct(postLikeTable.userId),
