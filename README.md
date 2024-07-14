@@ -30,7 +30,7 @@ The todo list of the website
 - [ ] Add admins to the forum
 - [ ] Create admin only ui
 - [ ] Implement deletion of forums
-- [ ] Implement Joining forums
+- [x] Implement Joining forums
 
 ### Post Tables
 
@@ -48,5 +48,5 @@ The todo list of the website
 - [x] Delete comments
 - [x] Like comments
 - [x] Count likes
-- [ ] Count replies
+- [x] Count replies
 - [ ] Reply to comment
