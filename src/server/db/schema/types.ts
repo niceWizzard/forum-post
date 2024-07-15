@@ -27,22 +27,22 @@ export type SortType = "newest" | "likes";
 
 export type SortOrder = "up" | "down";
 
-export function isSortType(type?: string): type is SortType {
+export function isSortType(type?: string | null): type is SortType {
   if (!type) return false;
   return ["newest", "likes"].includes(type);
 }
 
-export function asSortType(type?: string): SortType {
+export function asSortType(type?: string | null): SortType {
   if (!isSortType(type)) return "likes";
   return type;
 }
 
-export function isSortOrder(order?: string): order is SortOrder {
+export function isSortOrder(order?: string | null): order is SortOrder {
   if (!order) return false;
   return ["up", "down"].includes(order);
 }
 
-export function asSortOrder(order?: string): SortOrder {
+export function asSortOrder(order?: string | null): SortOrder {
   if (!isSortOrder(order)) return "down";
   return order;
 }
