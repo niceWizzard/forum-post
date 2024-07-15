@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { likePost, unlikePost } from "@/server/db/actions/post";
 import { type Post } from "@/server/db/schema/types";
+import { formatDistanceToNowStrict } from "date-fns";
 import { Heart } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -42,6 +43,11 @@ function PostPreview({ post }: { post: Post }) {
               onClick={(e) => onInnerClick(e, "username")}
             >
               @{post.poster ? post.poster.username ?? "no username" : "deleted"}
+            </span>
+            <span className="ml-4">
+              {formatDistanceToNowStrict(new Date(post.createdAt), {
+                addSuffix: true,
+              })}
             </span>
           </div>
           <p className="text-foreground-light font-light text-sm mt-4 max-h-64 line-clamp-6">
