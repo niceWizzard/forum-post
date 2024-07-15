@@ -61,6 +61,9 @@ const SideSheet = ({
           <Button asChild variant="link">
             <Link href="/forum/create">Create a forum</Link>
           </Button>
+          <Button asChild variant="link">
+            <Link href="/settings">Settings</Link>
+          </Button>
         </div>
       </SheetContent>
     </Sheet>
