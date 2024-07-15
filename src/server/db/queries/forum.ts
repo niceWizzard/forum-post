@@ -1,11 +1,27 @@
 import "server-only";
 import { db } from "..";
-import { count, eq, and, countDistinct, sql, desc, isNull } from "drizzle-orm";
+import {
+  count,
+  eq,
+  and,
+  countDistinct,
+  sql,
+  desc,
+  isNull,
+  asc,
+} from "drizzle-orm";
 import { forumMemberTable, forumTable } from "../schema/forum";
 import { postLikeTable, postTable } from "../schema/post";
 import { cache } from "react";
 import { userTable } from "../schema";
-import { exposeUserType, Forum, Post, RawForum } from "../schema/types";
+import {
+  exposeUserType,
+  Forum,
+  Post,
+  RawForum,
+  SortOrder,
+  SortType,
+} from "../schema/types";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
 import { getAuth } from "@/server/auth";
@@ -100,13 +116,28 @@ export const getForumById = cache(
 );
 
 export const getForumPosts = cache(
-  async (forumId: string): Promise<ApiResponse<Post[]>> => {
+  async ({
+    forumId,
+    sortOrder,
+    sortType,
+  }: {
+    forumId: string;
+    sortOrder: SortOrder;
+    sortType: SortType;
+  }): Promise<ApiResponse<Post[]>> => {
     try {
       const { user } = await getAuth();
 
-      const posts = await fetchPost(user?.id ?? null).where(
-        eq(postTable.forumId, forumId)
-      );
+      const orderFunc = sortOrder == "down" ? desc : asc;
+      const posts = await fetchPost(user?.id ?? null)
+        .where(eq(postTable.forumId, forumId))
+        .limit(20)
+        .offset(0)
+        .orderBy(
+          sortType == "likes"
+            ? orderFunc(sql`like_count`)
+            : orderFunc(postTable.createdAt)
+        );
       const a = posts.map((v, index): Post => {
         const poster = v.user ? exposeUserType(v.user) : null;
         const { name, id } = v.forum!;

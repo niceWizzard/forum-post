@@ -1,5 +1,10 @@
 import { getForumById, getForumPosts } from "@/server/db/queries/forum";
-import { type Forum, type Post } from "@/server/db/schema/types";
+import {
+  asSortOrder,
+  asSortType,
+  type Forum,
+  type Post,
+} from "@/server/db/schema/types";
 import Link from "next/link";
 import PostPreview from "./_components/PostPreview";
 import JoinButton from "./_components/JoinButton";
@@ -8,11 +13,15 @@ import SortButton from "./_components/SortButton";
 
 interface Props {
   params: { id: string };
+  searchParams: { sort?: string; order?: string };
 }
 
 export const dynamic = "force-dynamic";
 
-const ForumWithIdPage = async ({ params: { id } }: Props) => {
+const ForumWithIdPage = async ({
+  params: { id },
+  searchParams: { order, sort },
+}: Props) => {
   const res = await getForumById(id);
   if (res.error) {
     return res.message;
@@ -20,7 +29,14 @@ const ForumWithIdPage = async ({ params: { id } }: Props) => {
 
   const forum = res.data;
 
-  const postsRes = await getForumPosts(id);
+  const sortType = asSortType(sort);
+  const sortOrder = asSortOrder(order);
+
+  const postsRes = await getForumPosts({
+    forumId: id,
+    sortOrder,
+    sortType,
+  });
 
   if (postsRes.error) {
     return postsRes.message;

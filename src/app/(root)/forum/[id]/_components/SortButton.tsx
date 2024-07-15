@@ -30,9 +30,7 @@ export default function SortButton({ forumId }: { forumId: string }) {
   }
   return (
     <Popover>
-      <PopoverTrigger>
-        <Button>Sort</Button>
-      </PopoverTrigger>
+      <PopoverTrigger>Sort</PopoverTrigger>
       <PopoverContent>
         <div className="flex flex-col gap-2">
           <Button
