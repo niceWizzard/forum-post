@@ -48,12 +48,18 @@ const formSchema = z.object({
     }),
 });
 
-function OnBoardingForm() {
+function OnBoardingForm({
+  username,
+  name,
+}: {
+  username?: string;
+  name?: string;
+}) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
-      name: "",
+      username: username ?? "",
+      name: name ?? "",
     },
   });
 
