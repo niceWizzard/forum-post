@@ -111,7 +111,9 @@ function checkIsLiked(userId?: string | null) {
 export function fetchPost(userId: string | null) {
   return db
     .select({
-      likeCount: countDistinct(postLikeTable.userId),
+      likeCount: sql<number>`${countDistinct(
+        postLikeTable.userId
+      )} as like_count`,
       commentCount: countDistinct(commentTable),
       isLiked: checkIsLiked(userId),
       user: { ...userTable },
