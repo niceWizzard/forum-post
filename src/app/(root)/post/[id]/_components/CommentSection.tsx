@@ -17,7 +17,7 @@ import { deleteComment, toggleLikeComment } from "@/server/db/actions/comment";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { useUserStore } from "@/store/userStore";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { LoadingButton } from "@/components/ui/loadingButton";
 import {
   Pagination,
@@ -28,7 +28,12 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  ReadonlyURLSearchParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import { env } from "@/env/client.mjs";
 
 import {
@@ -133,30 +138,34 @@ function CommentSortButton() {
   );
 }
 
+const toUrlPath = (
+  pageNum: number,
+  searchParams: ReadonlyURLSearchParams,
+  path: string
+): string => {
+  const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
+  currentParams.set("commentPage", String(pageNum));
+  return `${path}?${currentParams.toString()}`;
+};
+
 function PaginationRow({ post, pageNumber }: Props) {
   const totalCommentPages = Math.ceil(post.commentCount / 10);
-  const [prevPageHref, setPrevPageHref] = useState("");
-  const [nextPageHref, setNextPageHref] = useState("");
+  // const [prevPageHref, setPrevPageHref] = useState("");
   const path = usePathname();
   const searchParams = useSearchParams();
 
-  const toUrlPath = useCallback(
-    (pageNum: number): string => {
-      const currentParams = new URLSearchParams(
-        Array.from(searchParams.entries())
-      );
-      currentParams.set("commentPage", String(pageNum));
-      return `${path}?${currentParams.toString()}`;
-    },
-    [path, searchParams]
-  );
+  const prevPageHref = useMemo(() => {
+    return pageNumber == 1
+      ? "#"
+      : toUrlPath(pageNumber - 1, searchParams, path);
+  }, [pageNumber, path, searchParams]);
 
-  useEffect(() => {
-    const prevPageUrl = toUrlPath(pageNumber - 1);
-    const nextPageUrl = toUrlPath(pageNumber + 1);
-    setPrevPageHref(pageNumber == 1 ? "#" : prevPageUrl);
-    setNextPageHref(pageNumber == totalCommentPages ? "#" : nextPageUrl);
-  }, [pageNumber, totalCommentPages, post.id, path, toUrlPath]);
+  const nextPageHref = useMemo(() => {
+    return pageNumber == totalCommentPages
+      ? "#"
+      : toUrlPath(pageNumber + 1, searchParams, path);
+  }, [pageNumber, path, searchParams, totalCommentPages]);
+
   return (
     <Pagination className="mt-3">
       <PaginationContent>
@@ -166,7 +175,7 @@ function PaginationRow({ post, pageNumber }: Props) {
         {...new Array(totalCommentPages).fill(1).map((v, i) => (
           <PaginationItem key={`page-${i}`}>
             <PaginationLink
-              href={toUrlPath(i + 1)}
+              href={toUrlPath(i + 1, searchParams, path)}
               isActive={i + 1 == pageNumber}
             >
               {i + 1}
