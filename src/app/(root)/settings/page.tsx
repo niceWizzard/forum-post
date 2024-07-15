@@ -7,11 +7,19 @@ export default async function SettingsPage() {
 
   return (
     <section className="py-6">
-      <div className="container">
+      <div className="container space-y-4">
         <h3>Edit your information</h3>
         <OnBoardingForm name={user.name} username={user.username} />
 
-        <UserAccountDeleteButton />
+        <div className="space-y-4">
+          <h4 className="border-b pb-4 text-xl font-semibold">
+            Delete your account
+          </h4>
+          <p className="text-sm font-light text-foreground-lighter">
+            There is no going back to this.
+          </p>
+          <UserAccountDeleteButton />
+        </div>
       </div>
     </section>
   );
