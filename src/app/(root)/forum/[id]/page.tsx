@@ -4,6 +4,7 @@ import Link from "next/link";
 import PostPreview from "./_components/PostPreview";
 import JoinButton from "./_components/JoinButton";
 import ForumSettings from "./_components/ForumSettings";
+import SortButton from "./_components/SortButton";
 
 interface Props {
   params: { id: string };
@@ -38,12 +39,15 @@ export default ForumWithIdPage;
 function ForumContent({ posts, forumId }: { posts: Post[]; forumId: string }) {
   return (
     <div className="px-2 py-6 flex flex-col  flex-grow">
-      <Link
-        href={`/post/create/${forumId}`}
-        className="border border-secondary rounded-md px-3 py-2 self-end"
-      >
-        Create a Post
-      </Link>
+      <div className="self-end flex gap-2">
+        <Link
+          href={`/post/create/${forumId}`}
+          className="border border-secondary rounded-md px-3 py-2"
+        >
+          Create a Post
+        </Link>
+        <SortButton forumId={forumId} />
+      </div>
       <div className="h-full mt-6">
         <div className="flex flex-col h-full divide-y divide-foreground-lighter ">
           {posts.map((post) => (
