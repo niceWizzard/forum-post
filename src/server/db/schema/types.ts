@@ -56,7 +56,7 @@ export type Comment = RawComment & {
   replyCount: number;
 };
 
-export type ReplyComment = Comment & {
+export type ReplyComment = StrictOmit<Comment, "replyCount"> & {
   replyToId: string;
 };
 

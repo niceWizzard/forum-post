@@ -31,6 +31,7 @@ export async function GET(
         isLiked: null,
         likeCount: 0,
         ...v.reply,
+        replyToId: commentId,
       })),
     });
   } catch (e) {
