@@ -9,7 +9,7 @@ import { postTable } from "../schema/post";
 import { and, eq, sql } from "drizzle-orm";
 import { type RawComment } from "../schema/types";
 import { revalidatePath } from "next/cache";
-import { getRawComment } from "../queries/comment";
+import { getRawComment, fetchComment } from "../queries/comment";
 
 export const createComment = async ({
   commentBody,
@@ -161,6 +161,44 @@ export const toggleLikeComment = async (
 
     return ApiRes.success({
       data: !likeExists,
+    });
+  } catch (e) {
+    const err = e as Error;
+    return ApiRes.error({
+      message: err.message,
+      code: ApiError.UnknownError,
+    });
+  }
+};
+
+export const replyToComment = async (
+  commentId: string,
+  body: string
+): Promise<ApiResponse<boolean>> => {
+  try {
+    const { user } = await getAuth();
+    if (!user) {
+      return ApiRes.error({
+        message: "Please login",
+        code: ApiError.AuthRequired,
+      });
+    }
+    const res = await getRawComment(commentId);
+    if (res.error) {
+      return res;
+    }
+    const comment = res.data;
+    const replyToId = comment.replyToId;
+
+    await db.insert(commentTable).values({
+      body,
+      commenterId: user.id,
+      postId: comment.postId,
+      replyToId: replyToId ?? commentId,
+    });
+
+    return ApiRes.success({
+      data: true,
     });
   } catch (e) {
     const err = e as Error;
