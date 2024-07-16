@@ -47,7 +47,9 @@ export const getPostById = cache(
       const [res, rawComments] = await db.batch([
         fetchPost(user?.id ?? null).where(eq(postTable.id, id)),
         fetchComment(user?.id ?? null)
-          .where(eq(commentTable.postId, id))
+          .where(
+            and(eq(commentTable.postId, id), isNull(commentTable.replyToId))
+          )
           .orderBy(
             sort == "newest"
               ? orderFunc(commentTable.createdAt)
@@ -63,7 +65,7 @@ export const getPostById = cache(
           message: "No such post found",
           code: ApiError.PostNotFound,
         });
-
+      console.log(rawComments.map((v) => v.comment.replyToId));
       const { likeCount, commentCount, ...data } = res[0];
       const poster = data.user ? exposeUserType(data.user) : null;
       const forum = data.forum!;
