@@ -130,9 +130,11 @@ export function Comment({ comment }: { comment: Comment }) {
       </div>
       {showReplyForm && <CommentReplyForm comment={comment} />}
       <div className="flex flex-col px-6 divide-y bg-card">
-        {replies.map((reply) => (
-          <Comment comment={reply} key={reply.id} />
-        ))}
+        {replies
+          .map((v) => ({ ...v, replyCount: 0 }))
+          .map((reply) => (
+            <Comment comment={reply} key={reply.id} />
+          ))}
       </div>
     </div>
   );
