@@ -33,7 +33,7 @@ export function isSortType(type?: string | null): type is SortType {
 }
 
 export function asSortType(type?: string | null): SortType {
-  if (!isSortType(type)) return "likes";
+  if (!isSortType(type)) return "newest";
   return type;
 }
 
