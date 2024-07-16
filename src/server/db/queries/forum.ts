@@ -200,3 +200,11 @@ export const getTrendingForums = cache(
     }
   }
 );
+
+export async function handleForumCheck(name: string) {
+  const res = await db.query.forumTable.findFirst({
+    where: eq(forumTable.name, name),
+  });
+
+  return res == null;
+}

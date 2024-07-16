@@ -1,6 +1,6 @@
 "use client";
 import { saveRequiredUserFields } from "@/server/db/actions/user";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useDebouncedCallback } from "use-debounce";
+import { useDebounce, useDebouncedCallback } from "use-debounce";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
 import { ApiResponse } from "@/server/apiResponse";
@@ -22,6 +22,9 @@ import { env } from "@/env/client.mjs";
 import { useEffectUpdate } from "@/lib/utils";
 import { LoadingButton } from "@/components/ui/loadingButton";
 import { toast } from "sonner";
+import { trpc } from "@/app/_trpc/client";
+import clsx from "clsx";
+import { LoaderCircle } from "lucide-react";
 
 const formSchema = z.object({
   username: z
@@ -55,6 +58,8 @@ function OnBoardingForm({
   username?: string;
   name?: string;
 }) {
+  const initialUsername = useRef(username);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -63,25 +68,43 @@ function OnBoardingForm({
     },
   });
 
-  const {
-    data: usernameAvailable,
-    fetching,
-    finish,
-    state,
-    reset,
-  } = useUsernameCheckStatus();
+  const usernameWatch = form.watch("username");
 
+  const [usernameChange] = useDebounce(usernameWatch, 200);
+  const isValidUsername =
+    !!usernameChange.trim() && usernameChange.trim().length > 2;
+
+  const {
+    status,
+    data: usernameAvailable,
+    isPaused,
+    refetch,
+  } = trpc.nameAvailability.useQuery(
+    {
+      name: usernameChange,
+      type: "username",
+    },
+    {
+      queryKey: [
+        "nameAvailability",
+        {
+          name: usernameChange,
+          type: "username",
+        },
+      ],
+      enabled: false,
+    }
+  );
+
+  useEffectUpdate(() => {
+    isValidUsername && refetch();
+  }, [usernameChange]);
   const setUser = useUserStore((v) => v.setUser);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const router = useRouter();
 
-  const usernameChange = form.watch("username");
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (
-      state == Status.Loading ||
-      (state == Status.Finished && !usernameAvailable)
-    ) {
+    if (status == "pending" || status == "error" || !usernameAvailable) {
       return;
     }
     setHasSubmitted(true);
@@ -96,40 +119,29 @@ function OnBoardingForm({
     router.push("/feed");
   }
 
-  const usernameCheck = useDebouncedCallback(async (username: string) => {
-    if (!(await form.trigger("username"))) {
-      reset();
-      return;
-    }
-    fetching();
-    const url = new URL(
-      "api/name-availability?type=username",
-      env.PUBLIC_BASE_URL
-    );
-    url.searchParams.append("name", username);
-    const a: ApiResponse<boolean> = await (await fetch(url)).json();
-    if (a.error) {
-      toast.error("An error has occurred", {
-        description: a.message,
-      });
-      reset();
-    } else {
-      finish(a.data ?? false);
-    }
-  }, 300);
-
-  useEffectUpdate(() => {
-    usernameCheck(usernameChange);
-  }, [usernameChange]);
-
   function UsernameStatus() {
-    if (state == Status.Finished) {
+    if (!isValidUsername || initialUsername.current === usernameChange) {
+      return null;
+    }
+    if (status == "success") {
       return (
-        <p>Username is {usernameAvailable ? "available" : "already taken."}</p>
+        <p
+          className={clsx({
+            "text-green-500": usernameAvailable,
+            "text-destructive": !usernameAvailable,
+          })}
+        >
+          Username is {usernameAvailable ? "available" : "already taken."}
+        </p>
       );
     }
-    if (state == Status.Loading) {
-      return <p>Checking username...</p>;
+    if (status == "pending") {
+      return (
+        <span className="flex items-center">
+          <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> Checking
+          username...
+        </span>
+      );
     }
 
     return null;
@@ -182,34 +194,3 @@ function OnBoardingForm({
 }
 
 export default OnBoardingForm;
-
-enum Status {
-  Unset,
-  Loading,
-  Finished,
-}
-function useUsernameCheckStatus() {
-  const [state, setState] = useState(Status.Unset);
-  const [data, setData] = useState(false);
-
-  function fetching() {
-    setState(Status.Loading);
-  }
-
-  function finish(availability: boolean) {
-    setState(Status.Finished);
-    setData(availability);
-  }
-
-  function reset() {
-    setState(Status.Unset);
-  }
-
-  return {
-    state,
-    data,
-    fetching,
-    reset,
-    finish,
-  };
-}
