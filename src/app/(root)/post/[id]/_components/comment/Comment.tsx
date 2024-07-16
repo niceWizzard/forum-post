@@ -43,10 +43,6 @@ export function Comment({ comment }: { comment: Comment }) {
     });
   const [showReplyForm, setShowReplyForm] = useState(false);
 
-  useEffectUpdate(() => {
-    fetchReplies();
-  }, [comment.replyCount]);
-
   return (
     <div className="space-y-2 py-2">
       <div className="flex justify-between w-full">
@@ -119,7 +115,9 @@ export function Comment({ comment }: { comment: Comment }) {
           </Button>
         )}
       </div>
-      {showReplyForm && <CommentReplyForm comment={comment} />}
+      {showReplyForm && (
+        <CommentReplyForm comment={comment} onReplyCreate={fetchReplies} />
+      )}
       <div className="flex flex-col px-6 divide-y bg-card">
         {replies &&
           replies
@@ -130,7 +128,13 @@ export function Comment({ comment }: { comment: Comment }) {
   );
 }
 
-function CommentReplyForm({ comment }: { comment: Comment }) {
+function CommentReplyForm({
+  comment,
+  onReplyCreate,
+}: {
+  comment: Comment;
+  onReplyCreate: () => void;
+}) {
   const replyText = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   async function onSubmit(e: FormEvent) {
@@ -148,6 +152,7 @@ function CommentReplyForm({ comment }: { comment: Comment }) {
       });
       return;
     }
+    onReplyCreate();
   }
   return (
     <form className="flex gap-2 max-w-lg pl-6" onSubmit={onSubmit}>
