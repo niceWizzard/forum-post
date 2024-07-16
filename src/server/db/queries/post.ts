@@ -15,6 +15,7 @@ import { userTable } from "../schema";
 import {
   exposeUserType,
   minimizeData,
+  Post,
   PostWithComments,
   SortOrder,
   SortType,
@@ -90,6 +91,38 @@ export const getPostById = cache(
           commentCount,
           ...data.post,
         },
+      });
+    } catch (e) {
+      const err = e as Error;
+      return ApiRes.error({
+        message: err.message,
+        code: ApiError.UnknownError,
+      });
+    }
+  }
+);
+
+export const getPostByIdWithNoComment = cache(
+  async (postId: string): Promise<ApiResponse<Post>> => {
+    try {
+      const res = await fetchPost(null).where(eq(postTable.id, postId));
+      if (res.length == 0) {
+        return ApiRes.error({
+          message: "No such post found",
+          code: ApiError.PostNotFound,
+        });
+      }
+      const v = res[0];
+      const data: Post = {
+        ...v.post,
+        poster: v.user ? exposeUserType(v.user) : null,
+        forum: v.forum!,
+        isLiked: v.isLiked,
+        likeCount: v.likeCount,
+        commentCount: v.commentCount,
+      };
+      return ApiRes.success({
+        data,
       });
     } catch (e) {
       const err = e as Error;
