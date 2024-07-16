@@ -105,7 +105,10 @@ export const getPostById = cache(
 export const getPostByIdWithNoComment = cache(
   async (postId: string): Promise<ApiResponse<Post>> => {
     try {
-      const res = await fetchPost(null).where(eq(postTable.id, postId));
+      const { user } = await getAuth();
+      const res = await fetchPost(user?.id ?? null).where(
+        eq(postTable.id, postId)
+      );
       if (res.length == 0) {
         return ApiRes.error({
           message: "No such post found",
