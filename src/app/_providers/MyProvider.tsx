@@ -1,9 +1,18 @@
-import ServerProvider from "./ServerProvider";
+import { getAuth } from "@/server/auth";
+import ClientProvider from "./ClientProvider";
+import UserStoreProvider from "./storeProvider";
 
-export default function MyProvider({
+export default async function MyProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <ServerProvider>{children}</ServerProvider>;
+  const { user } = await getAuth();
+
+  return (
+    <ClientProvider>
+      <UserStoreProvider initialState={user} />
+      {children}
+    </ClientProvider>
+  );
 }
