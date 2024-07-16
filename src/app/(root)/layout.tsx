@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "@/app/globals.css";
 import Header from "./_components/header";
 import Footer from "./_components/footer";
-import StoreProvider from "./_components/storeProvider";
 import { getAuth } from "@/server/auth";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -19,13 +18,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user } = await getAuth();
-
   return (
     <html lang="en" className="dark">
       <body className={inter.className}>
         <div className="flex flex-col h-screen">
-          <StoreProvider initialState={user} />
           <Header />
           <main className="flex-grow">{children}</main>
           <Footer />
