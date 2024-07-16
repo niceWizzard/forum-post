@@ -42,7 +42,6 @@ export function Comment({ comment }: { comment: Comment }) {
       enabled: false,
     });
   const [showReplyForm, setShowReplyForm] = useState(false);
-
   return (
     <div className="space-y-2 py-2">
       <div className="flex justify-between w-full">
@@ -122,7 +121,7 @@ export function Comment({ comment }: { comment: Comment }) {
         {replies &&
           replies
             .map((v) => ({ ...v, replyCount: 0 }))
-            .map((reply) => <Comment comment={reply} key={comment.id} />)}
+            .map((reply) => <Comment comment={reply} key={reply.id} />)}
       </div>
     </div>
   );
