@@ -44,8 +44,10 @@ export const getCommentReplies = cache(
       return ApiRes.success({
         data: res.map((v) => ({
           ...v.comment,
+          replyToId: commentId,
           isLiked: null,
           likeCount: 0,
+          replyCount: 0,
           commenter: v.user,
         })),
       });

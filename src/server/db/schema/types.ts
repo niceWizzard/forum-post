@@ -56,10 +56,8 @@ export type Comment = RawComment & {
   replyCount: number;
 };
 
-export type ReplyComment = RawComment & {
-  commenter: User | null;
-  likeCount: number;
-  isLiked: boolean | null;
+export type ReplyComment = Comment & {
+  replyToId: string;
 };
 
 export type PrivateUser = InferSelectModel<typeof userTable>;

@@ -127,12 +127,9 @@ export function Comment({ comment }: { comment: Comment }) {
         )}
       </div>
       {showReplyForm && <CommentReplyForm comment={comment} />}
-      <div className="flex flex-col pl-6">
+      <div className="flex flex-col px-6 divide-y bg-card">
         {replies.map((reply) => (
-          <div key={reply.id} className="bg-card px-4 py-2">
-            <span>{reply.commenter?.username ?? "deleted"}</span>
-            <p className="text-foreground-light">{reply.body}</p>
-          </div>
+          <Comment comment={reply} key={reply.id} />
         ))}
       </div>
     </div>
