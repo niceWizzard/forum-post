@@ -27,7 +27,6 @@ export const unlikePost = async (postId: string) => {
       );
 
     revalidatePath("/forum");
-    revalidatePath(`/post/${postId}`);
 
     return ApiRes.success({
       message: "Post liked successfully",
@@ -61,7 +60,6 @@ export const likePost = async (postId: string) => {
       .onConflictDoNothing();
 
     revalidatePath("/forum");
-    revalidatePath(`/post/${postId}`);
 
     return ApiRes.success({
       message: "Post liked successfully",

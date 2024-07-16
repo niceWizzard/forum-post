@@ -3,7 +3,15 @@ import { RawComment, ReplyComment } from "../schema/types";
 import { cache } from "react";
 import { ApiError } from "@/server/apiErrors";
 import { db } from "../index";
-import { asc, countDistinct, desc, eq, sql } from "drizzle-orm";
+import {
+  asc,
+  countDistinct,
+  desc,
+  eq,
+  isNotNull,
+  isNull,
+  sql,
+} from "drizzle-orm";
 import { commentLikeTable, commentTable } from "../schema/comment";
 import { getAuth } from "@/server/auth";
 import { userTable } from "../schema";
@@ -38,16 +46,15 @@ export const getCommentReplies = cache(
     try {
       const { user } = await getAuth();
       const res = await fetchComment(user?.id ?? null)
-        .where(eq(commentTable.id, commentId))
+        .where(eq(commentTable.replyToId, commentId))
         .orderBy(asc(commentTable.createdAt));
 
       return ApiRes.success({
         data: res.map((v) => ({
           ...v.comment,
           replyToId: commentId,
-          isLiked: null,
-          likeCount: 0,
-          replyCount: 0,
+          isLiked: user ? v.isLiked : null,
+          likeCount: v.likeCount,
           commenter: v.user,
         })),
       });
@@ -66,7 +73,7 @@ export function fetchComment(userId: string | null) {
     .select({
       user: { ...userTable },
       comment: { ...commentTable },
-      likeCount: sql<number>`COUNT(DISTINCT ${commentLikeTable.userId}) AS like_count`,
+      likeCount: sql<number>`CAST(COUNT(DISTINCT ${commentLikeTable.userId}) AS INT) AS like_count`,
       isLiked: sql<boolean>`SUM( CASE
     WHEN ${commentLikeTable.userId} = ${
         userId ?? "11111111-1111-1111-1111-1ce992f5e2db"

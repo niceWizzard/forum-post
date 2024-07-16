@@ -8,22 +8,21 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { env } from "@/env/client.mjs";
 import { cn, useEffectUpdate } from "@/lib/utils";
-import { ApiResponse } from "@/server/apiResponse";
 import { createForum } from "@/server/db/actions/forum";
 import { zodResolver } from "@hookform/resolvers/zod";
 import clsx from "clsx";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { useDebouncedCallback } from "use-debounce";
+import { useDebounce } from "use-debounce";
 import { z } from "zod";
 import { useState } from "react";
 import { LoadingButton } from "@/components/ui/loadingButton";
 import { forumCreateSchema } from "@/server/db/actions/schema";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { trpc } from "@/app/_trpc/client";
 
 const formSchema = forumCreateSchema;
 
@@ -40,22 +39,39 @@ function ForumCreateForm({ userId }: { userId: string }) {
 
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  const {
-    reset,
-    fetching,
-    finish,
-    state,
-    data: forumNameAvailable,
-  } = useForumNameCheckStatus();
-
   const router = useRouter();
+
+  const usernameWatch = form.watch("name");
+
+  const [usernameChange] = useDebounce(usernameWatch, 200);
+  const isValidUsername =
+    !!usernameChange.trim() && usernameChange.trim().length > 2;
+  const {
+    status,
+    data: forumNameAvailable,
+    isPaused,
+    refetch,
+  } = trpc.nameAvailability.useQuery(
+    {
+      name: usernameChange,
+      type: "forum",
+    },
+    {
+      enabled: false,
+    }
+  );
+
+  useEffectUpdate(() => {
+    isValidUsername && refetch();
+  }, [usernameChange]);
 
   async function onSubmit(values: ForumSchema) {
     if (
-      state == Status.Loading ||
-      state == Status.Unset ||
+      status == "pending" ||
+      status == "error" ||
       !forumNameAvailable ||
-      hasSubmitted
+      hasSubmitted ||
+      !(await form.trigger("name"))
     ) {
       return;
     }
@@ -74,34 +90,11 @@ function ForumCreateForm({ userId }: { userId: string }) {
     }
   }
 
-  const usernameChange = form.watch("name");
-
-  useEffectUpdate(() => {
-    (async () => await forumNameCheck(usernameChange))();
-  }, [usernameChange]);
-
-  const forumNameCheck = useDebouncedCallback(async (forumName: string) => {
-    if (!(await form.trigger("name"))) {
-      reset();
-      return;
-    }
-    fetching();
-    const url = new URL("api/name-availability", env.PUBLIC_BASE_URL);
-    url.searchParams.append("type", "forum");
-    url.searchParams.append("name", forumName);
-    const a: ApiResponse<boolean> = await (await fetch(url)).json();
-    if (a.error) {
-      reset();
-      toast.error("An error has occurred", {
-        description: a.message,
-      });
-    } else {
-      finish(a.data ?? false);
-    }
-  }, 300);
-
   function ForumNameAvailability() {
-    if (state == Status.Finished) {
+    if (!isValidUsername) {
+      return null;
+    }
+    if (status == "success") {
       return (
         <p
           className={cn(
@@ -115,7 +108,7 @@ function ForumCreateForm({ userId }: { userId: string }) {
         </p>
       );
     }
-    if (state == Status.Loading) {
+    if (status == "pending") {
       return (
         <span className="flex items-center">
           <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> Checking forum
@@ -177,34 +170,3 @@ function ForumCreateForm({ userId }: { userId: string }) {
 }
 
 export default ForumCreateForm;
-
-enum Status {
-  Unset,
-  Loading,
-  Finished,
-}
-function useForumNameCheckStatus() {
-  const [state, setState] = useState(Status.Unset);
-  const [data, setData] = useState(false);
-
-  function fetching() {
-    setState(Status.Loading);
-  }
-
-  function finish(availability: boolean) {
-    setState(Status.Finished);
-    setData(availability);
-  }
-
-  function reset() {
-    setState(Status.Unset);
-  }
-
-  return {
-    state,
-    data,
-    fetching,
-    reset,
-    finish,
-  };
-}

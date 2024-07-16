@@ -17,12 +17,20 @@ import { LoadingButton } from "@/components/ui/loadingButton";
 
 import { env } from "@/env/client.mjs";
 
-import { Heart } from "lucide-react";
+import { Divide, Heart } from "lucide-react";
 import { ApiResponse } from "@/server/apiResponse";
 import { Input } from "@/components/ui/input";
 import { useEffectUpdate } from "@/lib/utils";
+import { trpc } from "@/app/_trpc/client";
+import { RSC_PREFETCH_SUFFIX } from "next/dist/lib/constants";
 
-export function Comment({ comment }: { comment: Comment }) {
+export function Comment({
+  comment,
+  onDelete,
+}: {
+  comment: Comment;
+  onDelete?: () => void;
+}) {
   const user = useUserStore((v) => v.user);
   const onLikeButtonClick = useDebouncedCallback(async () => {
     const res = await toggleLikeComment(comment.id);
@@ -36,26 +44,11 @@ export function Comment({ comment }: { comment: Comment }) {
   }, 300);
 
   const [isDeleting, setIsDeleting] = useState(false);
-  const [replies, setReplies] = useState<ReplyComment[]>([]);
+  const { refetch: fetchReplies, data: replies } =
+    trpc.getCommentReplies.useQuery(comment.id, {
+      enabled: false,
+    });
   const [showReplyForm, setShowReplyForm] = useState(false);
-
-  useEffectUpdate(() => {
-    fetchReplies();
-  }, [comment.replyCount]);
-
-  const fetchReplies = async () => {
-    const res: ApiResponse<ReplyComment[]> = await (
-      await fetch(`${env.PUBLIC_BASE_URL}api/replies?commentId=${comment.id}`)
-    ).json();
-    if (res.error) {
-      toast.error("An error has occurred", {
-        description: res.message,
-      });
-      return;
-    }
-    setReplies(res.data);
-  };
-
   return (
     <div className="space-y-2 py-2">
       <div className="flex justify-between w-full">
@@ -81,7 +74,9 @@ export function Comment({ comment }: { comment: Comment }) {
                 toast.error("An error has occurred", {
                   description: res.message,
                 });
+                return;
               }
+              onDelete && onDelete();
             }}
           >
             Delete
@@ -106,7 +101,7 @@ export function Comment({ comment }: { comment: Comment }) {
 
         {comment.replyToId == null &&
           comment.replyCount > 0 &&
-          replies.length == 0 && (
+          replies == undefined && (
             <Button
               variant="ghost"
               onClick={() => {
@@ -120,25 +115,36 @@ export function Comment({ comment }: { comment: Comment }) {
           <Button
             variant="ghost"
             onClick={async () => {
-              replies.length == 0 && (await fetchReplies());
               setShowReplyForm(true);
+              replies == null && (await fetchReplies());
             }}
           >
             Reply
           </Button>
         )}
       </div>
-      {showReplyForm && <CommentReplyForm comment={comment} />}
+      {showReplyForm && (
+        <CommentReplyForm comment={comment} onReplyCreate={fetchReplies} />
+      )}
       <div className="flex flex-col px-6 divide-y bg-card">
-        {replies.map((reply) => (
-          <Comment comment={reply} key={reply.id} />
-        ))}
+        {replies &&
+          replies
+            .map((v) => ({ ...v, replyCount: 0 }))
+            .map((reply) => (
+              <Comment comment={reply} key={reply.id} onDelete={fetchReplies} />
+            ))}
       </div>
     </div>
   );
 }
 
-function CommentReplyForm({ comment }: { comment: Comment }) {
+function CommentReplyForm({
+  comment,
+  onReplyCreate,
+}: {
+  comment: Comment;
+  onReplyCreate: () => void;
+}) {
   const replyText = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   async function onSubmit(e: FormEvent) {
@@ -156,6 +162,7 @@ function CommentReplyForm({ comment }: { comment: Comment }) {
       });
       return;
     }
+    onReplyCreate();
   }
   return (
     <form className="flex gap-2 max-w-lg pl-6" onSubmit={onSubmit}>

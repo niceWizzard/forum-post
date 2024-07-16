@@ -15,6 +15,7 @@ import { userTable } from "../schema";
 import {
   exposeUserType,
   minimizeData,
+  Post,
   PostWithComments,
   SortOrder,
   SortType,
@@ -46,7 +47,9 @@ export const getPostById = cache(
       const [res, rawComments] = await db.batch([
         fetchPost(user?.id ?? null).where(eq(postTable.id, id)),
         fetchComment(user?.id ?? null)
-          .where(eq(commentTable.postId, id))
+          .where(
+            and(eq(commentTable.postId, id), isNull(commentTable.replyToId))
+          )
           .orderBy(
             sort == "newest"
               ? orderFunc(commentTable.createdAt)
@@ -62,7 +65,7 @@ export const getPostById = cache(
           message: "No such post found",
           code: ApiError.PostNotFound,
         });
-
+      console.log(rawComments.map((v) => v.comment.replyToId));
       const { likeCount, commentCount, ...data } = res[0];
       const poster = data.user ? exposeUserType(data.user) : null;
       const forum = data.forum!;
@@ -101,6 +104,41 @@ export const getPostById = cache(
   }
 );
 
+export const getPostByIdWithNoComment = cache(
+  async (postId: string): Promise<ApiResponse<Post>> => {
+    try {
+      const { user } = await getAuth();
+      const res = await fetchPost(user?.id ?? null).where(
+        eq(postTable.id, postId)
+      );
+      if (res.length == 0) {
+        return ApiRes.error({
+          message: "No such post found",
+          code: ApiError.PostNotFound,
+        });
+      }
+      const v = res[0];
+      const data: Post = {
+        ...v.post,
+        poster: v.user ? exposeUserType(v.user) : null,
+        forum: v.forum!,
+        isLiked: v.isLiked,
+        likeCount: v.likeCount,
+        commentCount: v.commentCount,
+      };
+      return ApiRes.success({
+        data,
+      });
+    } catch (e) {
+      const err = e as Error;
+      return ApiRes.error({
+        message: err.message,
+        code: ApiError.UnknownError,
+      });
+    }
+  }
+);
+
 function checkIsLiked(userId?: string | null) {
   return sql<boolean>`SUM( CASE
            WHEN ${postLikeTable.userId} = ${
@@ -111,9 +149,9 @@ function checkIsLiked(userId?: string | null) {
 export function fetchPost(userId: string | null) {
   return db
     .select({
-      likeCount: sql<number>`${countDistinct(
+      likeCount: sql<number>`cast(${countDistinct(
         postLikeTable.userId
-      )} as like_count`,
+      )} as int) as like_count`,
       commentCount: countDistinct(commentTable),
       isLiked: checkIsLiked(userId),
       user: { ...userTable },

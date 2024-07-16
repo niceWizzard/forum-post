@@ -18,7 +18,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ArrowDown, ArrowUp } from "lucide-react";
-import { PaginationRow } from "./PaginationRow";
+import { PaginationRow } from "../PaginationRow";
 import { Comment } from "./Comment";
 
 interface Props {

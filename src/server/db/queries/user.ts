@@ -81,3 +81,11 @@ export const getUserByUsername = cache(
     }
   }
 );
+
+export async function handleUsernameCheck(name: string) {
+  const res = await db.query.userTable.findFirst({
+    where: eq(userTable.username, name),
+  });
+
+  return res == null;
+}

@@ -58,7 +58,7 @@ export const createComment = async ({
         code: ApiError.UnknownError,
       });
     }
-    console.log("CREATED ", comment[0]);
+
     revalidatePath(`/post/${postId}`);
 
     return ApiRes.success({
@@ -102,7 +102,6 @@ export const deleteComment = async (
     }
 
     await db.delete(commentTable).where(eq(commentTable.id, commentId));
-
     revalidatePath(`/post/${comment.postId}`);
 
     return ApiRes.success({ data: true });
@@ -196,8 +195,6 @@ export const replyToComment = async (
       postId: comment.postId,
       replyToId: replyToId ?? commentId,
     });
-
-    revalidatePath(`/post/${comment.postId}`);
 
     return ApiRes.success({
       data: true,
