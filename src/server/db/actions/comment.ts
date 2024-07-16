@@ -58,8 +58,6 @@ export const createComment = async ({
         code: ApiError.UnknownError,
       });
     }
-    console.log("CREATED ", comment[0]);
-    revalidatePath(`/post/${postId}`);
 
     return ApiRes.success({
       data: comment[0],

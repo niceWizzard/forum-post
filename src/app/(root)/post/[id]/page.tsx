@@ -2,7 +2,7 @@ import { getPostById } from "@/server/db/queries/post";
 import Link from "next/link";
 import PostButtons from "./_components/PostButtons";
 import PostMenu from "./_components/PostMenu";
-import CommentSection from "./_components/CommentSection";
+import CommentSection from "./_components/comment/CommentSection";
 import PostBody from "./_components/PostBody";
 import {
   asSortOrder,
