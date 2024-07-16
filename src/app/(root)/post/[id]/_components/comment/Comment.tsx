@@ -22,8 +22,15 @@ import { ApiResponse } from "@/server/apiResponse";
 import { Input } from "@/components/ui/input";
 import { useEffectUpdate } from "@/lib/utils";
 import { trpc } from "@/app/_trpc/client";
+import { RSC_PREFETCH_SUFFIX } from "next/dist/lib/constants";
 
-export function Comment({ comment }: { comment: Comment }) {
+export function Comment({
+  comment,
+  onDelete,
+}: {
+  comment: Comment;
+  onDelete?: () => void;
+}) {
   const user = useUserStore((v) => v.user);
   const onLikeButtonClick = useDebouncedCallback(async () => {
     const res = await toggleLikeComment(comment.id);
@@ -67,7 +74,9 @@ export function Comment({ comment }: { comment: Comment }) {
                 toast.error("An error has occurred", {
                   description: res.message,
                 });
+                return;
               }
+              onDelete && onDelete();
             }}
           >
             Delete
@@ -121,7 +130,9 @@ export function Comment({ comment }: { comment: Comment }) {
         {replies &&
           replies
             .map((v) => ({ ...v, replyCount: 0 }))
-            .map((reply) => <Comment comment={reply} key={reply.id} />)}
+            .map((reply) => (
+              <Comment comment={reply} key={reply.id} onDelete={fetchReplies} />
+            ))}
       </div>
     </div>
   );
