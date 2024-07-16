@@ -59,6 +59,8 @@ export const createComment = async ({
       });
     }
 
+    revalidatePath(`/post/${postId}`);
+
     return ApiRes.success({
       data: comment[0],
     });
@@ -100,7 +102,6 @@ export const deleteComment = async (
     }
 
     await db.delete(commentTable).where(eq(commentTable.id, commentId));
-
     revalidatePath(`/post/${comment.postId}`);
 
     return ApiRes.success({ data: true });
