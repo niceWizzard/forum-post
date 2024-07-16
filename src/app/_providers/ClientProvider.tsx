@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { trpc } from "../_trpc/client";
 import { httpBatchLink } from "@trpc/client";
-import { env } from "@/env/client.mjs";
+import superjson from "superjson";
 
 export default function ClientProvider({
   children,
@@ -17,9 +17,10 @@ export default function ClientProvider({
       trpcClient: trpc.createClient({
         links: [
           httpBatchLink({
-            url: `${env.PUBLIC_BASE_URL}api/trpc`,
+            url: `/api/trpc`,
           }),
         ],
+        transformer: superjson,
       }),
     }),
     []
