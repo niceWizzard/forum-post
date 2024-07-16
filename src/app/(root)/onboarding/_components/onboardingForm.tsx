@@ -85,13 +85,6 @@ function OnBoardingForm({
       type: "username",
     },
     {
-      queryKey: [
-        "nameAvailability",
-        {
-          name: usernameChange,
-          type: "username",
-        },
-      ],
       enabled: false,
     }
   );

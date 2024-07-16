@@ -57,13 +57,6 @@ function ForumCreateForm({ userId }: { userId: string }) {
       type: "forum",
     },
     {
-      queryKey: [
-        "nameAvailability",
-        {
-          name: usernameChange,
-          type: "forum",
-        },
-      ],
       enabled: false,
     }
   );

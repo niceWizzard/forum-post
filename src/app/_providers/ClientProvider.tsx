@@ -19,9 +19,9 @@ export default function ClientProvider({
         links: [
           httpBatchLink({
             url: `${env.PUBLIC_BASE_URL}api/trpc`,
+            transformer: superjson,
           }),
         ],
-        transformer: superjson,
       }),
     }),
     []
