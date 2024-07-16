@@ -19,7 +19,6 @@ export default function PostComponent({
     {
       initialData: initialValue,
       refetchOnMount: true,
-      queryKey: ["getPost", { postId: initialValue.id }],
     }
   );
   const searchParams = useSearchParams();
