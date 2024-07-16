@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { trpc } from "../_trpc/client";
 import { httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
+import { env } from "@/env/client.mjs";
 
 export default function ClientProvider({
   children,
@@ -17,7 +18,7 @@ export default function ClientProvider({
       trpcClient: trpc.createClient({
         links: [
           httpBatchLink({
-            url: `/api/trpc`,
+            url: `${env.PUBLIC_BASE_URL}api/trpc`,
           }),
         ],
         transformer: superjson,
