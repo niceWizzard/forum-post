@@ -3,7 +3,15 @@ import { RawComment, ReplyComment } from "../schema/types";
 import { cache } from "react";
 import { ApiError } from "@/server/apiErrors";
 import { db } from "../index";
-import { asc, countDistinct, desc, eq, sql } from "drizzle-orm";
+import {
+  asc,
+  countDistinct,
+  desc,
+  eq,
+  isNotNull,
+  isNull,
+  sql,
+} from "drizzle-orm";
 import { commentLikeTable, commentTable } from "../schema/comment";
 import { getAuth } from "@/server/auth";
 import { userTable } from "../schema";
@@ -47,7 +55,6 @@ export const getCommentReplies = cache(
           replyToId: commentId,
           isLiked: user ? v.isLiked : null,
           likeCount: v.likeCount,
-          replyCount: v.replyCount,
           commenter: v.user,
         })),
       });
