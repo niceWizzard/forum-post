@@ -1,5 +1,3 @@
-"use client";
-
 import ServerProvider from "./ServerProvider";
 
 export default function MyProvider({
