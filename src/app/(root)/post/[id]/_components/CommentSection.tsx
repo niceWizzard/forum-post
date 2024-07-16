@@ -6,7 +6,6 @@ import {
   type Comment,
   PostWithComments,
   ReplyComment,
-  SortOrder,
   SortType,
 } from "@/server/db/schema/types";
 import { CommentForm } from "./CommentForm";
@@ -17,12 +16,11 @@ import { deleteComment, toggleLikeComment } from "@/server/db/actions/comment";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { useUserStore } from "@/store/userStore";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { LoadingButton } from "@/components/ui/loadingButton";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -41,7 +39,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ArrowDown, ArrowUp, Heart, ThumbsUp } from "lucide-react";
+import { ArrowDown, ArrowUp, Heart } from "lucide-react";
 import { ApiResponse } from "@/server/apiResponse";
 
 interface Props {
@@ -86,7 +84,7 @@ function CommentSortButton() {
 
   function onSortButtonClick(val: SortType): void {
     const currentParams = new URLSearchParams(
-      Array.from(searchParams.entries())
+      Array.from(searchParams.entries()),
     );
     currentParams.set("sort", val);
     if (sort == val) {
@@ -141,7 +139,7 @@ function CommentSortButton() {
 const toUrlPath = (
   pageNum: number,
   searchParams: ReadonlyURLSearchParams,
-  path: string
+  path: string,
 ): string => {
   const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
   currentParams.set("commentPage", String(pageNum));
@@ -260,7 +258,7 @@ function Comment({ comment }: { comment: Comment }) {
             onClick={async () => {
               const res: ApiResponse<ReplyComment[]> = await (
                 await fetch(
-                  `${env.PUBLIC_BASE_URL}api/replies?commentId=${comment.id}`
+                  `${env.PUBLIC_BASE_URL}api/replies?commentId=${comment.id}`,
                 )
               ).json();
               if (res.error) {
