@@ -17,10 +17,11 @@ import { LoadingButton } from "@/components/ui/loadingButton";
 
 import { env } from "@/env/client.mjs";
 
-import { Heart } from "lucide-react";
+import { Divide, Heart } from "lucide-react";
 import { ApiResponse } from "@/server/apiResponse";
 import { Input } from "@/components/ui/input";
 import { useEffectUpdate } from "@/lib/utils";
+import { trpc } from "@/app/_trpc/client";
 
 export function Comment({ comment }: { comment: Comment }) {
   const user = useUserStore((v) => v.user);
@@ -36,25 +37,15 @@ export function Comment({ comment }: { comment: Comment }) {
   }, 300);
 
   const [isDeleting, setIsDeleting] = useState(false);
-  const [replies, setReplies] = useState<ReplyComment[]>([]);
+  const { refetch: fetchReplies, data: replies } =
+    trpc.getCommentReplies.useQuery(comment.id, {
+      enabled: false,
+    });
   const [showReplyForm, setShowReplyForm] = useState(false);
 
   useEffectUpdate(() => {
     fetchReplies();
   }, [comment.replyCount]);
-
-  const fetchReplies = async () => {
-    const res: ApiResponse<ReplyComment[]> = await (
-      await fetch(`${env.PUBLIC_BASE_URL}api/replies?commentId=${comment.id}`)
-    ).json();
-    if (res.error) {
-      toast.error("An error has occurred", {
-        description: res.message,
-      });
-      return;
-    }
-    setReplies(res.data);
-  };
 
   return (
     <div className="space-y-2 py-2">
@@ -106,7 +97,7 @@ export function Comment({ comment }: { comment: Comment }) {
 
         {comment.replyToId == null &&
           comment.replyCount > 0 &&
-          replies.length == 0 && (
+          replies == undefined && (
             <Button
               variant="ghost"
               onClick={() => {
@@ -120,8 +111,8 @@ export function Comment({ comment }: { comment: Comment }) {
           <Button
             variant="ghost"
             onClick={async () => {
-              replies.length == 0 && (await fetchReplies());
               setShowReplyForm(true);
+              replies == null && (await fetchReplies());
             }}
           >
             Reply
@@ -130,11 +121,10 @@ export function Comment({ comment }: { comment: Comment }) {
       </div>
       {showReplyForm && <CommentReplyForm comment={comment} />}
       <div className="flex flex-col px-6 divide-y bg-card">
-        {replies
-          .map((v) => ({ ...v, replyCount: 0 }))
-          .map((reply) => (
-            <Comment comment={reply} key={reply.id} />
-          ))}
+        {replies &&
+          replies
+            .map((v) => ({ ...v, replyCount: 0 }))
+            .map((reply) => <Comment comment={reply} key={comment.id} />)}
       </div>
     </div>
   );

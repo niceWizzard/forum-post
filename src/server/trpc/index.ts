@@ -4,6 +4,7 @@ import { publicProcedure, router } from "./trpc";
 import { getPostByIdWithNoComment } from "../db/queries/post";
 import { Post } from "../db/schema/types";
 import { handleUsernameCheck } from "../db/queries/user";
+import { getCommentReplies } from "../db/queries/comment";
 
 export const appRouter = router({
   getPost: publicProcedure
@@ -27,6 +28,15 @@ export const appRouter = router({
         ? handleForumCheck(input.name)
         : handleUsernameCheck(input.name));
       return res;
+    }),
+  getCommentReplies: publicProcedure
+    .input(z.string().min(1))
+    .query(async ({ input: commentId }) => {
+      const res = await getCommentReplies(commentId);
+      if (res.error) {
+        throw new Error(res.message);
+      }
+      return res.data;
     }),
 });
 

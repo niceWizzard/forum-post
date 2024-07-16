@@ -38,16 +38,16 @@ export const getCommentReplies = cache(
     try {
       const { user } = await getAuth();
       const res = await fetchComment(user?.id ?? null)
-        .where(eq(commentTable.id, commentId))
+        .where(eq(commentTable.replyToId, commentId))
         .orderBy(asc(commentTable.createdAt));
 
       return ApiRes.success({
         data: res.map((v) => ({
           ...v.comment,
           replyToId: commentId,
-          isLiked: null,
-          likeCount: 0,
-          replyCount: 0,
+          isLiked: user ? v.isLiked : null,
+          likeCount: v.likeCount,
+          replyCount: v.replyCount,
           commenter: v.user,
         })),
       });
