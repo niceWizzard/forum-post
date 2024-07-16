@@ -66,7 +66,7 @@ export function fetchComment(userId: string | null) {
     .select({
       user: { ...userTable },
       comment: { ...commentTable },
-      likeCount: sql<number>`COUNT(DISTINCT ${commentLikeTable.userId}) AS like_count`,
+      likeCount: sql<number>`CAST(COUNT(DISTINCT ${commentLikeTable.userId}) AS INT) AS like_count`,
       isLiked: sql<boolean>`SUM( CASE
     WHEN ${commentLikeTable.userId} = ${
         userId ?? "11111111-1111-1111-1111-1ce992f5e2db"
