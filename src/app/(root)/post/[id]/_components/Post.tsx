@@ -7,12 +7,21 @@ import PostButtons from "./PostButtons";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import CommentSection from "./comment/CommentSection";
+import { trpc } from "@/app/_trpc/client";
 
 export default function PostComponent({
-  initialValue: post,
+  initialValue,
 }: {
   initialValue: PostWithComments;
 }) {
+  const { data: post, refetch } = trpc.getPost.useQuery(
+    { postId: initialValue.id },
+    {
+      initialData: initialValue,
+      refetchOnMount: true,
+      queryKey: ["getPost", { postId: initialValue.id }],
+    }
+  );
   const searchParams = useSearchParams();
   const commentPageNumber = useMemo(() => {
     const a = searchParams.get("commentPage");
@@ -43,9 +52,9 @@ export default function PostComponent({
         </div>
         <div className="py-2 flex flex-col gap-4">
           <PostBody postBody={post.body} />
-          <PostButtons post={post} />
+          <PostButtons post={post} refetch={refetch} />
         </div>
-        <CommentSection post={post} pageNumber={commentPageNumber} />
+        <CommentSection post={initialValue} pageNumber={commentPageNumber} />
       </div>
     </section>
   );
