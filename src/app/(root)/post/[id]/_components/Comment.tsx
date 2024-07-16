@@ -104,17 +104,19 @@ export function Comment({ comment }: { comment: Comment }) {
           {<Heart fill={comment.isLiked ? "currentColor" : ""} />}
         </Button>
 
-        {comment.replyCount > 0 && replies.length == 0 && (
-          <Button
-            variant="ghost"
-            onClick={() => {
-              fetchReplies();
-            }}
-          >
-            {comment.replyCount} replies
-          </Button>
-        )}
-        {!showReplyForm && (
+        {comment.replyToId == null &&
+          comment.replyCount > 0 &&
+          replies.length == 0 && (
+            <Button
+              variant="ghost"
+              onClick={() => {
+                fetchReplies();
+              }}
+            >
+              {comment.replyCount} replies
+            </Button>
+          )}
+        {comment.replyToId == null && !showReplyForm && (
           <Button
             variant="ghost"
             onClick={async () => {
