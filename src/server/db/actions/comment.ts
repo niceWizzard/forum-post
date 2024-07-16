@@ -197,6 +197,8 @@ export const replyToComment = async (
       replyToId: replyToId ?? commentId,
     });
 
+    revalidatePath(`/post/${comment.postId}`);
+
     return ApiRes.success({
       data: true,
     });
