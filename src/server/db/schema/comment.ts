@@ -30,7 +30,7 @@ export const commentTable = pgTable(
     replyReference: foreignKey({
       columns: [table.replyToId],
       foreignColumns: [table.id],
-    }),
+    }).onDelete("cascade"),
   })
 );
 
