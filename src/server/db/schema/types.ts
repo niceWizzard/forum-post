@@ -11,7 +11,7 @@ export type Forum = RawForum & {
   forumMembersCount: number;
   isJoined: boolean | null;
 };
-export type MinimizedForum = Pick<RawForum, "id" | "name">;
+export type MinimizedForum = Pick<RawForum, "id" | "name" | "ownerId">;
 export type Post = InferSelectModel<typeof postTable> & {
   forum: MinimizedForum;
   poster: User | null;
@@ -74,9 +74,10 @@ export function exposeUserType(user: PrivateUser): User {
 }
 
 export function minimizeData(forum: Forum): MinimizedForum {
-  const { id, name } = forum;
+  const { id, name, ownerId } = forum;
   return {
     id,
     name,
+    ownerId,
   };
 }

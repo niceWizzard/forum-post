@@ -9,6 +9,7 @@ import { ApiError } from "@/server/apiErrors";
 import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "../";
+import { forumTable } from "../schema/forum";
 
 export const unlikePost = async (postId: string) => {
   try {
@@ -127,27 +128,29 @@ export const deletePost = async (postId: string) => {
       });
     }
 
-    const post = await db.query.postTable.findFirst({
-      where: eq(postTable.id, postId),
-    });
+    const res = await db
+      .select()
+      .from(postTable)
+      .where(eq(postTable.id, postId))
+      .leftJoin(forumTable, eq(forumTable.id, postTable.forumId));
 
-    if (!post) {
+    if (res.length == 0) {
       return ApiRes.error({
         message: "No such post found",
         code: ApiError.PostNotFound,
       });
     }
 
-    if (post.posterId !== user.id) {
+    const { post, forum } = res[0];
+
+    if (forum?.ownerId !== user.id && post.posterId !== user.id) {
       return ApiRes.error({
         message: "Unauthorized to delete the post.",
         code: ApiError.Unathorized,
       });
     }
 
-    await db
-      .delete(postTable)
-      .where(and(eq(postTable.posterId, user.id), eq(postTable.id, postId)));
+    await db.delete(postTable).where(eq(postTable.id, postId));
 
     revalidatePath(`/post/${postId}`);
     revalidatePath(`/forum/${post.forumId}`);
