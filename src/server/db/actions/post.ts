@@ -128,7 +128,7 @@ export const deletePost = async (postId: string) => {
     }
 
     const post = await db.query.postTable.findFirst({
-      where: and(eq(postTable.id, postId), eq(postTable.posterId, user.id)),
+      where: eq(postTable.id, postId),
     });
 
     if (!post) {
