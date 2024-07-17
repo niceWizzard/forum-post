@@ -146,13 +146,6 @@ export const getPostByIdWithNoComment = cache(
   }
 );
 
-function checkIsLiked(userId?: string | null) {
-  return sql<boolean>`SUM( CASE
-           WHEN ${postLikeTable.userId} = ${
-    userId ?? "11111111-1111-1111-1111-1ce992f5e2db"
-  } THEN 1 ELSE 0 END) > 0`;
-}
-
 export function fetchPost(userId: string | null) {
   return db
     .select({
@@ -160,7 +153,10 @@ export function fetchPost(userId: string | null) {
         postLikeTable.userId
       )} as int) as like_count`,
       commentCount: countDistinct(commentTable),
-      isLiked: checkIsLiked(userId),
+      isLiked: sql<boolean>`SUM( CASE
+      WHEN ${postLikeTable.userId} = ${
+        userId ?? "11111111-1111-1111-1111-1ce992f5e2db"
+      } THEN 1 ELSE 0 END) > 0`,
       user: { ...userTable },
       post: { ...postTable },
       forum: { ...forumTable },
