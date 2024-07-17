@@ -18,8 +18,7 @@ export default function ForumSettings({ forum }: { forum: Forum }) {
   const user = useUserStore((v) => v.user);
   const [isDeletingForum, setisDeletingForum] = useState(false);
   const router = useRouter();
-
-  if (!user || !forum.isOwner) return null;
+  if (!user || (!forum.isOwner && !forum.isAdmin)) return null;
 
   async function onDeleteForum() {
     setisDeletingForum(true);
@@ -43,13 +42,15 @@ export default function ForumSettings({ forum }: { forum: Forum }) {
       </PopoverTrigger>
       <PopoverContent>
         <div className="flex flex-col gap-2">
-          <LoadingButton
-            isLoading={isDeletingForum}
-            loadingText="Deleting..."
-            onClick={onDeleteForum}
-          >
-            Delete forum
-          </LoadingButton>
+          {user && forum.isOwner && (
+            <LoadingButton
+              isLoading={isDeletingForum}
+              loadingText="Deleting..."
+              onClick={onDeleteForum}
+            >
+              Delete forum
+            </LoadingButton>
+          )}
         </div>
       </PopoverContent>
     </Popover>
