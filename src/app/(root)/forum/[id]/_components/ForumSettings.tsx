@@ -19,7 +19,7 @@ export default function ForumSettings({ forum }: { forum: Forum }) {
   const [isDeletingForum, setisDeletingForum] = useState(false);
   const router = useRouter();
 
-  if (!user || forum.ownerId !== user.id) return null;
+  if (!user || !forum.isOwner) return null;
 
   async function onDeleteForum() {
     setisDeletingForum(true);

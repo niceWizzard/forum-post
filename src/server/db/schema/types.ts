@@ -7,11 +7,13 @@ import { commentTable } from "./comment";
 type StrictOmit<T, K extends keyof T> = Omit<T, K>;
 
 export type RawForum = InferSelectModel<typeof forumTable>;
-export type Forum = RawForum & {
+export type Forum = StrictOmit<RawForum, "ownerId"> & {
   forumMembersCount: number;
   isJoined: boolean | null;
+  isOwner: boolean | null;
+  isAdmin: boolean | null;
 };
-export type MinimizedForum = Pick<RawForum, "id" | "name" | "ownerId">;
+export type MinimizedForum = Pick<Forum, "id" | "name" | "isOwner" | "isAdmin">;
 export type Post = InferSelectModel<typeof postTable> & {
   forum: MinimizedForum;
   poster: User | null;
@@ -74,10 +76,11 @@ export function exposeUserType(user: PrivateUser): User {
 }
 
 export function minimizeData(forum: Forum): MinimizedForum {
-  const { id, name, ownerId } = forum;
+  const { id, name, isOwner, isAdmin } = forum;
   return {
     id,
     name,
-    ownerId,
+    isOwner,
+    isAdmin,
   };
 }

@@ -74,7 +74,11 @@ export const getPostById = cache(
       return ApiRes.success({
         data: {
           poster,
-          forum,
+          forum: {
+            ...forum,
+            isAdmin: null,
+            isOwner: null,
+          },
           isLiked,
           initialComments: rawComments.map(
             ({ user, comment, likeCount, ...v }) => {
@@ -120,7 +124,11 @@ export const getPostByIdWithNoComment = cache(
       const data: Post = {
         ...v.post,
         poster: v.user ? exposeUserType(v.user) : null,
-        forum: v.forum!,
+        forum: {
+          ...v.forum!,
+          isAdmin: null,
+          isOwner: null,
+        },
         isLiked: v.isLiked,
         likeCount: v.likeCount,
         commentCount: v.commentCount,
