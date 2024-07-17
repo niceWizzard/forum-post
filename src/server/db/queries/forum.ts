@@ -10,7 +10,7 @@ import {
   isNull,
   asc,
 } from "drizzle-orm";
-import { forumMemberTable, forumTable } from "../schema/forum";
+import { forumAdminTable, forumMemberTable, forumTable } from "../schema/forum";
 import { postLikeTable, postTable } from "../schema/post";
 import { cache } from "react";
 import { userTable } from "../schema";
@@ -65,6 +65,17 @@ export const getCreatedForums = cache(async (userId: string) => {
 });
 
 export function fetchForum(userId: string | null) {
+  const id = userId ?? "11111111-1111-1111-1111-1ce992f5e2db";
+  const isAdminSubQuery = db
+    .select({})
+    .from(forumAdminTable)
+    .where(
+      and(
+        eq(forumAdminTable.forumId, forumTable.id),
+        eq(forumAdminTable.adminId, id)
+      )
+    )
+    .as("isAdmin");
   return db
     .select({
       forumMembersCount: sql<number>`${count(
@@ -72,9 +83,9 @@ export function fetchForum(userId: string | null) {
       )} as forum_members_count`,
       forum: { ...forumTable },
       isJoined: sql<boolean>`SUM( CASE
-      WHEN ${forumMemberTable.userId} = ${
-        userId ?? "11111111-1111-1111-1111-1ce992f5e2db"
-      } THEN 1 ELSE 0 END) > 0 AS is_joined`,
+      WHEN ${forumMemberTable.userId} = ${id} THEN 1 ELSE 0 END) > 0 AS is_joined`,
+      isOwner: sql<boolean>`${eq(forumTable.ownerId, id)}`,
+      isAdmin: sql<boolean>`EXISTS ${isAdminSubQuery}`,
     })
     .from(forumTable)
     .leftJoin(forumMemberTable, eq(forumMemberTable.forumId, forumTable.id))
@@ -96,13 +107,17 @@ export const getForumById = cache(
           code: ApiError.ForumNotFound,
         });
       }
-
+      ``;
       let isJoined: boolean | null = user ? res[0].isJoined : null;
+      const isAdmin = user ? res[0].isAdmin : null;
+      const isOwner = user ? res[0].isOwner : null;
       return ApiRes.success({
         data: {
           forumMembersCount: res[0].forumMembersCount,
           isJoined,
           ...res[0].forum,
+          isAdmin,
+          isOwner,
         },
       });
     } catch (e) {
@@ -148,6 +163,8 @@ export const getForumPosts = cache(
           forum: {
             name,
             id,
+            isAdmin: null,
+            isOwner: null,
           },
           likeCount: v.likeCount,
           commentCount: v.commentCount,
@@ -189,6 +206,8 @@ export const getTrendingForums = cache(
           ...v.forum,
           forumMembersCount: v.forumMembersCount,
           isJoined: null,
+          isAdmin: null,
+          isOwner: null,
         })),
       });
     } catch (e) {
