@@ -64,18 +64,20 @@ export const getCreatedForums = cache(async (userId: string) => {
   }
 });
 
-export function fetchForum(userId: string | null) {
-  const id = userId ?? "11111111-1111-1111-1111-1ce992f5e2db";
-  const isAdminSubQuery = db
+export const createIsAdminSubQuery = (userId: string) =>
+  db
     .select({})
     .from(forumAdminTable)
     .where(
       and(
         eq(forumAdminTable.forumId, forumTable.id),
-        eq(forumAdminTable.adminId, id)
+        eq(forumAdminTable.adminId, userId)
       )
     )
     .as("isAdmin");
+
+export function fetchForum(userId: string | null) {
+  const id = userId ?? "11111111-1111-1111-1111-1ce992f5e2db";
   return db
     .select({
       forumMembersCount: sql<number>`${count(
@@ -85,7 +87,7 @@ export function fetchForum(userId: string | null) {
       isJoined: sql<boolean>`SUM( CASE
       WHEN ${forumMemberTable.userId} = ${id} THEN 1 ELSE 0 END) > 0 AS is_joined`,
       isOwner: sql<boolean>`${eq(forumTable.ownerId, id)}`,
-      isAdmin: sql<boolean>`EXISTS ${isAdminSubQuery}`,
+      isAdmin: sql<boolean>`EXISTS ${createIsAdminSubQuery(id)}`,
     })
     .from(forumTable)
     .leftJoin(forumMemberTable, eq(forumMemberTable.forumId, forumTable.id))
