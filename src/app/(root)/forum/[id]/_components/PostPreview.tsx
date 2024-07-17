@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { likePost, unlikePost } from "@/server/db/actions/post";
 import { type Post } from "@/server/db/schema/types";
 import clsx from "clsx";
-import { formatDistanceToNowStrict } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { Heart } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -48,7 +48,7 @@ function PostPreview({ post }: { post: Post }) {
               @{post.poster ? post.poster.username ?? "no username" : "deleted"}
             </span>
             <span className="ml-4">
-              {formatDistanceToNowStrict(new Date(post.createdAt), {
+              {formatDistanceToNow(new Date(post.createdAt), {
                 addSuffix: true,
               })}
             </span>
