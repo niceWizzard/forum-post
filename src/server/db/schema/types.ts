@@ -3,6 +3,7 @@ import { forumTable } from "./forum";
 import { postTable } from "./post";
 import { userTable } from ".";
 import { commentTable } from "./comment";
+import { notificationTable } from "./notification";
 
 type StrictOmit<T, K extends keyof T> = Omit<T, K>;
 
@@ -24,6 +25,8 @@ export type Post = InferSelectModel<typeof postTable> & {
 export type PostWithComments = Post & {
   initialComments: Comment[];
 };
+
+export type Notification = InferSelectModel<typeof notificationTable>;
 
 export type SortType = "newest" | "likes";
 
