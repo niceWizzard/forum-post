@@ -156,8 +156,6 @@ export const toggleLikeComment = async (
         );
     }
 
-    revalidatePath(`/post/${comment.postId}`);
-
     return ApiRes.success({
       data: !likeExists,
     });
