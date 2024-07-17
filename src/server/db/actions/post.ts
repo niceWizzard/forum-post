@@ -10,6 +10,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "../";
 import { forumTable } from "../schema/forum";
+import { fetchPost, getPostByIdWithNoComment } from "../queries/post";
 
 export const unlikePost = async (postId: string) => {
   try {
@@ -128,22 +129,15 @@ export const deletePost = async (postId: string) => {
       });
     }
 
-    const res = await db
-      .select()
-      .from(postTable)
-      .where(eq(postTable.id, postId))
-      .leftJoin(forumTable, eq(forumTable.id, postTable.forumId));
+    const res = await getPostByIdWithNoComment(postId);
 
-    if (res.length == 0) {
-      return ApiRes.error({
-        message: "No such post found",
-        code: ApiError.PostNotFound,
-      });
+    if (res.error) {
+      return res;
     }
 
-    const { post, forum } = res[0];
+    const { forum, ...post } = res.data;
 
-    if (forum?.ownerId !== user.id && post.posterId !== user.id) {
+    if (post.posterId !== user.id && !forum.isAdmin && !forum.isOwner) {
       return ApiRes.error({
         message: "Unauthorized to delete the post.",
         code: ApiError.Unathorized,

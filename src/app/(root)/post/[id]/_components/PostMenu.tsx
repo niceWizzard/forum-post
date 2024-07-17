@@ -25,28 +25,31 @@ export default function PostMenu({ post }: { post: Post }) {
       </PopoverTrigger>
       <PopoverContent>
         <div className="flex flex-col">
-          {user && (user.id === post.posterId || post.forum.isOwner) && (
-            <LoadingButton
-              className="mt-2"
-              onClick={async () => {
-                if (isDeleting) return;
-                setIsDeleting(true);
-                const res = await deletePost(post.id);
-                if (res.error) {
-                  console.error(res);
-                  toast.error("An error has occurred", {
-                    description: res.message,
-                  });
-                  return;
-                }
-                router.push(`/forum/${post.forumId}`);
-              }}
-              isLoading={isDeleting}
-              loadingText="Deleting..."
-            >
-              Delete
-            </LoadingButton>
-          )}
+          {user &&
+            (user.id === post.posterId ||
+              post.forum.isOwner ||
+              post.forum.isAdmin) && (
+              <LoadingButton
+                className="mt-2"
+                onClick={async () => {
+                  if (isDeleting) return;
+                  setIsDeleting(true);
+                  const res = await deletePost(post.id);
+                  if (res.error) {
+                    console.error(res);
+                    toast.error("An error has occurred", {
+                      description: res.message,
+                    });
+                    return;
+                  }
+                  router.push(`/forum/${post.forumId}`);
+                }}
+                isLoading={isDeleting}
+                loadingText="Deleting..."
+              >
+                Delete
+              </LoadingButton>
+            )}
         </div>
       </PopoverContent>
     </Popover>

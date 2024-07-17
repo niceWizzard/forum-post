@@ -28,6 +28,7 @@ import { ApiError } from "@/server/apiErrors";
 import { commentLikeTable, commentTable } from "../schema/comment";
 import { isTuple } from "@/lib/utils.server";
 import { fetchComment } from "./comment";
+import { createIsAdminSubQuery } from "./forum";
 
 export const getPostById = cache(
   async ({
@@ -76,8 +77,8 @@ export const getPostById = cache(
           poster,
           forum: {
             ...forum,
-            isAdmin: null,
-            isOwner: null,
+            isAdmin: user ? data.forumData.isAdmin : null,
+            isOwner: user ? data.forumData.isOwner : null,
           },
           isLiked,
           initialComments: rawComments.map(
@@ -126,8 +127,8 @@ export const getPostByIdWithNoComment = cache(
         poster: v.user ? exposeUserType(v.user) : null,
         forum: {
           ...v.forum!,
-          isAdmin: null,
-          isOwner: null,
+          isAdmin: v.user ? v.forumData.isAdmin : null,
+          isOwner: v.user ? v.forumData.isOwner : null,
         },
         isLiked: v.isLiked,
         likeCount: v.likeCount,
@@ -147,6 +148,7 @@ export const getPostByIdWithNoComment = cache(
 );
 
 export function fetchPost(userId: string | null) {
+  const safeId = userId ?? "11111111-1111-1111-1111-1ce992f5e2db";
   return db
     .select({
       likeCount: sql<number>`cast(${countDistinct(
@@ -154,12 +156,16 @@ export function fetchPost(userId: string | null) {
       )} as int) as like_count`,
       commentCount: countDistinct(commentTable),
       isLiked: sql<boolean>`SUM( CASE
-      WHEN ${postLikeTable.userId} = ${
-        userId ?? "11111111-1111-1111-1111-1ce992f5e2db"
-      } THEN 1 ELSE 0 END) > 0`,
+      WHEN ${postLikeTable.userId} = ${safeId} THEN 1 ELSE 0 END) > 0`,
       user: { ...userTable },
       post: { ...postTable },
-      forum: { ...forumTable },
+      forum: {
+        ...forumTable,
+      },
+      forumData: {
+        isOwner: sql<boolean>`${eq(forumTable.ownerId, safeId)}`,
+        isAdmin: sql<boolean>`EXISTS ${createIsAdminSubQuery(safeId)}`,
+      },
     })
     .from(postTable)
     .leftJoin(userTable, eq(userTable.id, postTable.posterId))
