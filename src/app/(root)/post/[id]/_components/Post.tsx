@@ -40,7 +40,10 @@ export default function PostComponent({
               f/{post.forum.name}
             </Link>
             &middot;
-            <Link href={`/profile/${post.posterId}`} className="underline">
+            <Link
+              href={post.poster ? `/profile/${post.posterId}` : "#"}
+              className="underline"
+            >
               {" "}
               @{post.poster?.username ?? "deleted"}
             </Link>

@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { likePost, unlikePost } from "@/server/db/actions/post";
 import { type Post } from "@/server/db/schema/types";
+import clsx from "clsx";
 import { formatDistanceToNowStrict } from "date-fns";
 import { Heart } from "lucide-react";
 import Link from "next/link";
@@ -20,7 +21,7 @@ function PostPreview({ post }: { post: Post }) {
         router.push(`/forum/${post.forumId}`);
         break;
       case "username":
-        router.push(`/profile/${post.posterId}`);
+        post.poster && router.push(`/profile/${post.posterId}`);
         break;
     }
   }
@@ -39,7 +40,9 @@ function PostPreview({ post }: { post: Post }) {
             </span>
             ·
             <span
-              className="hover:underline"
+              className={clsx({
+                "hover:underline": !!post.poster,
+              })}
               onClick={(e) => onInnerClick(e, "username")}
             >
               @{post.poster ? post.poster.username ?? "no username" : "deleted"}
