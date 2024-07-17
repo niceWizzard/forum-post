@@ -1,11 +1,12 @@
 "use server";
 import { getAuth } from "@/server/auth";
 import { db } from "../index";
-import { forumMemberTable, forumTable } from "../schema/forum";
+import { forumAdminTable, forumMemberTable, forumTable } from "../schema/forum";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { userTable } from "../schema";
 
 export async function createForum({
   forumDesc,
@@ -187,6 +188,71 @@ export async function deleteForum(
 
     revalidatePath(`/forum/${forumId}`);
     revalidatePath(`/feed`);
+
+    return ApiRes.success({
+      data: true,
+    });
+  } catch (e) {
+    const err = e as Error;
+    return ApiRes.error({
+      message: err.message,
+      code: ApiError.UnknownError,
+    });
+  }
+}
+
+export async function assignAdmin(
+  forumId: string,
+  username: string
+): Promise<ApiResponse<boolean>> {
+  try {
+    const { user } = await getAuth();
+    if (!user) {
+      return ApiRes.error({
+        message: "Please login",
+        code: ApiError.AuthRequired,
+      });
+    }
+
+    const forum = await db.query.forumTable.findFirst({
+      where: eq(forumTable.id, forumId),
+    });
+
+    if (forum?.ownerId !== user.id) {
+      return ApiRes.error({
+        message: "Only creators can assign administrators.",
+        code: ApiError.Unathorized,
+      });
+    }
+
+    const userExists = await db.query.userTable.findFirst({
+      where: eq(userTable.username, username),
+    });
+
+    if (!userExists) {
+      return ApiRes.error({
+        message: "User assigning to be admin not found.",
+        code: ApiError.UserNotFound,
+      });
+    }
+
+    const res = await db
+      .insert(forumAdminTable)
+      .values({
+        forumId,
+        adminId: userExists.id,
+      })
+      .onConflictDoNothing()
+      .returning();
+
+    if (res.length == 0) {
+      return ApiRes.error({
+        message: "User already assigned as admin.",
+        code: ApiError.UserAlreadyExists,
+      });
+    }
+
+    revalidatePath(`/forum/${forumId}`);
 
     return ApiRes.success({
       data: true,
