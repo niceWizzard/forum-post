@@ -23,32 +23,54 @@ import { Input } from "@/components/ui/input";
 import { useEffectUpdate } from "@/lib/utils";
 import { trpc } from "@/app/_trpc/client";
 import { RSC_PREFETCH_SUFFIX } from "next/dist/lib/constants";
+import { Trocchi } from "next/font/google";
 
 export function Comment({
-  comment,
+  comment: initialData,
   onDelete,
+  utils,
 }: {
   comment: Comment;
   onDelete?: () => void;
+  utils: ReturnType<typeof trpc.useUtils>;
 }) {
   const user = useUserStore((v) => v.user);
-  const onLikeButtonClick = useDebouncedCallback(async () => {
-    const res = await toggleLikeComment(comment.id);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { refetch: fetchReplies, data: replies } =
+    trpc.getCommentReplies.useQuery(initialData.id, {
+      enabled: false,
+    });
+  const { data: comment, refetch: refetchCommentData } =
+    trpc.getComment.useQuery(initialData.id, {
+      initialData,
+      refetchOnMount: false,
+      enabled: false,
+    });
+  const [showReplyForm, setShowReplyForm] = useState(false);
 
+  const onLikeButtonClick = useDebouncedCallback(async () => {
+    utils.getComment.cancel(comment.id);
+    const originalData = utils.getComment.getData();
+    utils.getComment.setData(comment.id, (old) =>
+      !old
+        ? undefined
+        : {
+            ...old,
+            isLiked: old.isLiked == null ? null : !old.isLiked,
+            likeCount: old?.isLiked ? old.likeCount - 1 : old.likeCount + 1,
+          }
+    );
+    const res = await toggleLikeComment(comment.id);
     if (res.error) {
+      utils.getComment.setData(comment.id, originalData);
       toast.error("An error has occurred", {
         description: res.message,
       });
       return;
     }
+    refetchCommentData();
   }, 300);
 
-  const [isDeleting, setIsDeleting] = useState(false);
-  const { refetch: fetchReplies, data: replies } =
-    trpc.getCommentReplies.useQuery(comment.id, {
-      enabled: false,
-    });
-  const [showReplyForm, setShowReplyForm] = useState(false);
   return (
     <div className="space-y-2 py-2">
       <div className="flex justify-between w-full">
@@ -131,7 +153,12 @@ export function Comment({
           replies
             .map((v) => ({ ...v, replyCount: 0 }))
             .map((reply) => (
-              <Comment comment={reply} key={reply.id} onDelete={fetchReplies} />
+              <Comment
+                comment={reply}
+                key={reply.id}
+                onDelete={fetchReplies}
+                utils={utils}
+              />
             ))}
       </div>
     </div>

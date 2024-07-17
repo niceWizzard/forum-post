@@ -1,5 +1,10 @@
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
-import { RawComment, ReplyComment } from "../schema/types";
+import {
+  Comment,
+  RawComment,
+  ReplyComment,
+  exposeUserType,
+} from "../schema/types";
 import { cache } from "react";
 import { ApiError } from "@/server/apiErrors";
 import { db } from "../index";
@@ -57,6 +62,52 @@ export const getCommentReplies = cache(
           likeCount: v.likeCount,
           commenter: v.user,
         })),
+      });
+    } catch (e) {
+      const err = e as Error;
+      return ApiRes.error({
+        message: err.message,
+        code: ApiError.UnknownError,
+      });
+    }
+  }
+);
+
+export const getCommentById = cache(
+  async (commentId: string): Promise<ApiResponse<Comment>> => {
+    try {
+      const { user } = await getAuth();
+      const res = await fetchComment(user?.id ?? null).where(
+        eq(commentTable.id, commentId)
+      );
+      if (res.length == 0) {
+        return ApiRes.error({
+          message: "Comment not found",
+          code: ApiError.CommentNotFound,
+        });
+      }
+      const {
+        isLiked,
+        likeCount,
+        replyCount,
+        user: commenter,
+        ...data
+      } = res[0];
+      const comment: Comment = {
+        ...data.comment,
+        isLiked,
+        likeCount,
+        replyCount,
+        commenter: commenter ? exposeUserType(commenter) : null,
+      };
+      if (!comment) {
+        return ApiRes.error({
+          message: "Comment not found",
+          code: ApiError.CommentNotFound,
+        });
+      }
+      return ApiRes.success({
+        data: comment,
       });
     } catch (e) {
       const err = e as Error;

@@ -20,6 +20,7 @@ import {
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { PaginationRow } from "../PaginationRow";
 import { Comment } from "./Comment";
+import { trpc } from "@/app/_trpc/client";
 
 interface Props {
   post: PostWithComments;
@@ -27,6 +28,7 @@ interface Props {
 }
 
 export default function CommentSection({ post, pageNumber }: Props) {
+  const utils = trpc.useUtils();
   return (
     <section className="">
       <div className="border-b pb-2 flex justify-between">
@@ -36,7 +38,7 @@ export default function CommentSection({ post, pageNumber }: Props) {
       <CommentForm post={post} />
       <div className="flex flex-col gap-3 divide-y divide-foreground-lighter">
         {post.initialComments.map((v) => (
-          <Comment comment={v} key={v.id} />
+          <Comment comment={v} key={v.id} utils={utils} />
         ))}
         {post.initialComments.length === 0 && (
           <div className="text-center text-sm font-light text-foreground-lighter">
