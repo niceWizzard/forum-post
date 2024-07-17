@@ -65,7 +65,6 @@ export const getPostById = cache(
           message: "No such post found",
           code: ApiError.PostNotFound,
         });
-      console.log(rawComments.map((v) => v.comment.replyToId));
       const { likeCount, commentCount, ...data } = res[0];
       const poster = data.user ? exposeUserType(data.user) : null;
       const forum = data.forum!;
