@@ -11,6 +11,7 @@ import { useUserStore } from "@/store/userStore";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function PostMenu({ post }: { post: Post }) {
   const router = useRouter();
@@ -24,21 +25,29 @@ export default function PostMenu({ post }: { post: Post }) {
       </PopoverTrigger>
       <PopoverContent>
         <div className="flex flex-col">
-          {user && user.id === post.posterId && (
-            <LoadingButton
-              className="mt-2"
-              onClick={async () => {
-                if (isDeleting) return;
-                setIsDeleting(true);
-                await deletePost(post.id);
-                router.push(`/forum/${post.forumId}`);
-              }}
-              isLoading={isDeleting}
-              loadingText="Deleting..."
-            >
-              Delete
-            </LoadingButton>
-          )}
+          {user &&
+            (user.id === post.posterId || user.id == post.forum.ownerId) && (
+              <LoadingButton
+                className="mt-2"
+                onClick={async () => {
+                  if (isDeleting) return;
+                  setIsDeleting(true);
+                  const res = await deletePost(post.id);
+                  if (res.error) {
+                    console.error(res);
+                    toast.error("An error has occurred", {
+                      description: res.message,
+                    });
+                    return;
+                  }
+                  router.push(`/forum/${post.forumId}`);
+                }}
+                isLoading={isDeleting}
+                loadingText="Deleting..."
+              >
+                Delete
+              </LoadingButton>
+            )}
         </div>
       </PopoverContent>
     </Popover>
