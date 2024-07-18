@@ -27,6 +27,10 @@ export type PostWithComments = Post & {
 };
 
 export type Notification = InferSelectModel<typeof notificationTable>;
+export type NotificationData = {
+  notifications: Notification[];
+  unreadCount: number;
+};
 
 export type SortType = "newest" | "likes";
 
