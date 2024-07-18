@@ -1,0 +1,1 @@
+ALTER TABLE "notification" ALTER COLUMN "link_to" DROP NOT NULL;

@@ -9,7 +9,7 @@ export const notificationTable = pgTable("notification", {
       onDelete: "cascade",
     }),
   message: varchar("message", { length: 5024 }).notNull(),
-  linkTo: varchar("link_to", { length: 5024 }).notNull(),
+  linkTo: varchar("link_to", { length: 5024 }),
   readAt: timestamp("read_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
