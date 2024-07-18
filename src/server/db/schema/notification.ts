@@ -8,7 +8,7 @@ export const notificationTable = pgTable("notification", {
     .references(() => userTable.id, {
       onDelete: "cascade",
     }),
-  message: varchar("link_to", { length: 5024 }).notNull(),
+  message: varchar("message", { length: 5024 }).notNull(),
   linkTo: varchar("link_to", { length: 5024 }).notNull(),
   readAt: timestamp("read_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

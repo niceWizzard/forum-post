@@ -85,6 +85,13 @@
       "when": 1721267496853,
       "tag": "0011_cold_randall",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1721268653236,
+      "tag": "0012_faithful_bloodstorm",
+      "breakpoints": true
     }
   ]
 }

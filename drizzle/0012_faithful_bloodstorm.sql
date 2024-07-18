@@ -1,0 +1,1 @@
+ALTER TABLE "notification" ADD COLUMN "message" varchar(5024) NOT NULL;
