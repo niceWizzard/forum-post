@@ -9,6 +9,7 @@ import { trpc } from "@/app/_trpc/client";
 import { useEffect, useState } from "react";
 import { setNotifictionAsRead } from "@/server/db/actions/notification";
 import { toast } from "sonner";
+import Link from "next/link";
 
 export default function NotificationsButton({
   user,
@@ -54,12 +55,14 @@ export default function NotificationsButton({
       <PopoverContent>
         <div>
           {notifications.notifications.map((v) => (
-            <div key={v.id}>
-              {String(!!v.readAt)}
-              {v.message}
-            </div>
+            <Link key={v.id} href={v.linkTo ?? "#"}>
+              <div>
+                {String(!!v.readAt)}
+                {v.message}
+              </div>
+            </Link>
           ))}
-          {notifications.notifications.length == 0 && (
+          {notifications.notifications.length === 0 && (
             <span>No notifications.</span>
           )}
         </div>
