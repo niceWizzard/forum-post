@@ -5,6 +5,8 @@ import { getPostByIdWithNoComment } from "../db/queries/post";
 import { Post } from "../db/schema/types";
 import { handleUsernameCheck } from "../db/queries/user";
 import { getCommentById, getCommentReplies } from "../db/queries/comment";
+import { getNotifications } from "../db/queries/notifications";
+import { getAuth } from "../auth";
 
 export const appRouter = router({
   getPost: publicProcedure
@@ -47,6 +49,17 @@ export const appRouter = router({
       }
       return res.data;
     }),
+  getNotifications: publicProcedure.query(async () => {
+    const { user } = await getAuth();
+    if (!user) {
+      return null;
+    }
+    const res = await getNotifications(user.id);
+    if (res.error) {
+      throw new Error(res.message);
+    }
+    return res.data;
+  }),
 });
 
 export type AppRouter = typeof appRouter;

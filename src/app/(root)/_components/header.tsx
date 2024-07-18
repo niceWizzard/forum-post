@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import SideSheet from "./sideSheet";
+import NotificationsButton from "./NotificationsButton";
 
 const Header = () => {
   const { user, isLoading } = useUserStore(({ user, isLoading }) => ({
@@ -20,6 +21,7 @@ const Header = () => {
             <h1 className="text-xl font-semibold">Forum Poster</h1>
           </Link>
           <nav className="flex gap-3 items-center">
+            <NotificationsButton user={user} isLoading={isLoading} />
             {!isLoading &&
               (user ? (
                 <Button onClick={() => setIsOpen(true)} variant="outline">
