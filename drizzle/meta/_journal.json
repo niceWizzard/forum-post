@@ -99,6 +99,13 @@
       "when": 1721309723995,
       "tag": "0013_classy_golden_guardian",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1721368354867,
+      "tag": "0014_mean_solo",
+      "breakpoints": true
     }
   ]
 }
