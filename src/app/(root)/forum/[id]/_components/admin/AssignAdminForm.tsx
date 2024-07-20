@@ -23,6 +23,7 @@ export function AssignAdminForm({ forumId }: { forumId: string }) {
     300
   );
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+  const utils = trpc.useUtils();
 
   const {
     data: searchedUsers,
@@ -67,6 +68,8 @@ export function AssignAdminForm({ forumId }: { forumId: string }) {
       return;
     }
     setSelectedUsers([]);
+    utils.getForumAdmins.refetch(forumId);
+    refetch();
     toast.success("Admins successfully assigned.");
   }
   return (
