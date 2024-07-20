@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { getForumById, handleForumCheck } from "../db/queries/forum";
+import {
+  getForumAdmins,
+  getForumById,
+  handleForumCheck,
+} from "../db/queries/forum";
 import { publicProcedure, router } from "./trpc";
 import { getPostByIdWithNoComment } from "../db/queries/post";
 import { Post } from "../db/schema/types";
@@ -73,6 +77,18 @@ export const appRouter = router({
         throw new Error("Please login");
       }
       const res = await searchUserWithText(input.username, input.exceptionIds);
+      if (res.error) throw new Error(res.message);
+      return res.data;
+    }),
+  getForumAdmins: publicProcedure
+    .input(z.string().min(1, "Forum id is required."))
+    .query(async ({ input: forumId }) => {
+      const { user } = await getAuth();
+      if (!user) throw new Error("Please login.");
+      const res = await getForumAdmins({
+        logginnedUserId: user.id,
+        forumId,
+      });
       if (res.error) throw new Error(res.message);
       return res.data;
     }),
