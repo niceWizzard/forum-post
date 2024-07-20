@@ -266,3 +266,55 @@ export async function assignAdmin(
     });
   }
 }
+
+export async function deleteAdmin(
+  adminId: string,
+  forumId: string
+): Promise<ApiResponse<boolean>> {
+  const { user } = await getAuth();
+  if (!user) {
+    return ApiRes.error({
+      message: "Please login",
+      code: ApiError.AuthRequired,
+    });
+  }
+  try {
+    const forum = await getRawForumById(forumId);
+    if (!forum) {
+      return ApiRes.error({
+        message: "Forum not found",
+        code: ApiError.ForumNotFound,
+      });
+    }
+    if (forum.ownerId !== user.id) {
+      return ApiRes.error({
+        message: "Only creators can delete administrators.",
+        code: ApiError.Unathorized,
+      });
+    }
+    const res = await db
+      .delete(forumAdminTable)
+      .where(
+        and(
+          eq(forumAdminTable.forumId, forumId),
+          eq(forumAdminTable.adminId, adminId)
+        )
+      )
+      .returning();
+    if (res.length == 0) {
+      return ApiRes.error({
+        message: "Admin not found in forum",
+        code: ApiError.UserNotFound,
+      });
+    }
+    return ApiRes.success({
+      data: true,
+    });
+  } catch (e) {
+    const err = e as Error;
+    return ApiRes.error({
+      message: err.message,
+      code: ApiError.UnknownError,
+    });
+  }
+}
