@@ -137,11 +137,11 @@ function AssignAdminDialog({ forumId }: { forumId: string }) {
   return (
     <Dialog>
       <DialogTrigger>Assign an admin.</DialogTrigger>
-      <DialogContent className="max-h-[90vh] min-h-[70vh]">
+      <DialogContent className="min-h-[70vh]">
         <DialogHeader>
           <DialogTitle>Assign an Admin</DialogTitle>
-          <div className="flex flex-col gap-4 min-h-full">
-            <div className="flex flex-col gap-3 max-h-48 overflow-y-auto">
+          <div className="flex flex-col gap-4 h-full">
+            <div className="flex flex-col gap-3 overflow-y-auto flex-grow max-h-52">
               <h4>Selected users</h4>
               {selectedUsers.map((v) => (
                 <div key={v.id} className="flex justify-between items-center">
