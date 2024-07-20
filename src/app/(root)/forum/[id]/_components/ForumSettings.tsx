@@ -1,5 +1,6 @@
 "use client";
 
+import { trpc } from "@/app/_trpc/client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,11 +18,10 @@ import {
 } from "@/components/ui/popover";
 import SignedIn from "@/components/utils/SignedIn";
 import { useEffectUpdate } from "@/lib/utils";
-import { deleteForum } from "@/server/db/actions/forum";
-import { Forum } from "@/server/db/schema/types";
+import { assignAdmin, deleteForum } from "@/server/db/actions/forum";
+import { Forum, User } from "@/server/db/schema/types";
 import { useUserStore } from "@/store/userStore";
-import { User } from "lucia";
-import { Settings } from "lucide-react";
+import { Loader2, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -65,7 +65,9 @@ export default function ForumSettings({ forum }: { forum: Forum }) {
                 Delete forum
               </LoadingButton>
             )}
-            {(forum.isOwner || forum.isAdmin) && <AssignAdminDialog />}
+            {(forum.isOwner || forum.isAdmin) && (
+              <AssignAdminDialog forumId={forum.id} />
+            )}
           </SignedIn>
         </div>
       </PopoverContent>
@@ -73,61 +75,64 @@ export default function ForumSettings({ forum }: { forum: Forum }) {
   );
 }
 
-const mockUsers: User[] = [
-  { id: "1", name: "John doe", email: "johndoe@gmail.com", username: "Johnny" },
-  { id: "2", name: "Jane Doe", email: "janedoe@gmail.com", username: "Jane" },
-  {
-    id: "3",
-    name: "Michael Doe",
-    email: "michaeldoe@gmail.com",
-    username: "Michael",
-  },
-  {
-    id: "4",
-    name: "Janeth doe",
-    email: "jennethdoe@gmail.com",
-    username: "Janeth",
-  },
-  { id: "5", name: "Alex Doe", email: "alexdoe@gmail.com", username: "Alex" },
-  { id: "6", name: "Tom Doe", email: "tomdoe@gmail.com", username: "Tom" },
-  {
-    id: "7",
-    name: "Sarah Doe",
-    email: "sarahdoe@gmail.com",
-    username: "Sarah",
-  },
-  {
-    id: "8",
-    name: "David Doe",
-    email: "daviddoe@gmail.com",
-    username: "David",
-  },
-  { id: "9", name: "Sam smith", email: "sam@gmail.com", username: "Sammy" },
-  { id: "10", name: "Lisa Doe", email: "lisa@gmail.com", username: "Lisa" },
-  { id: "11", name: "Rose Doe", email: "rose@gmail.com", username: "Rose" },
-  { id: "12", name: "Emily Doe", email: "emily@gmail.com", username: "Emily" },
-];
-
-function AssignAdminDialog() {
+function AssignAdminDialog({ forumId }: { forumId: string }) {
   const [search, setSearch] = useState("");
   const onSearch = useDebouncedCallback(
     (v: React.ChangeEvent<HTMLInputElement>) => {
       const value = v.target.value.trim();
       setSearch(value);
+      value &&
+        setTimeout(() => {
+          refetch();
+        }, 10);
     },
     300
   );
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+  const {
+    data: searchedUsers,
+    refetch,
+    isFetching,
+  } = trpc.searchUsername.useQuery(
+    { exceptionIds: selectedUsers.map((v) => v.id), username: search },
+    {
+      initialData: [],
+      enabled: false,
+    }
+  );
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const filteredUsers = useMemo(() => {
     if (!search) return [];
-    return mockUsers.filter(
+    return searchedUsers.filter(
       (u) =>
         !selectedUsers.find((v) => v.id == u.id) &&
-        u.username.toLowerCase().includes(search.toLowerCase())
+        u.username!.toLowerCase().includes(search.toLowerCase())
     );
-  }, [search, selectedUsers]);
+  }, [search, searchedUsers, selectedUsers]);
+
   function onSearchSelect(u: User) {
     setSelectedUsers((v) => [...v, u]);
+  }
+
+  async function onAssign() {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    const res = await assignAdmin(
+      forumId,
+      selectedUsers.map((v) => v.id)
+    );
+    setIsSubmitting(false);
+    if (res.error) {
+      console.error(res);
+      toast.error("An error occurred while assigning admins", {
+        description: res.message,
+      });
+      return;
+    }
+    setSelectedUsers([]);
+    toast.success("Admins successfully assigned.");
   }
   return (
     <Dialog>
@@ -163,8 +168,15 @@ function AssignAdminDialog() {
               search={search}
               filteredUsers={filteredUsers}
               onSearchSelect={onSearchSelect}
+              isFetching={isFetching}
             />
-            <Button>Assign as admins</Button>
+            <LoadingButton
+              isLoading={isSubmitting}
+              loadingText="Assigning..."
+              onClick={onAssign}
+            >
+              Assign as admins
+            </LoadingButton>
           </div>
         </DialogHeader>
       </DialogContent>
@@ -176,34 +188,41 @@ function SearchResults({
   search,
   filteredUsers,
   onSearchSelect,
+  isFetching,
 }: {
   search: string;
   filteredUsers: User[];
+  isFetching: boolean;
   onSearchSelect: (v: User) => void;
 }) {
-  const firstRef = useRef<HTMLButtonElement>(null);
-
   return (
-    <div className="flex flex-col p-4 flex-grow gap-3 max-h-[30vh] overflow-y-auto ">
-      {filteredUsers.map((user, index) => (
-        <Button
-          key={user.id}
-          variant="ghost"
-          className="border border-foreground-lighter"
-          onClick={() => onSearchSelect(user)}
-        >
-          <span className="text-left w-full text-foreground-light">
-            <span className="font-light text-primary"> #{user.username}</span> -{" "}
-            {user.name}
-          </span>
-        </Button>
-      ))}
-      {search && filteredUsers.length === 0 && (
+    <div className="flex flex-col p-4 flex-grow gap-3 max-h-[30vh] overflow-y-auto text-center">
+      {isFetching && (
+        <span className="inline-flex gap-2 justify-center items-center">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Searching...
+        </span>
+      )}
+      {!isFetching &&
+        filteredUsers.map((user, index) => (
+          <Button
+            key={user.id}
+            variant="ghost"
+            className="border border-foreground-lighter"
+            onClick={() => onSearchSelect(user)}
+          >
+            <span className="text-left w-full text-foreground-light">
+              <span className="font-light text-primary"> #{user.username}</span>{" "}
+              - {user.name}
+            </span>
+          </Button>
+        ))}
+      {!isFetching && search && filteredUsers.length === 0 && (
         <div className="text-center text-sm font-light text-foreground-lighter">
           No users found matching the search criteria.
         </div>
       )}
-      {!search && (
+      {!isFetching && !search && (
         <span className="text-foreground-light font-light">
           Type a username into the search bar.
         </span>

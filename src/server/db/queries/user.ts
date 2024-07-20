@@ -2,7 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { getCreatedForums } from "@/server/db/queries/forum";
 import { db } from "../index";
-import { eq } from "drizzle-orm";
+import { eq, notInArray, ilike, and, isNull } from "drizzle-orm";
 import { userTable } from "../schema";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { exposeUserType, Forum, User } from "../schema/types";
@@ -89,3 +89,36 @@ export async function handleUsernameCheck(name: string) {
 
   return res == null;
 }
+
+export const searchUserWithText = cache(
+  async (
+    search: string,
+    exceptionsId: string[]
+  ): Promise<ApiResponse<User[]>> => {
+    try {
+      const res = await db
+        .select({
+          id: userTable.id,
+          username: userTable.username,
+          name: userTable.name,
+          email: userTable.email,
+        })
+        .from(userTable)
+        .where(
+          exceptionsId.length > 0
+            ? and(
+                ilike(userTable.username, `%${search}%`),
+                notInArray(userTable.id, exceptionsId)
+              )
+            : ilike(userTable.username, `%${search}%`)
+        );
+      return ApiRes.success({ data: res });
+    } catch (e) {
+      const err = e as Error;
+      return ApiRes.error({
+        message: err.message,
+        code: ApiError.UnknownError,
+      });
+    }
+  }
+);

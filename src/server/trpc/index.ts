@@ -3,7 +3,7 @@ import { getForumById, handleForumCheck } from "../db/queries/forum";
 import { publicProcedure, router } from "./trpc";
 import { getPostByIdWithNoComment } from "../db/queries/post";
 import { Post } from "../db/schema/types";
-import { handleUsernameCheck } from "../db/queries/user";
+import { handleUsernameCheck, searchUserWithText } from "../db/queries/user";
 import { getCommentById, getCommentReplies } from "../db/queries/comment";
 import { getNotifications } from "../db/queries/notifications";
 import { getAuth } from "../auth";
@@ -60,6 +60,22 @@ export const appRouter = router({
     }
     return res.data;
   }),
+  searchUsername: publicProcedure
+    .input(
+      z.object({
+        username: z.string(),
+        exceptionIds: z.array(z.string()),
+      })
+    )
+    .query(async ({ input }) => {
+      const { user } = await getAuth();
+      if (!user) {
+        throw new Error("Please login");
+      }
+      const res = await searchUserWithText(input.username, input.exceptionIds);
+      if (res.error) throw new Error(res.message);
+      return res.data;
+    }),
 });
 
 export type AppRouter = typeof appRouter;

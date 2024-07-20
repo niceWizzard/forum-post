@@ -4,7 +4,7 @@ import { db } from "../index";
 import { forumAdminTable, forumMemberTable, forumTable } from "../schema/forum";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { userTable } from "../schema";
 
@@ -203,7 +203,7 @@ export async function deleteForum(
 
 export async function assignAdmin(
   forumId: string,
-  username: string
+  ids: string[]
 ): Promise<ApiResponse<boolean>> {
   try {
     const { user } = await getAuth();
@@ -225,11 +225,11 @@ export async function assignAdmin(
       });
     }
 
-    const userExists = await db.query.userTable.findFirst({
-      where: eq(userTable.username, username),
+    const userExists = await db.query.userTable.findMany({
+      where: inArray(userTable.id, ids),
     });
 
-    if (!userExists) {
+    if (userExists.length == 0) {
       return ApiRes.error({
         message: "User assigning to be admin not found.",
         code: ApiError.UserNotFound,
@@ -238,10 +238,12 @@ export async function assignAdmin(
 
     const res = await db
       .insert(forumAdminTable)
-      .values({
-        forumId,
-        adminId: userExists.id,
-      })
+      .values(
+        userExists.map((v) => ({
+          forumId,
+          adminId: v.id,
+        }))
+      )
       .onConflictDoNothing()
       .returning();
 
