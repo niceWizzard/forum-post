@@ -1,4 +1,5 @@
 import {
+  pgEnum,
   pgTable,
   primaryKey,
   timestamp,
@@ -37,6 +38,12 @@ export const forumMemberTable = pgTable(
   })
 );
 
+export const adminStatus = pgEnum("admin_status", [
+  "accepted",
+  "rejected",
+  "pending",
+]);
+
 export const forumAdminTable = pgTable(
   "forum_admin",
   {
@@ -50,6 +57,7 @@ export const forumAdminTable = pgTable(
       .references(() => forumTable.id, {
         onDelete: "cascade",
       }),
+    status: adminStatus("status").default("pending").notNull(),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.adminId, table.forumId] }),
