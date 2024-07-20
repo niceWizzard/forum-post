@@ -76,6 +76,22 @@ export default function ForumSettings({ forum }: { forum: Forum }) {
 }
 
 function AssignAdminDialog({ forumId }: { forumId: string }) {
+  return (
+    <Dialog>
+      <DialogTrigger>Assign an admin.</DialogTrigger>
+      <DialogContent className="min-h-[70vh]">
+        <DialogHeader>
+          <DialogTitle>Assign an Admin</DialogTitle>
+          <div className="flex flex-col gap-4 h-full">
+            <AssignAdminForm forumId={forumId} />
+          </div>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function AssignAdminForm({ forumId }: { forumId: string }) {
   const [search, setSearch] = useState("");
   const onSearch = useDebouncedCallback(
     (v: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,52 +151,44 @@ function AssignAdminDialog({ forumId }: { forumId: string }) {
     toast.success("Admins successfully assigned.");
   }
   return (
-    <Dialog>
-      <DialogTrigger>Assign an admin.</DialogTrigger>
-      <DialogContent className="min-h-[70vh]">
-        <DialogHeader>
-          <DialogTitle>Assign an Admin</DialogTitle>
-          <div className="flex flex-col gap-4 h-full">
-            <div className="flex flex-col gap-3 overflow-y-auto flex-grow max-h-52">
-              <h4>Selected users</h4>
-              {selectedUsers.map((v) => (
-                <div key={v.id} className="flex justify-between items-center">
-                  <span>{v.username}</span>
-                  <Button
-                    onClick={() =>
-                      setSelectedUsers(
-                        selectedUsers.filter((selected) => selected.id !== v.id)
-                      )
-                    }
-                  >
-                    Remove
-                  </Button>
-                </div>
-              ))}
-              {selectedUsers.length === 0 && (
-                <span className="font-light text-sm  text-foreground-light">
-                  No selected users.
-                </span>
-              )}
-            </div>
-            <Input placeholder="Search a username..." onChange={onSearch} />
-            <SearchResults
-              search={search}
-              filteredUsers={filteredUsers}
-              onSearchSelect={onSearchSelect}
-              isFetching={isFetching}
-            />
-            <LoadingButton
-              isLoading={isSubmitting}
-              loadingText="Assigning..."
-              onClick={onAssign}
+    <>
+      <div className="flex flex-col gap-3 overflow-y-auto flex-grow max-h-52">
+        <h4>Selected users</h4>
+        {selectedUsers.map((v) => (
+          <div key={v.id} className="flex justify-between items-center">
+            <span>{v.username}</span>
+            <Button
+              onClick={() =>
+                setSelectedUsers(
+                  selectedUsers.filter((selected) => selected.id !== v.id)
+                )
+              }
             >
-              Assign as admins
-            </LoadingButton>
+              Remove
+            </Button>
           </div>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
+        ))}
+        {selectedUsers.length === 0 && (
+          <span className="font-light text-sm  text-foreground-light">
+            No selected users.
+          </span>
+        )}
+      </div>
+      <Input placeholder="Search a username..." onChange={onSearch} />
+      <SearchResults
+        search={search}
+        filteredUsers={filteredUsers}
+        onSearchSelect={onSearchSelect}
+        isFetching={isFetching}
+      />
+      <LoadingButton
+        isLoading={isSubmitting}
+        loadingText="Assigning..."
+        onClick={onAssign}
+      >
+        Assign as admins
+      </LoadingButton>
+    </>
   );
 }
 
