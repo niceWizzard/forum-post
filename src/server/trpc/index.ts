@@ -7,7 +7,7 @@ import {
 import { publicProcedure, router } from "./trpc";
 import { getPostByIdWithNoComment } from "../db/queries/post";
 import { Post } from "../db/schema/types";
-import { handleUsernameCheck, searchUserWithText } from "../db/queries/user";
+import { handleUsernameCheck, searchUserToSetAdmin } from "../db/queries/user";
 import { getCommentById, getCommentReplies } from "../db/queries/comment";
 import { getNotifications } from "../db/queries/notifications";
 import { getAuth } from "../auth";
@@ -68,6 +68,7 @@ export const appRouter = router({
     .input(
       z.object({
         username: z.string(),
+        forumId: z.string(),
       })
     )
     .query(async ({ input }) => {
@@ -75,7 +76,7 @@ export const appRouter = router({
       if (!user) {
         throw new Error("Please login");
       }
-      const res = await searchUserWithText(input.username);
+      const res = await searchUserToSetAdmin(input.username, input.forumId);
       if (res.error) throw new Error(res.message);
       return res.data;
     }),

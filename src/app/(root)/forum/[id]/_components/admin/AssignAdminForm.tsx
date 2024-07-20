@@ -23,12 +23,13 @@ export function AssignAdminForm({ forumId }: { forumId: string }) {
     300
   );
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+
   const {
     data: searchedUsers,
     refetch,
     isFetching,
   } = trpc.searchUsername.useQuery(
-    { username: search },
+    { username: search, forumId },
     {
       initialData: [],
       enabled: false,

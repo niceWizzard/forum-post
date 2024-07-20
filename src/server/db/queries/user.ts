@@ -7,6 +7,7 @@ import { userTable } from "../schema";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { exposeUserType, Forum, User } from "../schema/types";
 import { ApiError } from "@/server/apiErrors";
+import { forumAdminTable, forumTable } from "../schema/forum";
 
 export const getUser = cache(
   async (userId: string): Promise<ApiResponse<User>> => {
@@ -90,9 +91,18 @@ export async function handleUsernameCheck(name: string) {
   return res == null;
 }
 
-export const searchUserWithText = cache(
-  async (search: string): Promise<ApiResponse<User[]>> => {
+export const searchUserToSetAdmin = cache(
+  async (search: string, forumId: string): Promise<ApiResponse<User[]>> => {
     try {
+      const forum = await db.query.forumTable.findFirst({
+        where: eq(forumTable.id, forumId),
+      });
+      if (!forum) {
+        return ApiRes.error({
+          message: "Forum not found",
+          code: ApiError.ForumNotFound,
+        });
+      }
       const res = await db
         .select({
           id: userTable.id,
@@ -101,7 +111,16 @@ export const searchUserWithText = cache(
           email: userTable.email,
         })
         .from(userTable)
-        .where(ilike(userTable.username, `%${search}%`));
+        .where(ilike(userTable.username, `%${search}%`))
+        .leftJoin(
+          forumAdminTable,
+          and(
+            eq(forumAdminTable.adminId, userTable.id),
+            eq(forumAdminTable.forumId, forumId)
+          )
+        )
+        .groupBy(userTable.id, forumAdminTable.adminId)
+        .having(isNull(forumAdminTable.adminId));
       return ApiRes.success({ data: res });
     } catch (e) {
       const err = e as Error;
