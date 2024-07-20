@@ -283,3 +283,9 @@ export const getForumAdmins = cache(
     }
   }
 );
+
+export const getRawForumById = cache(async (forumId: string) => {
+  return db.query.forumTable.findFirst({
+    where: eq(forumTable.id, forumId),
+  });
+});

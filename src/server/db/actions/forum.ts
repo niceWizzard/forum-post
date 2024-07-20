@@ -7,6 +7,7 @@ import { ApiError } from "@/server/apiErrors";
 import { and, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { userTable } from "../schema";
+import { getRawForumById } from "../queries/forum";
 
 export async function createForum({
   forumDesc,
@@ -214,9 +215,7 @@ export async function assignAdmin(
       });
     }
 
-    const forum = await db.query.forumTable.findFirst({
-      where: eq(forumTable.id, forumId),
-    });
+    const forum = await getRawForumById(forumId);
 
     if (forum?.ownerId !== user.id) {
       return ApiRes.error({
