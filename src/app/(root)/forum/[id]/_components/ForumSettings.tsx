@@ -6,6 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import SignedIn from "@/components/utils/SignedIn";
 import { deleteForum } from "@/server/db/actions/forum";
 import { Forum } from "@/server/db/schema/types";
 import { useUserStore } from "@/store/userStore";
@@ -42,15 +43,17 @@ export default function ForumSettings({ forum }: { forum: Forum }) {
       </PopoverTrigger>
       <PopoverContent>
         <div className="flex flex-col gap-2">
-          {user && forum.isOwner && (
-            <LoadingButton
-              isLoading={isDeletingForum}
-              loadingText="Deleting..."
-              onClick={onDeleteForum}
-            >
-              Delete forum
-            </LoadingButton>
-          )}
+          <SignedIn>
+            {forum.isOwner && (
+              <LoadingButton
+                isLoading={isDeletingForum}
+                loadingText="Deleting..."
+                onClick={onDeleteForum}
+              >
+                Delete forum
+              </LoadingButton>
+            )}
+          </SignedIn>
         </div>
       </PopoverContent>
     </Popover>
