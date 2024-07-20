@@ -94,7 +94,7 @@ function AssignAdminDialog({ forumId }: { forumId: string }) {
     refetch,
     isFetching,
   } = trpc.searchUsername.useQuery(
-    { exceptionIds: selectedUsers.map((v) => v.id), username: search },
+    { username: search },
     {
       initialData: [],
       enabled: false,

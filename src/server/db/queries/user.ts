@@ -91,10 +91,7 @@ export async function handleUsernameCheck(name: string) {
 }
 
 export const searchUserWithText = cache(
-  async (
-    search: string,
-    exceptionsId: string[]
-  ): Promise<ApiResponse<User[]>> => {
+  async (search: string): Promise<ApiResponse<User[]>> => {
     try {
       const res = await db
         .select({
@@ -104,14 +101,7 @@ export const searchUserWithText = cache(
           email: userTable.email,
         })
         .from(userTable)
-        .where(
-          exceptionsId.length > 0
-            ? and(
-                ilike(userTable.username, `%${search}%`),
-                notInArray(userTable.id, exceptionsId)
-              )
-            : ilike(userTable.username, `%${search}%`)
-        );
+        .where(ilike(userTable.username, `%${search}%`));
       return ApiRes.success({ data: res });
     } catch (e) {
       const err = e as Error;

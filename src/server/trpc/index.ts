@@ -68,7 +68,6 @@ export const appRouter = router({
     .input(
       z.object({
         username: z.string(),
-        exceptionIds: z.array(z.string()),
       })
     )
     .query(async ({ input }) => {
@@ -76,7 +75,7 @@ export const appRouter = router({
       if (!user) {
         throw new Error("Please login");
       }
-      const res = await searchUserWithText(input.username, input.exceptionIds);
+      const res = await searchUserWithText(input.username);
       if (res.error) throw new Error(res.message);
       return res.data;
     }),
