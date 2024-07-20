@@ -17,10 +17,12 @@ import { userTable } from "../schema";
 import {
   exposeUserType,
   Forum,
+  ForumAdmin,
   Post,
   RawForum,
   SortOrder,
   SortType,
+  User,
 } from "../schema/types";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { ApiError } from "@/server/apiErrors";
@@ -229,3 +231,55 @@ export async function handleForumCheck(name: string) {
 
   return res == null;
 }
+
+export const getForumAdmins = cache(
+  async ({
+    logginnedUserId,
+    forumId,
+  }: {
+    logginnedUserId: string;
+    forumId: string;
+  }): Promise<ApiResponse<ForumAdmin[]>> => {
+    try {
+      const forum = await db.query.forumTable.findFirst({
+        where: eq(forumTable.id, forumId),
+      });
+      if (!forum) {
+        return ApiRes.error({
+          message: "Forum not found",
+          code: ApiError.ForumNotFound,
+        });
+      }
+      if (logginnedUserId !== forum.ownerId) {
+        return ApiRes.error({
+          message: "Only the owner can see the admins.",
+          code: ApiError.Unathorized,
+        });
+      }
+      const admins = await db
+        .select({
+          user: { ...userTable },
+          status: forumAdminTable.status,
+        })
+        .from(forumAdminTable)
+        .where(eq(forumAdminTable.forumId, forumId))
+        .leftJoin(userTable, eq(forumAdminTable.adminId, userTable.id));
+
+      const a = admins
+        .filter((v) => v.user != null)
+        .map((v) => ({
+          ...(v.user ? exposeUserType(v.user) : {}),
+          status: v.status,
+        }));
+      return ApiRes.success({
+        data: a as unknown as ForumAdmin[],
+      });
+    } catch (e) {
+      const error = e as Error;
+      return ApiRes.error({
+        message: error.message,
+        code: ApiError.UnknownError,
+      });
+    }
+  }
+);
