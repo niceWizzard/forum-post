@@ -1,5 +1,5 @@
-import { InferSelectModel } from "drizzle-orm";
-import { forumTable } from "./forum";
+import { InferSelectModel, InferModelFromColumns } from "drizzle-orm";
+import { forumAdminTable, forumTable, adminStatus } from "./forum";
 import { postTable } from "./post";
 import { userTable } from ".";
 import { commentTable } from "./comment";
@@ -69,8 +69,11 @@ export type ReplyComment = StrictOmit<Comment, "replyCount"> & {
   replyToId: string;
 };
 
+export type ForumAdminRaw = InferSelectModel<typeof forumAdminTable>;
+
 export type PrivateUser = InferSelectModel<typeof userTable>;
 export type User = StrictOmit<PrivateUser, "github_id" | "google_id">;
+export type ForumAdmin = User & { status: ForumAdminRaw["status"] };
 
 export function exposeUserType(user: PrivateUser): User {
   const { github_id, ...output } = user;
