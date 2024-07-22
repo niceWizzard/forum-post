@@ -1,5 +1,10 @@
 import PostCreateForm from "./_components/postCreateForm";
 
+export const metadata = {
+  title: "Forum Post - Create Post",
+  description: "Create a new post in the forum",
+};
+
 interface Props {
   params: { forumId: string };
 }

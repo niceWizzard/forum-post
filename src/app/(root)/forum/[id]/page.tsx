@@ -10,10 +10,25 @@ import PostPreview from "./_components/PostPreview";
 import JoinButton from "./_components/JoinButton";
 import ForumSettings from "./_components/ForumSettings";
 import SortButton from "./_components/SortButton";
+import { Metadata, ResolvingMetadata } from "next";
 
 interface Props {
   params: { id: string };
   searchParams: { sort?: string; order?: string };
+}
+
+export async function generateMetadata({
+  params: { id },
+}: Props): Promise<Metadata> {
+  const res = await getForumById(id);
+  if (res.error) {
+    throw new Error(res.message);
+  }
+  const forum = res.data;
+  return {
+    title: `${forum.name} - Forum Post`,
+    description: forum.description,
+  };
 }
 
 export const dynamic = "force-dynamic";

@@ -1,6 +1,11 @@
 import ForumCreateForm from "./_components/ForumCreateForm";
 import { authenticatedOnly } from "@/server/auth/validate";
 
+export const metadata = {
+  title: "Forum Post - Create Forum",
+  description: "Create a new discussion forum",
+};
+
 const ForumCreatePage = async () => {
   const { user } = await authenticatedOnly();
   return (
