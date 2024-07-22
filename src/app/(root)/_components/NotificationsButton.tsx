@@ -10,6 +10,8 @@ import { useEffect, useState } from "react";
 import { setNotifictionAsRead } from "@/server/db/actions/notification";
 import { toast } from "sonner";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
+import clsx from "clsx";
 
 export default function NotificationsButton({
   user,
@@ -56,10 +58,15 @@ export default function NotificationsButton({
         <div>
           {notifications.notifications.map((v) => (
             <Link key={v.id} href={v.linkTo ?? "#"}>
-              <div>
-                {String(!!v.readAt)}
-                {v.message}
-              </div>
+              <div
+                dangerouslySetInnerHTML={{ __html: v.message }}
+                className={cn(
+                  clsx({
+                    "bg-card": !v.readAt,
+                  }),
+                  "px-4 py-2"
+                )}
+              ></div>
             </Link>
           ))}
           {notifications.notifications.length === 0 && (
