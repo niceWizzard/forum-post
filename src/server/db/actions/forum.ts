@@ -8,6 +8,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { userTable } from "../schema";
 import { getForumAdminInvite, getRawForumById } from "../queries/forum";
+import { notificationTable } from "../schema/notification";
 
 export async function createForum({
   forumDesc,
@@ -245,6 +246,15 @@ export async function assignAdmin(
       )
       .onConflictDoNothing()
       .returning();
+    await db.insert(notificationTable).values(
+      userExists.map((v) => {
+        return {
+          message: `You have been invited to be an admin for ${forum.name}`,
+          userId: v.id,
+          linkTo: `/forum/admin/invite/${forumId}`,
+        };
+      })
+    );
 
     if (res.length == 0) {
       return ApiRes.error({
