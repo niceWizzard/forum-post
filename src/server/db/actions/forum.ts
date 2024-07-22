@@ -249,7 +249,7 @@ export async function assignAdmin(
     await db.insert(notificationTable).values(
       userExists.map((v) => {
         return {
-          message: `You have been invited to be an admin for ${forum.name}`,
+          message: `You have been invited to be an admin for <b>${forum.name}</b>`,
           userId: v.id,
           linkTo: `/forum/admin/invite/${forumId}`,
         };
