@@ -7,7 +7,7 @@ import { ApiError } from "@/server/apiErrors";
 import { and, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { userTable } from "../schema";
-import { getRawForumById } from "../queries/forum";
+import { getForumAdminInvite, getRawForumById } from "../queries/forum";
 
 export async function createForum({
   forumDesc,
@@ -310,6 +310,62 @@ export async function deleteAdmin(
     return ApiRes.success({
       data: true,
     });
+  } catch (e) {
+    const err = e as Error;
+    return ApiRes.error({
+      message: err.message,
+      code: ApiError.UnknownError,
+    });
+  }
+}
+
+export async function resolveAdminInvite({
+  forumId,
+  accept,
+}: {
+  forumId: string;
+  accept: boolean;
+}): Promise<ApiResponse<boolean>> {
+  const { user } = await getAuth();
+  if (!user) {
+    return ApiRes.error({
+      message: "Please login",
+      code: ApiError.AuthRequired,
+    });
+  }
+  try {
+    const forum = await getRawForumById(forumId);
+    if (!forum) {
+      return ApiRes.error({
+        message: "Forum not found",
+        code: ApiError.ForumNotFound,
+      });
+    }
+    const adminInvite = await getForumAdminInvite(forumId);
+    if (adminInvite.error) {
+      return adminInvite;
+    }
+
+    if (adminInvite.data.status !== "pending") {
+      return ApiRes.error({
+        message: "Admin invite already resolved",
+        code: ApiError.InvalidParameter,
+      });
+    }
+
+    await db
+      .update(forumAdminTable)
+      .set({
+        status: accept ? "accepted" : "rejected",
+      })
+      .where(
+        and(
+          eq(forumAdminTable.adminId, user.id),
+          eq(forumAdminTable.forumId, forumId)
+        )
+      );
+
+    return ApiRes.success({ data: true });
   } catch (e) {
     const err = e as Error;
     return ApiRes.error({
