@@ -1,5 +1,7 @@
 import { authenticatedOnly } from "@/server/auth/validate";
 import { getForumAdminInvite, getForumById } from "@/server/db/queries/forum";
+import { redirect } from "next/navigation";
+import AcceptButtons from "./_components/AcceptButtons";
 
 export default async function ForumAdminInvitePage({
   params: { id },
@@ -21,5 +23,20 @@ export default async function ForumAdminInvitePage({
   }
 
   const invite = adminRes.data;
-  return <pre>{JSON.stringify(invite, null, 2)}</pre>;
+  if (invite.status !== "pending") {
+    redirect(`/forum/${id}`);
+  }
+  return (
+    <section className="w-full h-full py-6">
+      <div className="container flex flex-col">
+        <h3 className="text-lg font-semibold">
+          You are invited to be an admin of {forumRes.data.name}
+        </h3>
+        <p className="text-sm font-light text-foreground-lighter">
+          To accept the invite, click the button below:
+        </p>
+        <AcceptButtons invite={invite} forumId={forumRes.data.id} />
+      </div>
+    </section>
+  );
 }
