@@ -256,14 +256,9 @@ export const getForumAdmins = cache(
           code: ApiError.Unathorized,
         });
       }
-      const admins = await db
-        .select({
-          user: { ...userTable },
-          status: forumAdminTable.status,
-        })
-        .from(forumAdminTable)
-        .where(eq(forumAdminTable.forumId, forumId))
-        .leftJoin(userTable, eq(forumAdminTable.adminId, userTable.id));
+      const admins = await fetchForumAdmin().where(
+        eq(forumAdminTable.forumId, forumId)
+      );
 
       const a = admins
         .filter((v) => v.user != null)
@@ -289,3 +284,13 @@ export const getRawForumById = cache(async (forumId: string) => {
     where: eq(forumTable.id, forumId),
   });
 });
+
+export function fetchForumAdmin() {
+  return db
+    .select({
+      user: { ...userTable },
+      status: forumAdminTable.status,
+    })
+    .from(forumAdminTable)
+    .leftJoin(userTable, eq(forumAdminTable.adminId, userTable.id));
+}
