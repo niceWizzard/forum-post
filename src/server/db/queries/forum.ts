@@ -294,3 +294,50 @@ export function fetchForumAdmin() {
     .from(forumAdminTable)
     .leftJoin(userTable, eq(forumAdminTable.adminId, userTable.id));
 }
+
+export const getForumAdminInvite = cache(
+  async (forumId: string): Promise<ApiResponse<ForumAdmin>> => {
+    const { user } = await getAuth();
+    if (!user) {
+      return ApiRes.error({
+        message: "User not authenticated",
+        code: ApiError.AuthRequired,
+      });
+    }
+
+    try {
+      const res = await fetchForumAdmin().where(
+        and(
+          eq(forumAdminTable.forumId, forumId),
+          eq(forumAdminTable.adminId, user.id)
+        )
+      );
+      if (res.length == 0) {
+        return ApiRes.error({
+          message: "You are not an admin of this forum",
+          code: ApiError.Unathorized,
+        });
+      }
+
+      const invite = res[0];
+      if (invite.user == null) {
+        return ApiRes.error({
+          message: "You are not an admin of this forum",
+          code: ApiError.Unathorized,
+        });
+      }
+      return ApiRes.success({
+        data: {
+          ...exposeUserType(invite.user),
+          status: invite.status,
+        },
+      });
+    } catch (e) {
+      const err = e as Error;
+      return ApiRes.error({
+        message: err.message,
+        code: ApiError.UnknownError,
+      });
+    }
+  }
+);
