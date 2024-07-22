@@ -73,7 +73,8 @@ export const createIsAdminSubQuery = (userId: string) =>
     .where(
       and(
         eq(forumAdminTable.forumId, forumTable.id),
-        eq(forumAdminTable.adminId, userId)
+        eq(forumAdminTable.adminId, userId),
+        eq(forumAdminTable.status, "accepted")
       )
     )
     .as("isAdmin");
