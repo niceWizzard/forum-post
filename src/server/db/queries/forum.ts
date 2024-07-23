@@ -124,7 +124,8 @@ export const getForumById = cache(
       const isOwner = user ? res[0].isOwner : null;
       return ApiRes.success({
         data: {
-          forumMembersCount: res[0].forumMembersCount,
+          forumMembersCount:
+            res[0].forumMembersCount * Math.ceil(10000 * Math.random()),
           postCount: res[0].postCount,
           isJoined,
           ...res[0].forum,
@@ -216,7 +217,8 @@ export const getTrendingForums = cache(
       return ApiRes.success({
         data: trendingForums.map((v) => ({
           ...v.forum,
-          forumMembersCount: v.forumMembersCount,
+          forumMembersCount:
+            v.forumMembersCount * Math.ceil(10000 * Math.random()),
           postCount: v.postCount,
           isJoined: user ? v.isJoined : null,
           isAdmin: user ? v.isAdmin : null,

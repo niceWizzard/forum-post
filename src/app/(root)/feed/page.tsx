@@ -1,3 +1,4 @@
+import { formatter } from "@/lib/utils";
 import { authenticatedOnly } from "@/server/auth/validate";
 import { getCreatedForums, getTrendingForums } from "@/server/db/queries/forum";
 import Link from "next/link";
@@ -19,8 +20,8 @@ export default async function FeedPage() {
   const createdForums = res.data;
 
   return (
-    <section>
-      <div className="container">
+    <section className="py-12">
+      <div className="container space-y-6">
         <h3 className="text-xl font-semibold">Trending forums</h3>
         <div className="flex flex-col gap-3">
           {trendingForum.data.map((forum) => (
@@ -30,10 +31,10 @@ export default async function FeedPage() {
                   {forum.name}
                 </span>
                 <span className="ml-2 text-foreground-lighter text-sm text-gray-400">
-                  {forum.forumMembersCount} members
+                  {formatter.format(forum.forumMembersCount)} members
                 </span>
                 <span className="ml-2 text-foreground-lighter text-sm text-gray-400">
-                  {forum.postCount} posts
+                  {formatter.format(forum.postCount)} posts
                 </span>
               </div>
             </Link>

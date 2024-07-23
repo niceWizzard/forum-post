@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { formatter } from "@/lib/utils";
 import { likePost, unlikePost } from "@/server/db/actions/post";
 import { type Post } from "@/server/db/schema/types";
 import clsx from "clsx";
@@ -74,7 +75,7 @@ function PostPreview({ post }: { post: Post }) {
               }}
             >
               <Heart fill={post.isLiked ? "currentColor" : ""} />{" "}
-              {post.likeCount}
+              {formatter.format(post.likeCount)}
             </Button>
             <span>{post.commentCount} comments</span>
           </div>

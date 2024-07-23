@@ -12,6 +12,7 @@ import ForumSettings from "./_components/ForumSettings";
 import SortButton from "./_components/SortButton";
 import { Metadata, ResolvingMetadata } from "next";
 import Page from "./loading";
+import { formatter } from "@/lib/utils";
 
 interface Props {
   params: { id: string };
@@ -105,7 +106,9 @@ function ForumHeader({ forum }: { forum: Forum }) {
       <div className="container gap-6 flex flex-col ">
         <div className="row-span-2 flex gap-4 items-center">
           <h3 className="text-xl font-semibold flex-grow">{forum.name}</h3>
-          <span className="">{forum.forumMembersCount} members</span>
+          <span className="">
+            {formatter.format(forum.forumMembersCount)} members
+          </span>
           <JoinButton forum={forum} />
           <ForumSettings forum={forum} />
         </div>

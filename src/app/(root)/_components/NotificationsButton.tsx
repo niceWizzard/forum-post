@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import clsx from "clsx";
+import { MailIcon } from "lucide-react";
 
 export default function NotificationsButton({
   user,
@@ -51,7 +52,7 @@ export default function NotificationsButton({
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger>
-        Notifications{" "}
+        <MailIcon />
         {notifications.unreadCount > 0 && `(${notifications.unreadCount})`}
       </PopoverTrigger>
       <PopoverContent>

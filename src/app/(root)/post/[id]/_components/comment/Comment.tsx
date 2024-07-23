@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import { trpc } from "@/app/_trpc/client";
 import { RSC_PREFETCH_SUFFIX } from "next/dist/lib/constants";
 import { Trocchi } from "next/font/google";
+import { formatter } from "@/lib/utils";
 
 export function Comment({
   comment: initialData,
@@ -116,7 +117,7 @@ export function Comment({
           onClick={onLikeButtonClick}
           className="flex items-center gap-2"
         >
-          {comment.likeCount}
+          {formatter.format(comment.likeCount)}
           {<Heart fill={comment.isLiked ? "currentColor" : ""} />}
         </Button>
 
