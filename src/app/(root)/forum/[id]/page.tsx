@@ -11,6 +11,7 @@ import JoinButton from "./_components/JoinButton";
 import ForumSettings from "./_components/ForumSettings";
 import SortButton from "./_components/SortButton";
 import { Metadata, ResolvingMetadata } from "next";
+import Page from "./loading";
 
 interface Props {
   params: { id: string };
