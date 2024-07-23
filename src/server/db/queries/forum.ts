@@ -218,9 +218,9 @@ export const getTrendingForums = cache(
           ...v.forum,
           forumMembersCount: v.forumMembersCount,
           postCount: v.postCount,
-          isJoined: null,
-          isAdmin: null,
-          isOwner: null,
+          isJoined: user ? v.isJoined : null,
+          isAdmin: user ? v.isAdmin : null,
+          isOwner: user ? v.isOwner : null,
         })),
       });
     } catch (e) {
