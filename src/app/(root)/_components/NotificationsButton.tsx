@@ -65,7 +65,7 @@ export default function NotificationsButton({
                   clsx({
                     "bg-card": !v.readAt,
                   }),
-                  "px-4 py-2"
+                  "px-4 py-2 hover:bg-card"
                 )}
               ></div>
             </Link>
