@@ -2,7 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { getCreatedForums } from "@/server/db/queries/forum";
 import { db } from "../index";
-import { eq, notInArray, ilike, and, isNull } from "drizzle-orm";
+import { eq, notInArray, ilike, and, isNull, ne } from "drizzle-orm";
 import { userTable } from "../schema";
 import { ApiRes, ApiResponse } from "@/server/apiResponse";
 import { exposeUserType, Forum, User } from "../schema/types";
@@ -92,7 +92,11 @@ export async function handleUsernameCheck(name: string) {
 }
 
 export const searchUserToSetAdmin = cache(
-  async (search: string, forumId: string): Promise<ApiResponse<User[]>> => {
+  async (
+    search: string,
+    forumId: string,
+    loginnedUserId: string
+  ): Promise<ApiResponse<User[]>> => {
     try {
       const forum = await db.query.forumTable.findFirst({
         where: eq(forumTable.id, forumId),
@@ -111,7 +115,12 @@ export const searchUserToSetAdmin = cache(
           email: userTable.email,
         })
         .from(userTable)
-        .where(ilike(userTable.username, `%${search}%`))
+        .where(
+          and(
+            ilike(userTable.username, `%${search}%`),
+            ne(userTable.id, loginnedUserId)
+          )
+        )
         .leftJoin(
           forumAdminTable,
           and(

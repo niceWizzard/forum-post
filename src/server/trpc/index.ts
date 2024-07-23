@@ -76,7 +76,11 @@ export const appRouter = router({
       if (!user) {
         throw new Error("Please login");
       }
-      const res = await searchUserToSetAdmin(input.username, input.forumId);
+      const res = await searchUserToSetAdmin(
+        input.username,
+        input.forumId,
+        user.id
+      );
       if (res.error) throw new Error(res.message);
       return res.data;
     }),
