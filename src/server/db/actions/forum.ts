@@ -207,6 +207,12 @@ export async function assignAdmin(
   forumId: string,
   ids: string[]
 ): Promise<ApiResponse<boolean>> {
+  if (ids.length == 0) {
+    return ApiRes.error({
+      message: "No users selected to assign as admins.",
+      code: ApiError.InvalidParameter,
+    });
+  }
   try {
     const { user } = await getAuth();
     if (!user) {
