@@ -10,6 +10,7 @@ type StrictOmit<T, K extends keyof T> = Omit<T, K>;
 export type RawForum = InferSelectModel<typeof forumTable>;
 export type Forum = StrictOmit<RawForum, "ownerId"> & {
   forumMembersCount: number;
+  postCount: number;
   isJoined: boolean | null;
   isOwner: boolean | null;
   isAdmin: boolean | null;

@@ -81,11 +81,17 @@ export const createIsAdminSubQuery = (userId: string) =>
 
 export function fetchForum(userId: string | null) {
   const id = userId ?? "11111111-1111-1111-1111-1ce992f5e2db";
+  const postCountSubQuery = db
+    .select({ count: count() })
+    .from(postTable)
+    .where(eq(postTable.forumId, forumTable.id))
+    .as("post_count_subquery");
   return db
     .select({
       forumMembersCount: sql<number>`${count(
         forumMemberTable.userId
       )} as forum_members_count`,
+      postCount: sql<number>`${postCountSubQuery}`,
       forum: { ...forumTable },
       isJoined: sql<boolean>`SUM( CASE
       WHEN ${forumMemberTable.userId} = ${id} THEN 1 ELSE 0 END) > 0 AS is_joined`,
@@ -119,6 +125,7 @@ export const getForumById = cache(
       return ApiRes.success({
         data: {
           forumMembersCount: res[0].forumMembersCount,
+          postCount: res[0].postCount,
           isJoined,
           ...res[0].forum,
           isAdmin,
@@ -210,6 +217,7 @@ export const getTrendingForums = cache(
         data: trendingForums.map((v) => ({
           ...v.forum,
           forumMembersCount: v.forumMembersCount,
+          postCount: v.postCount,
           isJoined: null,
           isAdmin: null,
           isOwner: null,
