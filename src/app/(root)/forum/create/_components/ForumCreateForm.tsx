@@ -8,7 +8,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { cn, useEffectUpdate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { createForum } from "@/server/db/actions/forum";
 import { zodResolver } from "@hookform/resolvers/zod";
 import clsx from "clsx";
@@ -23,6 +23,7 @@ import { forumCreateSchema } from "@/server/db/actions/schema";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { trpc } from "@/app/_trpc/client";
+import { useEffectUpdate } from "@/lib/utils.client";
 
 const formSchema = forumCreateSchema;
 

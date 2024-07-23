@@ -20,7 +20,6 @@ import { env } from "@/env/client.mjs";
 import { Divide, Heart } from "lucide-react";
 import { ApiResponse } from "@/server/apiResponse";
 import { Input } from "@/components/ui/input";
-import { useEffectUpdate } from "@/lib/utils";
 import { trpc } from "@/app/_trpc/client";
 import { RSC_PREFETCH_SUFFIX } from "next/dist/lib/constants";
 import { Trocchi } from "next/font/google";

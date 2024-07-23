@@ -19,12 +19,12 @@ import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
 import { ApiResponse } from "@/server/apiResponse";
 import { env } from "@/env/client.mjs";
-import { useEffectUpdate } from "@/lib/utils";
 import { LoadingButton } from "@/components/ui/loadingButton";
 import { toast } from "sonner";
 import { trpc } from "@/app/_trpc/client";
 import clsx from "clsx";
 import { LoaderCircle } from "lucide-react";
+import { useEffectUpdate } from "@/lib/utils.client";
 
 const formSchema = z.object({
   username: z
