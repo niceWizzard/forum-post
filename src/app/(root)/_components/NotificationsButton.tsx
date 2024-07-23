@@ -51,7 +51,7 @@ export default function NotificationsButton({
   if (isLoading || !user || notifications == null) return null;
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger>
+      <PopoverTrigger className="flex gap-2">
         <MailIcon />
         {notifications.unreadCount > 0 && `(${notifications.unreadCount})`}
       </PopoverTrigger>
