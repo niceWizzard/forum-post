@@ -53,7 +53,7 @@ export function AssignAdminForm({ forumId }: { forumId: string }) {
   }
 
   async function onAssign() {
-    if (isSubmitting) return;
+    if (isSubmitting || selectedUsers.length === 0) return;
     setIsSubmitting(true);
     const res = await assignAdmin(
       forumId,
