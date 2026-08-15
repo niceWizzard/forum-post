@@ -3,7 +3,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { LoadingButton } from "@/components/ui/loadingButton";
@@ -17,11 +16,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Send } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const commentFormSchema = z.object({
   comment: z
     .string()
-    .min(1, "Comment is required.")
+    .min(1, "Comment cannot be empty.")
     .max(512, "Comment must not exceed 512 characters"),
 });
 
@@ -51,31 +53,41 @@ export function CommentForm({ post }: { post: Post }) {
       commentBody: values.comment,
     });
     if (res.error) {
-      console.error(res.message);
-      toast.error("An error has occurred", {
+      toast.error("Could not post comment", {
         description: res.message,
       });
+      setHasSubmitted(false);
       return;
     }
     setHasSubmitted(false);
     form.reset();
+    toast.success("Comment added");
+    router.refresh();
+  }
+
+  if (!user) {
+    return (
+      <div className="rounded-lg border border-border/80 bg-muted/30 p-4 text-center text-xs text-muted-foreground">
+        <span>Please </span>
+        <Link href="/login" className="font-semibold text-foreground underline underline-offset-4">
+          log in
+        </Link>
+        <span> to participate in the conversation.</span>
+      </div>
+    );
   }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="py-4 flex flex-col gap-3"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
         <FormField
           name="comment"
           render={({ field }) => (
-            <FormItem className="flex-grow flex flex-col">
-              <FormLabel>Create a comment</FormLabel>
+            <FormItem>
               <FormControl>
                 <Textarea
-                  placeholder="Comment something...."
-                  className="resize-none flex-grow"
+                  placeholder="What are your thoughts?"
+                  className="min-h-[80px] resize-y text-xs"
                   {...field}
                 />
               </FormControl>
@@ -83,15 +95,18 @@ export function CommentForm({ post }: { post: Post }) {
             </FormItem>
           )}
         />
-        <LoadingButton
-          type="submit"
-          className="md:self-end"
-          isLoading={hasSubmitted}
-          loadingText="Creating..."
-          disabledOnLoading
-        >
-          Create
-        </LoadingButton>
+        <div className="flex justify-end">
+          <LoadingButton
+            type="submit"
+            size="sm"
+            isLoading={hasSubmitted}
+            loadingText="Posting..."
+            className="gap-1.5"
+          >
+            <Send className="h-3 w-3" />
+            <span>Post Comment</span>
+          </LoadingButton>
+        </div>
       </form>
     </Form>
   );

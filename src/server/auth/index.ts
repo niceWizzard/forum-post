@@ -6,6 +6,7 @@ import { cache } from "react";
 import type { Session, User } from "lucia";
 import { cookies } from "next/headers";
 
+// @ts-expect-error Drizzle PostgreSQL adapter type mismatch
 const adapter = new DrizzlePostgreSQLAdapter(db, sessionTable, userTable);
 
 export const lucia = new Lucia(adapter, {

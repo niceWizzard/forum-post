@@ -1,17 +1,20 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
+  SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import { logout } from "@/server/auth/action";
 import { useUserStore } from "@/store/userStore";
-import { Loader2 } from "lucide-react";
+import { Loader2, LogOut, PlusCircle, Settings, User as UserIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { Avatar } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 const SideSheet = ({
   setIsOpen,
@@ -30,41 +33,81 @@ const SideSheet = ({
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen} modal>
-      <SheetTitle className="sr-only">Side navigation</SheetTitle>
-      <SheetDescription className="sr-only">
-        Profile navigation
-      </SheetDescription>
-      <SheetTrigger className="hidden aria-hidden"></SheetTrigger>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetContent
+        side="right"
+        className="w-80 sm:w-96 flex flex-col p-6 border-l border-border bg-card"
         onClickCapture={(e) => {
           if (e.target instanceof HTMLAnchorElement) {
             setIsOpen(false);
           }
         }}
       >
-        <div className="flex flex-col gap-4 py-4  h-full">
-          <div className="profile-side-sheet border-b border-gray-400 pb-4">
-            <div className="w-12 h-12 bg-white rounded-full item-a"></div>
-            <h2 className="text-md md:text-xl font-bold item-b">{user.name}</h2>
-            <div className="text-sm md:text-md font-medium text-foreground-lighter item-c flex gap-2">
-              <span>@{user.username}</span>
-              <Link href={`/profile/${user.id}`}>View Profile</Link>
-            </div>
-          </div>
-          <LogoutButton
-            onLogout={() => {
-              clearUser();
-              setIsOpen(false);
-            }}
+        <SheetHeader className="text-left space-y-1">
+          <SheetTitle className="text-base font-semibold">Account</SheetTitle>
+          <SheetDescription className="text-xs text-muted-foreground">
+            Manage your account and navigation
+          </SheetDescription>
+        </SheetHeader>
+
+        <div className="flex items-center gap-3 py-4 my-2 rounded-lg border border-border bg-background p-3">
+          <Avatar
+            fallback={user.name || user.username || "U"}
+            className="h-11 w-11 text-sm font-semibold"
           />
-          <Button asChild variant="link">
-            <Link href="/forum/create">Create a forum</Link>
-          </Button>
-          <Button asChild variant="link">
-            <Link href="/settings">Settings</Link>
-          </Button>
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className="text-sm font-semibold truncate leading-snug">
+              {user.name || "Anonymous"}
+            </span>
+            <span className="text-xs text-muted-foreground truncate">
+              @{user.username || "nousername"}
+            </span>
+          </div>
         </div>
+
+        <nav className="flex flex-col gap-1 flex-1">
+          <Button
+            asChild
+            variant="ghost"
+            className="justify-start gap-2.5 h-10 px-3 font-normal"
+          >
+            <Link href={`/profile/${user.id}`}>
+              <UserIcon className="h-4 w-4 text-muted-foreground" />
+              <span>View Profile</span>
+            </Link>
+          </Button>
+
+          <Button
+            asChild
+            variant="ghost"
+            className="justify-start gap-2.5 h-10 px-3 font-normal"
+          >
+            <Link href="/forum/create">
+              <PlusCircle className="h-4 w-4 text-muted-foreground" />
+              <span>Create a Forum</span>
+            </Link>
+          </Button>
+
+          <Button
+            asChild
+            variant="ghost"
+            className="justify-start gap-2.5 h-10 px-3 font-normal"
+          >
+            <Link href="/settings">
+              <Settings className="h-4 w-4 text-muted-foreground" />
+              <span>Settings</span>
+            </Link>
+          </Button>
+        </nav>
+
+        <Separator className="my-3" />
+
+        <LogoutButton
+          onLogout={() => {
+            clearUser();
+            setIsOpen(false);
+          }}
+        />
       </SheetContent>
     </Sheet>
   );
@@ -75,6 +118,8 @@ function LogoutButton({ onLogout }: { onLogout: () => void }) {
   return (
     <Button
       variant="destructive"
+      size="sm"
+      className="w-full justify-center gap-2"
       disabled={isLoggingOut}
       onClick={async () => {
         if (isLoggingOut) return;
@@ -85,11 +130,14 @@ function LogoutButton({ onLogout }: { onLogout: () => void }) {
     >
       {isLoggingOut ? (
         <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Logging out
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span>Logging out...</span>
         </>
       ) : (
-        "Log out"
+        <>
+          <LogOut className="h-4 w-4" />
+          <span>Log out</span>
+        </>
       )}
     </Button>
   );

@@ -1,253 +1,135 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { MotionDiv, MotionH2, MotionP } from "./_components/motionComponents";
 import { unathenticatedOnly } from "@/server/auth/validate";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowRight, MessageSquare, ShieldCheck, Users, Zap } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Forum Post - Home",
-  description: "Your platform for discussion",
+  title: "ForumPost - A Modern Discussion Platform",
+  description: "Join topic-focused communities, discuss ideas, and share knowledge in a fast, modern forum.",
 };
 
 export default async function Home() {
   await unathenticatedOnly();
 
   return (
-    <section className="container px-6 py-4  mb-12">
-      <div className="flex flex-col justify-center items-center">
-        <HighlightSection />
-        <CountSection />
-        <CommunitySection />
-      </div>
-    </section>
-  );
-}
-
-function HighlightSection() {
-  return (
-    <section className="h-[90vh] w-full flex flex-col items-center justify-center gap-4 bg-gradient-to-tr from-gray-300/2">
-      <div className="text-center w-full">
-        <MotionH2
-          className="text-4xl font-semibold"
-          initial={{
-            opacity: 0,
-            translateY: "-75%",
-          }}
-          transition={{
-            type: "spring",
-            duration: 1.5,
-            stiffness: 150,
-          }}
-          animate={{
-            opacity: 1,
-            translateY: 0,
-          }}
-        >
-          Your{" "}
-          <span className="text-primary hover:scale-105 inline-block transition-transform">
-            forum
-          </span>
-          , your &nbsp;
-          <span className="text-primary hover:scale-105 inline-block transition-transform">
-            post
-          </span>
-        </MotionH2>
-        <MotionP
-          className="text-foreground-lighter  font-light mt-2 text-lg"
-          initial={{
-            opacity: 0,
-            translateY: "75%",
-          }}
-          transition={{
-            delay: 0.5,
-            type: "spring",
-            duration: 1.5,
-            stiffness: 150,
-          }}
-          animate={{
-            opacity: 1,
-            translateY: 0,
-          }}
-        >
-          Your platform for discussion
-        </MotionP>
-      </div>
-      <MotionDiv
-        className="mt-12"
-        initial={{
-          opacity: 0,
-          scale: 0.75,
-        }}
-        transition={{
-          delay: 0.75,
-          type: "spring",
-          duration: 1.5,
-          stiffness: 200,
-          damping: 10,
-        }}
-        animate={{
-          opacity: 1,
-          scale: 1,
-        }}
-      >
-        <Link
-          href="/login"
-          className="px-12 py-3 border rounded-md border-gray-400 hover:bg-primary hover:text-primary-foreground transition-all"
-        >
-          Continue now
-        </Link>
-      </MotionDiv>
-    </section>
-  );
-}
-
-function CountSection() {
-  return (
-    <section className="w-full min-h-[70vh]">
-      <MotionDiv
-        initial={{
-          opacity: 0,
-        }}
-        transition={{
-          delay: 0.25,
-          duration: 1.5,
-        }}
-        whileInView={{
-          opacity: 1,
-        }}
-        viewport={{
-          once: true,
-        }}
-        className="overflow-hidden max-w-6xl mx-auto bg-card text-card-foreground rounded-md p-6 md:grid gap-4 md:grid-cols-[1fr,5fr] flex flex-col"
-      >
-        <MotionDiv
-          initial={{
-            opacity: 0,
-            scale: 0.75,
-          }}
-          transition={{
-            duration: 1.5,
-            delay: 0.25,
-            type: "spring",
-          }}
-          whileInView={{
-            opacity: 1,
-            scale: 1,
-          }}
-          viewport={{
-            once: true,
-          }}
-          className="border-2 border-gray-400 p-4 rounded-md md:aspect-square flex justify-center items-center md:flex-col gap-2"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold break-words">12 M+</h2>
-          <span>active users</span>
-        </MotionDiv>
-        <div className="flex-grow flex flex-col overflow-hidden">
-          <MotionH2
-            initial={{
-              opacity: 0,
-              translateX: "10%",
-              skewX: "-30deg",
-            }}
-            whileInView={{
-              opacity: 1,
-              translateX: 0,
-              skewX: "0deg",
-            }}
-            transition={{
-              delay: 0.3,
-              duration: 1,
-            }}
-            viewport={{
-              once: true,
-            }}
-            className="text-2xl font-medium "
-          >
-            Discuss whatever you want
-          </MotionH2>
-          <MotionP
-            initial={{
-              opacity: 0,
-              translateX: "10%",
-            }}
-            whileInView={{
-              opacity: 1,
-              translateX: 0,
-            }}
-            transition={{
-              delay: 0.5,
-              duration: 1,
-            }}
-            viewport={{
-              once: true,
-            }}
-            className="font-light text-foreground-lighter mt-4"
-          >
-            Join a vibrant community where your thoughts and ideas take center
-            stage. Dive into endless discussions, share your passions, and
-            connect with like-minded individuals. Explore diverse topics, spark
-            engaging debates, and find your voice in a space that celebrates
-            free expression. Start your conversation today on Forum-Poster!
-          </MotionP>
+    <div className="flex flex-col items-center">
+      {/* Hero Section */}
+      <section className="w-full border-b border-border bg-gradient-to-b from-background to-muted/20 py-20 md:py-32">
+        <div className="container max-w-5xl px-4 sm:px-8 text-center flex flex-col items-center">
+          <div className="inline-flex items-center rounded-full border border-border bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground mb-6">
+            Open Community Discussions
+          </div>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-foreground max-w-3xl">
+            Where thoughtful minds connect and discuss.
+          </h1>
+          <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl font-normal leading-relaxed">
+            Create communities, start engaging discussions, and share insights with people who share your interests.
+          </p>
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <Button asChild size="lg" className="h-11 px-8 gap-2 font-medium">
+              <Link href="/register">
+                Get Started <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="h-11 px-8 font-medium">
+              <Link href="/login">Sign In</Link>
+            </Button>
+          </div>
         </div>
-      </MotionDiv>
-    </section>
-  );
-}
+      </section>
 
-function CommunitySection() {
-  return (
-    <section className="w-full min-h-[50vh] overflow-hidden">
-      <div className="container">
-        <MotionH2
-          initial={{
-            opacity: 0,
-            translateY: "40%",
-          }}
-          whileInView={{
-            opacity: 1,
-            translateY: 0,
-          }}
-          transition={{
-            delay: 0.5,
-            duration: 1,
-          }}
-          viewport={{
-            once: true,
-          }}
-          className="text-4xl font-semibold border-b border-primary pb-4"
-        >
-          Join a thriving community
-        </MotionH2>
-        <MotionP
-          initial={{
-            opacity: 0,
-            translateY: "40%",
-          }}
-          whileInView={{
-            opacity: 1,
-            translateY: 0,
-          }}
-          transition={{
-            delay: 0.5,
-            duration: 1,
-          }}
-          viewport={{
-            once: true,
-          }}
-          className="font-light text-foreground-light mt-4 text-2xl text-justify"
-        >
-          Join a thriving community where your thoughts and ideas take center
-          stage. Dive into endless discussions, share your passions, and connect
-          with like-minded individuals. Explore diverse topics, spark engaging
-          debates, and find your voice in a space that celebrates free
-          expression.
-          <br />
-          <Link className="underlined mt-4 inline-block" href="/login">
-            Start
-          </Link>{" "}
-          your conversation today on Forum-Poster!
-        </MotionP>
-      </div>
-    </section>
+      {/* Metrics Section */}
+      <section className="w-full border-b border-border py-12 bg-card/40">
+        <div className="container max-w-5xl px-4 sm:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+            <div className="flex flex-col items-center">
+              <span className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">100%</span>
+              <span className="text-sm text-muted-foreground mt-1 font-medium">Open Access</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">Real-time</span>
+              <span className="text-sm text-muted-foreground mt-1 font-medium">Discussions & Comments</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">Topic-First</span>
+              <span className="text-sm text-muted-foreground mt-1 font-medium">Focused Communities</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="w-full py-20 bg-background">
+        <div className="container max-w-5xl px-4 sm:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              Designed for organized conversations
+            </h2>
+            <p className="text-muted-foreground mt-3 text-sm sm:text-base">
+              Everything you need to build vibrant communities and engage in focused discussions.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="border-border/80 shadow-none hover:border-border transition-colors">
+              <CardHeader className="pb-3">
+                <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center mb-2 text-foreground">
+                  <Users className="h-5 w-5" />
+                </div>
+                <CardTitle className="text-lg">Custom Communities</CardTitle>
+                <CardDescription className="text-xs">
+                  Create tailored forums with specific guidelines, descriptions, and privacy configurations.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">
+                Easily administer members, assign co-admins via invites, and foster high-quality discussions.
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/80 shadow-none hover:border-border transition-colors">
+              <CardHeader className="pb-3">
+                <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center mb-2 text-foreground">
+                  <MessageSquare className="h-5 w-5" />
+                </div>
+                <CardTitle className="text-lg">Rich Thread Discussions</CardTitle>
+                <CardDescription className="text-xs">
+                  Publish detailed posts, sort threads by newest or most liked, and participate in comment chains.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">
+                Clean formatting and readable typography ensure ideas remain central to the experience.
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/80 shadow-none hover:border-border transition-colors">
+              <CardHeader className="pb-3">
+                <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center mb-2 text-foreground">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <CardTitle className="text-lg">Community Moderation</CardTitle>
+                <CardDescription className="text-xs">
+                  Delegated administrative tools allow multiple moderators to manage invitations and forum settings.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">
+                Keep discussions safe, constructive, and on-topic with transparent community controls.
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="mt-16 text-center border rounded-xl p-8 bg-card/50 flex flex-col items-center">
+            <h3 className="text-xl font-bold tracking-tight">Ready to join the conversation?</h3>
+            <p className="text-sm text-muted-foreground mt-2 max-w-lg">
+              Sign in with your Google or GitHub account to start creating forums and participating immediately.
+            </p>
+            <Button asChild className="mt-6" size="default">
+              <Link href="/register">Create an Account</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }

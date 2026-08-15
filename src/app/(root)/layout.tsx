@@ -9,9 +9,9 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex flex-col h-screen dark">
+    <div className="flex flex-col min-h-screen bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground">
       <Header />
-      <main className="flex-grow">{children}</main>
+      <main className="flex-1">{children}</main>
       <Footer />
       <Toaster />
     </div>

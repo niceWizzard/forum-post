@@ -1,8 +1,8 @@
 "use client";
 
-import { type Comment, ReplyComment } from "@/server/db/schema/types";
+import { type Comment } from "@/server/db/schema/types";
 import { Button } from "@/components/ui/button";
-import { formatDistance } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import {
   deleteComment,
@@ -14,16 +14,11 @@ import { useDebouncedCallback } from "use-debounce";
 import { useUserStore } from "@/store/userStore";
 import { FormEvent, useRef, useState } from "react";
 import { LoadingButton } from "@/components/ui/loadingButton";
-
-import { env } from "@/env/client.mjs";
-
-import { Divide, Heart } from "lucide-react";
-import { ApiResponse } from "@/server/apiResponse";
+import { Heart, MessageSquare, Trash2, CornerDownRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { trpc } from "@/app/_trpc/client";
-import { RSC_PREFETCH_SUFFIX } from "next/dist/lib/constants";
-import { Trocchi } from "next/font/google";
 import { formatter } from "@/lib/utils";
+import { Avatar } from "@/components/ui/avatar";
 
 export function Comment({
   comment: initialData,
@@ -63,7 +58,7 @@ export function Comment({
     const res = await toggleLikeComment(comment.id);
     if (res.error) {
       utils.getComment.setData(comment.id, originalData);
-      toast.error("An error has occurred", {
+      toast.error("Could not update like", {
         description: res.message,
       });
       return;
@@ -72,85 +67,134 @@ export function Comment({
   }, 300);
 
   return (
-    <div className="space-y-2 py-2">
-      <div className="flex justify-between w-full">
-        {comment.commenter ? (
-          <Link
-            className="text-sm hover:underline"
-            href={`/user/${comment.commenter?.username}`}
-          >
-            @{comment.commenter.username}
-          </Link>
-        ) : (
-          <span className="text-sm">deleted</span>
-        )}
-        {user && user.id == comment.commenterId && (
+    <div className="space-y-2">
+      {/* Comment Header */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Avatar
+            fallback={comment.commenter?.username || "U"}
+            className="h-6 w-6 text-[10px] font-semibold"
+          />
+          {comment.commenter ? (
+            <Link
+              className="text-xs font-semibold text-foreground hover:underline"
+              href={`/user/${comment.commenter?.username}`}
+            >
+              @{comment.commenter.username}
+            </Link>
+          ) : (
+            <span className="text-xs text-muted-foreground">deleted user</span>
+          )}
+          <span className="text-xs text-muted-foreground">&middot;</span>
+          <span className="text-xs text-muted-foreground">
+            {formatDistanceToNow(new Date(comment.createdAt), {
+              addSuffix: true,
+            })}
+          </span>
+        </div>
+
+        {user && user.id === comment.commenterId && (
           <LoadingButton
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 text-muted-foreground hover:text-destructive"
             isLoading={isDeleting}
-            loadingText="Deleting..."
+            loadingText=""
             onClick={async () => {
               setIsDeleting(true);
               const res = await deleteComment(comment.id);
               setIsDeleting(false);
               if (res.error) {
-                toast.error("An error has occurred", {
+                toast.error("Could not delete comment", {
                   description: res.message,
                 });
                 return;
               }
+              toast.success("Comment deleted");
               onDelete && onDelete();
             }}
           >
-            Delete
+            <Trash2 className="h-3 w-3" />
           </LoadingButton>
         )}
       </div>
-      <span className="text-xs font-light text-foreground-lighter block">
-        {formatDistance(new Date(comment.createdAt), new Date(), {
-          addSuffix: true,
-        })}
-      </span>
-      <p className="text-sm">{comment.body}</p>
-      <div className="flex gap-2">
+
+      {/* Body */}
+      <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed pl-8">
+        {comment.body}
+      </p>
+
+      {/* Comment Actions */}
+      <div className="flex items-center gap-2 pl-8 pt-1 text-xs">
         <Button
-          variant={"ghost"}
+          variant="ghost"
+          size="sm"
           onClick={onLikeButtonClick}
-          className="flex items-center gap-2"
+          className={`h-6 px-2 text-xs font-normal gap-1 ${
+            comment.isLiked
+              ? "text-rose-500 hover:text-rose-600 bg-rose-500/10"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
         >
-          {formatter.format(comment.likeCount)}
-          {<Heart fill={comment.isLiked ? "currentColor" : ""} />}
+          <Heart
+            className="h-3 w-3"
+            fill={comment.isLiked ? "currentColor" : "none"}
+          />
+          <span>{formatter.format(comment.likeCount)}</span>
         </Button>
 
         {comment.replyToId == null &&
           comment.replyCount > 0 &&
-          replies == undefined && (
+          replies === undefined && (
             <Button
               variant="ghost"
+              size="sm"
+              className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
               onClick={() => {
                 fetchReplies();
               }}
             >
-              {comment.replyCount} replies
+              <MessageSquare className="h-3 w-3" />
+              <span>{comment.replyCount} {comment.replyCount === 1 ? "reply" : "replies"}</span>
             </Button>
           )}
+
         {comment.replyToId == null && !showReplyForm && (
           <Button
             variant="ghost"
+            size="sm"
+            className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
             onClick={async () => {
               setShowReplyForm(true);
-              replies == null && (await fetchReplies());
+              if (replies == null) {
+                await fetchReplies();
+              }
             }}
           >
-            Reply
+            <CornerDownRight className="h-3 w-3" />
+            <span>Reply</span>
           </Button>
         )}
       </div>
+
+      {/* Reply Form */}
       {showReplyForm && (
-        <CommentReplyForm comment={comment} onReplyCreate={fetchReplies} />
+        <div className="pl-8 pt-2">
+          <CommentReplyForm
+            comment={comment}
+            onReplyCreate={() => {
+              fetchReplies();
+              setShowReplyForm(false);
+            }}
+            onCancel={() => setShowReplyForm(false)}
+          />
+        </div>
       )}
-      <div className="flex flex-col px-6 divide-y bg-card">
-        {replies &&
-          replies
+
+      {/* Nested Replies */}
+      {replies && replies.length > 0 && (
+        <div className="ml-8 mt-3 pl-3 border-l-2 border-border/80 space-y-3">
+          {replies
             .map((v) => ({ ...v, replyCount: 0 }))
             .map((reply) => (
               <Comment
@@ -160,7 +204,8 @@ export function Comment({
                 utils={utils}
               />
             ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -168,33 +213,55 @@ export function Comment({
 function CommentReplyForm({
   comment,
   onReplyCreate,
+  onCancel,
 }: {
   comment: Comment;
   onReplyCreate: () => void;
+  onCancel: () => void;
 }) {
   const replyText = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!replyText.current?.value) return;
+    if (!replyText.current?.value.trim()) return;
     setIsLoading(true);
-    const value = replyText.current.value;
+    const value = replyText.current.value.trim();
     replyText.current.value = "";
     const res = await replyToComment(comment.id, value);
     setIsLoading(false);
     if (res.error) {
-      console.error(res);
-      toast.error("An error has occurred", {
+      toast.error("Could not send reply", {
         description: res.message,
       });
       return;
     }
+    toast.success("Reply posted");
     onReplyCreate();
   }
+
   return (
-    <form className="flex gap-2 max-w-lg pl-6" onSubmit={onSubmit}>
-      <Input placeholder="Reply" ref={replyText} />
-      <LoadingButton isLoading={isLoading} variant="secondary">
+    <form className="flex items-center gap-2 max-w-md" onSubmit={onSubmit}>
+      <Input
+        placeholder="Write a reply..."
+        className="h-8 text-xs"
+        ref={replyText}
+        autoFocus
+      />
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="h-8 text-xs px-2"
+        onClick={onCancel}
+      >
+        Cancel
+      </Button>
+      <LoadingButton
+        size="sm"
+        className="h-8 text-xs px-3"
+        isLoading={isLoading}
+      >
         Reply
       </LoadingButton>
     </form>

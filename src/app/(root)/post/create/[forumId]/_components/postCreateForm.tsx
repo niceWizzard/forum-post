@@ -6,6 +6,7 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -19,6 +20,8 @@ import { LoadingButton } from "@/components/ui/loadingButton";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   forumId: string;
@@ -48,28 +51,32 @@ export default function PostCreateForm({ forumId }: Props) {
     });
     if (res.error) {
       setHasSubmitted(false);
-      toast("An error has occured", {
+      toast.error("Could not publish post", {
         description: res.message,
       });
     } else if (res.data) {
+      toast.success("Post published successfully");
       router.push(`/post/${res.data.postId}`);
     }
   }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="bg-card px-6 py-4 flex flex-col gap-4 min-h-[70vh]"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
         <FormField
           name="title"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="Your great idea...." {...field} />
+                <Input
+                  placeholder="What would you like to discuss?"
+                  {...field}
+                />
               </FormControl>
+              <FormDescription className="text-xs">
+                Be specific and clear with your discussion title.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -78,26 +85,32 @@ export default function PostCreateForm({ forumId }: Props) {
         <FormField
           name="content"
           render={({ field }) => (
-            <FormItem className="flex flex-col flex-grow">
+            <FormItem>
               <FormLabel>Content</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="This is...."
+                  placeholder="Write the details of your post here..."
+                  className="min-h-[180px] resize-y leading-relaxed"
                   {...field}
-                  className="flex-grow"
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <LoadingButton
-          type="submit"
-          isLoading={hasSubmitted}
-          loadingText="Creating..."
-        >
-          Create Post
-        </LoadingButton>
+
+        <div className="flex items-center justify-end gap-3 pt-2">
+          <Button asChild variant="ghost" size="sm">
+            <Link href={`/forum/${forumId}`}>Cancel</Link>
+          </Button>
+          <LoadingButton
+            type="submit"
+            isLoading={hasSubmitted}
+            loadingText="Publishing..."
+          >
+            Publish Post
+          </LoadingButton>
+        </div>
       </form>
     </Form>
   );

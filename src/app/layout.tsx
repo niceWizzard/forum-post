@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "@/app/globals.css";
 import MyProvider from "./_providers/MyProvider";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "Forum Post - the new way of posting",
+  title: "ForumPost - A Modern Discussion Platform",
   description:
-    "Forum post is a leading and unique website for posting whatever you can imagine! Join the conversation for more information!",
+    "ForumPost is a clean, modern platform for thoughtful discussions, communities, and conversations.",
 };
 
 export default async function RootLayout({
@@ -19,7 +16,9 @@ export default async function RootLayout({
   return (
     <MyProvider>
       <html lang="en" className="dark">
-        <body className={inter.className}>{children}</body>
+        <body className="font-sans antialiased bg-background text-foreground selection:bg-primary selection:text-primary-foreground min-h-screen">
+          {children}
+        </body>
       </html>
     </MyProvider>
   );

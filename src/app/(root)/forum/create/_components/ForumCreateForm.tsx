@@ -1,18 +1,18 @@
 "use client";
+
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import { createForum } from "@/server/db/actions/forum";
 import { zodResolver } from "@hookform/resolvers/zod";
-import clsx from "clsx";
-import { LoaderCircle } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useDebounce } from "use-debounce";
@@ -39,22 +39,19 @@ function ForumCreateForm({ userId }: { userId: string }) {
   });
 
   const [hasSubmitted, setHasSubmitted] = useState(false);
-
   const router = useRouter();
 
-  const usernameWatch = form.watch("name");
+  const nameWatch = form.watch("name");
+  const [nameChange] = useDebounce(nameWatch, 250);
+  const isValidName = !!nameChange.trim() && nameChange.trim().length > 2;
 
-  const [usernameChange] = useDebounce(usernameWatch, 200);
-  const isValidUsername =
-    !!usernameChange.trim() && usernameChange.trim().length > 2;
   const {
     status,
     data: forumNameAvailable,
-    isPaused,
     refetch,
   } = trpc.nameAvailability.useQuery(
     {
-      name: usernameChange,
+      name: nameChange,
       type: "forum",
     },
     {
@@ -63,13 +60,15 @@ function ForumCreateForm({ userId }: { userId: string }) {
   );
 
   useEffectUpdate(() => {
-    isValidUsername && refetch();
-  }, [usernameChange]);
+    if (isValidName) {
+      refetch();
+    }
+  }, [nameChange]);
 
   async function onSubmit(values: ForumSchema) {
     if (
-      status == "pending" ||
-      status == "error" ||
+      status === "pending" ||
+      status === "error" ||
       !forumNameAvailable ||
       hasSubmitted ||
       !(await form.trigger("name"))
@@ -83,58 +82,62 @@ function ForumCreateForm({ userId }: { userId: string }) {
       userId,
     });
     if (res.error) {
-      toast.error("An error has occurred", {
+      toast.error("Could not create forum", {
         description: res.message,
       });
+      setHasSubmitted(false);
     } else if (res.data) {
+      toast.success("Community created successfully");
       router.push(`/forum/${res.data.forumId}`);
     }
   }
 
   function ForumNameAvailability() {
-    if (!isValidUsername) {
+    if (!isValidName) {
       return null;
     }
-    if (status == "success") {
+    if (status === "success") {
       return (
         <p
-          className={cn(
-            clsx({
-              "text-green-400": forumNameAvailable,
-              "text-destructive": !forumNameAvailable,
-            })
-          )}
+          className={`text-xs mt-1 font-medium ${
+            forumNameAvailable ? "text-emerald-500" : "text-destructive"
+          }`}
         >
-          Forum is {forumNameAvailable ? "available" : "already taken."}
+          {forumNameAvailable
+            ? "Forum name is available"
+            : "Forum name is already taken"}
         </p>
       );
     }
-    if (status == "pending") {
+    if (status === "pending") {
       return (
-        <span className="flex items-center">
-          <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> Checking forum
-          name...
+        <span className="flex items-center text-xs text-muted-foreground mt-1">
+          <Loader2 className="mr-1.5 h-3 w-3 animate-spin" /> Checking availability...
         </span>
       );
     }
-
     return null;
   }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-4 min-h-[70vh]"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
         <FormField
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Forum name</FormLabel>
+              <FormLabel>Community Name</FormLabel>
               <FormControl>
-                <Input placeholder="Form name" {...field} />
+                <div className="relative flex items-center">
+                  <span className="absolute left-3 text-xs text-muted-foreground font-mono">
+                    f/
+                  </span>
+                  <Input placeholder="technology" className="pl-7" {...field} />
+                </div>
               </FormControl>
+              <FormDescription className="text-xs">
+                Names cannot contain spaces and must be unique.
+              </FormDescription>
               <ForumNameAvailability />
               <FormMessage />
             </FormItem>
@@ -144,27 +147,33 @@ function ForumCreateForm({ userId }: { userId: string }) {
         <FormField
           name="description"
           render={({ field }) => (
-            <FormItem className="flex-grow flex flex-col">
-              <FormLabel>Forum Description</FormLabel>
+            <FormItem>
+              <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Descibe what the forum is for..."
-                  className="resize-none flex-grow"
+                  placeholder="Describe the purpose and discussion topics of this community..."
+                  className="min-h-[120px] resize-y"
                   {...field}
                 />
               </FormControl>
+              <FormDescription className="text-xs">
+                A brief summary displayed on your community header and explore cards.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <LoadingButton
-          type="submit"
-          className="md:self-end"
-          isLoading={hasSubmitted}
-          loadingText="Creating..."
-        >
-          Create
-        </LoadingButton>
+
+        <div className="flex justify-end gap-3 pt-2">
+          <LoadingButton
+            type="submit"
+            isLoading={hasSubmitted}
+            loadingText="Creating..."
+            disabled={!forumNameAvailable && isValidName}
+          >
+            Create Community
+          </LoadingButton>
+        </div>
       </form>
     </Form>
   );
